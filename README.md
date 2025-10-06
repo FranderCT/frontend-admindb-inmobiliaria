@@ -15,7 +15,7 @@ La aplicación permite la **gestión de propiedades, contratos, clientes y pagos
 * [ShadCN/UI](https://ui.shadcn.com/) 
 * [Axios](https://axios-http.com/)
 * [Zod](https://zod.dev/) 
-* [React Hook Form / TanStack Form](https://tanstack.com/form/latest)
+* [TanStack Form](https://tanstack.com/form/latest)
 
   
 ---
