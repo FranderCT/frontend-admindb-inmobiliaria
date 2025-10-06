@@ -5,7 +5,7 @@ La aplicación permite la **gestión de propiedades, contratos, clientes y pagos
 
 ---
 
-## 🚀 Tecnologías principales
+## Tecnologías 
 
 - [React 18](https://react.dev/)
 - [TypeScript](https://www.typescriptlang.org/)
@@ -20,7 +20,7 @@ La aplicación permite la **gestión de propiedades, contratos, clientes y pagos
   
 ---
 
-## 🧠 Funcionalidades principales
+## Funcionalidades principales
 
 - 🔐 Inicio de sesión y control de roles
 
@@ -36,7 +36,7 @@ La aplicación permite la **gestión de propiedades, contratos, clientes y pagos
 
 ---
 
-## 👥 Integrantes del Grupo #2
+## 👥 Integrantes del proyecto
 
 - Frander Carrillo Torres
 - Karina Moreno Díaz
@@ -45,6 +45,7 @@ La aplicación permite la **gestión de propiedades, contratos, clientes y pagos
 - Axel Badilla Fernández
 
 
-## License
+---
+License: 
 
 Proyecto académico — Universidad Nacional, Curso de Proyectos Finales 2025.
