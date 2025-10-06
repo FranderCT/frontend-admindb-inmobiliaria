@@ -1,69 +1,50 @@
-# React + TypeScript + Vite
+# 🏡 Agencia Inmobiliaria Altos del Valle – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este proyecto corresponde al **módulo web del sistema inmobiliario**, desarrollado por el **Grupo #2 – Proyectos Finales 2025**.  
+La aplicación permite la **gestión de propiedades, contratos, clientes y pagos**, mostrando datos provenientes del backend y la base de datos SQL Server.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Tecnologías principales
 
-## Expanding the ESLint configuration
+- [React 18](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [TanStack Router](https://tanstack.com/router/latest)
+- [TanStack Query](https://tanstack.com/query/latest)
+- [ShadCN/UI](https://ui.shadcn.com/) 
+- [Axios](https://axios-http.com/)
+- [Zod](https://zod.dev/) 
+- [React Hook Form / TanStack Form](https://tanstack.com/form/latest)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+  
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🧠 Funcionalidades principales
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- 🔐 Inicio de sesión y control de roles
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- 🏠 Gestión de propiedades y disponibilidad
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- 👥 Administración de clientes
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- 📄 Creación y seguimiento de contratos
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- 💰 Registro de facturas y generación de reportes
+
+- 📊 Panel de control con estadísticas
+
+---
+
+## 👥 Integrantes del Grupo #2
+
+- Frander Carrillo Torres
+- Karina Moreno Díaz
+- Krystel Salazar Chavarría
+- Jimena Jiménez Gutiérrez
+- Axel Badilla Fernández
+
+
+## License
+
+Proyecto académico — Universidad Nacional, Curso de Proyectos Finales 2025.
