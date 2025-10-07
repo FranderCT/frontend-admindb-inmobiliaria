@@ -25,7 +25,7 @@ const CardCliente = ({ client }: ClientCardProps) => {
         <CardContent className="space-y-3">
             <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                    <IdCard/>
+                    <IdCard size={19} />
                     <span>Cédula</span>
                 </div>
                 <span className="font-medium">{client.id}</span>
@@ -33,7 +33,7 @@ const CardCliente = ({ client }: ClientCardProps) => {
 
             <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                    <Phone  />
+                    <Phone size={17} />
                     <span>Contacto</span>
                 </div>
                 <span className="font-medium">{client.phone}</span>
@@ -41,7 +41,7 @@ const CardCliente = ({ client }: ClientCardProps) => {
 
             <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                    <Home />
+                    <Home size={17} />
                     <span>Cant Propiedades</span>
                 </div>
                 <span className="font-medium">{cantProps}</span>
@@ -51,7 +51,7 @@ const CardCliente = ({ client }: ClientCardProps) => {
                 <div className="text-sm text-muted-foreground">Acciones</div>
                 <div className="flex gap-1">
                     <Button variant="ghost" aria-label="Editar">
-                        <Edit/>
+                        <Edit size={18} />
                     </Button>
                     <Button
                         variant="ghost"
