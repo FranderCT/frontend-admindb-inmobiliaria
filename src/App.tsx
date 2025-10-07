@@ -13,7 +13,7 @@ function App({ children }: { children: React.ReactNode }) {
         className={cn(
           "flex flex-col flex-1 p-3 space-y-2",
           "transition-[padding] duration-300 ease-in-out",
-          open ? "lg:pl-64" : "lg:pl-4"
+          open ? "lg:pl-70" : "lg:pl-10"
         )}
       >
         {children}
