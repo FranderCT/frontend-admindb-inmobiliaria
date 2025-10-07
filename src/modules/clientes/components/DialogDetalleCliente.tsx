@@ -19,8 +19,8 @@ const DialogDetalleCliente = ({from = 'bottom', trigger, client}: DialogClienteP
       <AlertDialogContent from={from}>
         <div className="absolute right-3 top-3">
           <AlertDialogCancel asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Cerrar">
-              <X className="h-4 w-4" />
+            <Button variant="ghost" size="icon">
+              <X />
             </Button>
           </AlertDialogCancel>
         </div>
