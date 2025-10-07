@@ -7,5 +7,5 @@ export const navigation = [
     { name: 'Contratos', href: '/contratos', icon: FileText },
     { name: 'Facturación', href: '/facturacion', icon: Receipt },
     { name: 'Propiedades', href: '/propiedades', icon: Building2 },
-    { name: 'Estadísticas', href: '/statistics', icon: BarChart3 },
+    { name: 'Estadísticas', href: '/statistics/', icon: BarChart3 },
 ]

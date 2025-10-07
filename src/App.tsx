@@ -1,33 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState } from "react"
+import { SidebarProvider } from "./components/animate-ui/components/radix/sidebar"
+import { AppSidebar } from "./modules/app/components/AppSidebar"
+import { cn } from "./lib/utils"
 
-function App() {
-  const [count, setCount] = useState(0)
+function App({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(true)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <SidebarProvider>
+      <AppSidebar isOpen={open} setIsOpen={setOpen} />
+      <main
+        className={cn(
+          "flex flex-col flex-1 p-3 space-y-2",
+          "transition-[padding] duration-300 ease-in-out",
+          open ? "lg:pl-64" : "lg:pl-4"
+        )}
+      >
+        {children}
+      </main>
+    </SidebarProvider>
   )
 }
 
