@@ -3,6 +3,7 @@ import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { AppSidebar } from '../modules/app/components/AppSidebar'
 
 
+
 export const Route = createRootRoute({
   component: RootComponent,
 })
