@@ -1,37 +1,20 @@
-import { Link, Outlet, createRootRoute } from '@tanstack/react-router'
+import { useState } from 'react'
+import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { AppSidebar } from '../modules/app/components/AppSidebar'
+
 
 export const Route = createRootRoute({
   component: RootComponent,
 })
 
 function RootComponent() {
+  const [open, setOpen] = useState(true)
   return (
-  <>
-    <div className="p-2 flex gap-2">
-      <Link to="/" className="[&.active]:font-bold">
-        Home
-      </Link>{' '}
-      <Link to="/agentes" className="[&.active]:font-bold">
-        agentes
-      </Link>{' '}
-      <Link to="/clientes" className="[&.active]:font-bold">
-        clientes
-      </Link>{' '}
-      <Link to="/contratos" className="[&.active]:font-bold">
-        contratos
-      </Link>{' '}
-      <Link to="/facturacion" className="[&.active]:font-bold">
-        facturacion
-      </Link>{' '}
-      <Link to="/propiedades" className="[&.active]:font-bold">
-        propiedades
-      </Link>{' '}
-      <Link to="/statistics" className="[&.active]:font-bold">
-        estadisticas
-      </Link>{' '}
-    </div>
-    <hr />
-    <Outlet />
-  </>
+    <>
+      <AppSidebar isOpen={open} setIsOpen={setOpen} />
+      <div className="lg:pl-64 p-4">
+        <Outlet />
+      </div>
+    </>
   )
 }
