@@ -1,24 +1,22 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Edit, Trash2, IdCard, Phone, Home } from 'lucide-react'
+import { Edit, Trash2, IdCard, Phone } from 'lucide-react'
 import type { ClientCardProps } from '../types/clientTypes'
 import DialogDetalleCliente from './DialogDetalleCliente'
 
 const CardCliente = ({ client }: ClientCardProps) => {
-  const fullName = `${client.name} ${client.lastname1} ${client.lastname2}`.trim()
-  const cantProps = 0;
 
   const renderEstado = (status: boolean) =>
     status ? <Badge>Activo</Badge> : <Badge variant="outline">Inactivo</Badge>
 
-    const CardTrigger = <Card key={client.id} className="hover:shadow-md transition-shadow hover:cursor-pointer">
+    const CardTrigger = <Card key={client.identificacion} className="hover:shadow-md transition-shadow hover:cursor-pointer">
         <CardHeader className="pb-2">
             <div className="flex items-start justify-between">
                 <div>
-                    <CardTitle className="text-base font-semibold">{fullName}</CardTitle>
+                    <CardTitle className="text-base font-semibold">{client.nombreCompleto}</CardTitle>
                 </div>
-                {renderEstado(client.status)}
+                {renderEstado(client.estado)}
             </div>
         </CardHeader>
 
@@ -28,7 +26,7 @@ const CardCliente = ({ client }: ClientCardProps) => {
                     <IdCard size={19} />
                     <span>Identificación: </span>
                 </div>
-                <span className="font-medium">{client.id}</span>
+                <span className="font-medium">{client.identificacion}</span>
             </div>
 
             <div className="flex items-center justify-between text-sm">
@@ -36,15 +34,7 @@ const CardCliente = ({ client }: ClientCardProps) => {
                     <Phone size={17} />
                     <span>Contacto: </span>
                 </div>
-                <span className="font-medium">{client.phone}</span>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                    <Home size={17} />
-                    <span>Cant Propiedades: </span>
-                </div>
-                <span className="font-medium">{cantProps}</span>
+                <span className="font-medium">{client.telefono}</span>
             </div>
 
             <div className="flex items-center justify-between pt-3 mt-1 border-t">

@@ -1,8 +1,14 @@
 export interface Client {
-  id: number;
-  name: string;
-  lastname1: string;
-  lastname2: string;
-  phone: string;
-  status: boolean; 
+  identificacion: number;
+  nombreCompleto: string;
+  telefono: string;
+  estado: boolean; 
+}
+
+export interface CreateClient {
+  identificacion: number;
+  nombre: string;
+  apellido1: string;
+  apellido2?: string;
+  telefono: string;
 }

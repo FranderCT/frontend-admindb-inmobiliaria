@@ -33,9 +33,9 @@ const DialogDetalleCliente = ({from = 'bottom', trigger, client}: DialogClienteP
 
         <div className="space-y-4 text-sm">
           <section className="space-y-1">
-            <h3 className="font-semibold">{client.name} {client.lastname1} {client.lastname2}</h3>
-            <p className="text-muted-foreground">{client.id}</p>
-            <p className="text-muted-foreground">{client.phone}</p>
+            <h3 className="font-semibold">{client.nombreCompleto}</h3>
+            <p className="text-muted-foreground">{client.identificacion}</p>
+            <p className="text-muted-foreground">{client.telefono}</p>
           </section>
 
           <section className="space-y-2">
