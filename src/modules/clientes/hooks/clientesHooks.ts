@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createCliente, deleteCliente, getCliente, getClientes, getClientesPaginate, updateCliente } from "../services/clientesServices";
 import {  CreateClient, UpdateClient } from "../models/client";
-import { ClientesPaginateParams, ClientesPaginateResponse } from "../types/clientTypes";
 
 // post
 
@@ -79,31 +78,23 @@ export function useGetHistorialCliente(
     };
 }
 
-export function useGetClientesPaginate(params: ClientesPaginateParams) {
-  const qc = useQueryClient();
+export function useGetClientesPaginate(params: {
+    page?: number; limit?: number; sortCol?: string;
+    sortDir?: "ASC" | "DESC"; q?: string; estado?: 0 | 1 | undefined;
+}) {
+    const normalized = {
+        ...params,
+        estado: typeof params.estado === "string"
+            ? (Number(params.estado) as 0 | 1)
+            : params.estado,
+    };
 
-  const query = useQuery<ClientesPaginateResponse>({
-    queryKey: ["clientes", "paginate", params],
-    queryFn: () => getClientesPaginate(params),
-    staleTime: 60_000,
-  });
-
-  const prefetchNext = () => {
-    const nextPage = (query.data?.meta.page ?? 1) + 1;
-    const pageCount = query.data?.meta.pageCount ?? 1;
-    if (nextPage <= pageCount) {
-      const nextParams = { ...params, page: nextPage };
-      qc.prefetchQuery({
-        queryKey: ["clientes", "paginate", nextParams],
-        queryFn: () => getClientesPaginate(nextParams),
+    return useQuery({
+        queryKey: ["clientes", "paginate", normalized],
+        queryFn: () => getClientesPaginate(normalized),
         staleTime: 60_000,
-      });
-    }
-  };
-
-  return { ...query, prefetchNext };
+    });
 }
-
 
 export const useDeleteCliente = () => {
     const queryClient = useQueryClient();

@@ -67,6 +67,7 @@ const ClientesFiltros = () => {
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Estados</SelectLabel>
+                  <SelectItem value={undefined}>Todos</SelectItem>
                   <SelectItem value="1">Activo</SelectItem>
                   <SelectItem value="0">Inactivo</SelectItem>
                 </SelectGroup>

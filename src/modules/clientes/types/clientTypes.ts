@@ -52,7 +52,7 @@ export type ClientesPaginateParams = {
   sortCol?: string
   sortDir?: 'ASC' | 'DESC'
   q?: string
-  estado?: '0' | '1'
+  estado?: 0 | 1
 }
 
 export type ClientesPaginateResponse = {

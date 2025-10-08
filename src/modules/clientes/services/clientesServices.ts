@@ -1,6 +1,6 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
 import { Client, CreateClient, UpdateClient } from "../models/client";
-import { ClientesPaginateParams, ClientesPaginateResponse } from "../types/clientTypes";
+import { ClientesPaginateParams } from "../types/clientTypes";
 
 // post
 
@@ -23,28 +23,22 @@ export const getCliente = async (identificacion: string): Promise<Client | null>
     return response.data;
 };
 
-export const getClientesPaginate = async (
-  params: ClientesPaginateParams = {}
-): Promise<ClientesPaginateResponse> => {
-  const {
-    page = 1,
-    limit = 10,
-    sortCol = "identificacion",
-    sortDir = "ASC",
-    q = "",
-    estado,
-  } = params;
 
-  const response = await altosDelValleAPI.get<ClientesPaginateResponse>(
-    "cliente/paginate",
-    {
-      params: { page, limit, sortCol, sortDir, q, estado },
-    }
-  );
-
-  return response.data;
+export const getClientesPaginate = async (params: ClientesPaginateParams) => {
+  const { data } = await altosDelValleAPI.get("/cliente/paginate", {
+    params: {
+      page: params.page ?? 1,
+      limit: params.limit ?? 10,                 // ← 10 como en tu curl
+      sortCol: params.sortCol ?? "identificacion",
+      sortDir: params.sortDir ?? "ASC",
+      // solo envía q si existe
+      ...(params.q ? { q: params.q } : {}),
+      // estado solo si es number (0|1)
+      ...(typeof params.estado === "number" ? { estado: params.estado } : {}),
+    },
+  });
+  return data;
 };
-
 export const deleteCliente = async (identificacion: string): Promise<{ ok: boolean }> => {
     const response = await altosDelValleAPI.delete<{ ok: boolean }>(`cliente/${identificacion}`);
     return response.data;

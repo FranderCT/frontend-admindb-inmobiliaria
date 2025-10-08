@@ -43,17 +43,6 @@ const FormAgregarCliente = () => {
     },
   });
 
-  const isDirty = form.store.state.isDirty;
-  const values = form.store.state.values;
-  const hasAnyValue = !!(
-    values?.identificacion ||
-    values?.nombre ||
-    values?.apellido1 ||
-    values?.apellido2 ||
-    values?.telefono
-  );
-
-  const submitDisabled = crear.isPending || !isDirty || !hasAnyValue;
 
   return (
     <>
@@ -71,7 +60,7 @@ const FormAgregarCliente = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              if (!submitDisabled) form.handleSubmit(); // doble seguro
+              form.handleSubmit();
             }}
             className="mt-2"
           >
@@ -84,13 +73,19 @@ const FormAgregarCliente = () => {
                     </Label>
                     <Input
                       id="identificacion"
-                      type="text"
+                      type="number"
                       inputMode="numeric"
+                      // evita NaN/0 al borrar
                       value={field.state.value ?? ""}
-                      onChange={(e) =>
-                        field.handleChange(e.target.value.replace(/[^\d]/g, ""))
-                      }
+                      onChange={(e) => {
+                        const v = e.currentTarget.valueAsNumber;
+                        // si está vacío, valueAsNumber es NaN
+                        if (Number.isNaN(v)) field.handleChange(undefined);
+                        else field.handleChange(Math.trunc(v)); // nos aseguramos entero
+                      }}
                       placeholder="504440503"
+                      min={1}
+                      step={1}
                     />
                     {formErrors.identificacion && (
                       <p className="text-red-700 text-sm">{formErrors.identificacion}</p>
@@ -186,7 +181,7 @@ const FormAgregarCliente = () => {
             )}
 
             <DialogFooter className="flex gap-2">
-              <Button type="submit" disabled={submitDisabled}>
+              <Button type="submit" >
                 {crear.isPending ? "Guardando..." : "Guardar"}
               </Button>
 
