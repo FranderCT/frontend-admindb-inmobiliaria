@@ -1,8 +1,32 @@
 export interface Client {
-  id: number;
-  name: string;
-  lastname1: string;
-  lastname2: string;
-  phone: string;
-  status: boolean; 
+  identificacion: number;
+  nombre: string;
+  apellido1: string;
+  apellido2?: string;
+  telefono: string;
+  estado: boolean; 
+}
+
+export interface CreateClient {
+  identificacion: number;
+  nombre: string;
+  apellido1: string;
+  apellido2?: string;
+  telefono: string;
+}
+export interface UpdateClient {
+  identificacion: number;
+  nombre: string;
+  apellido1: string;
+  apellido2?: string;
+  telefono: string;
+  estado: boolean;
+}
+export interface ClientesPaginateParams {
+  page?: number;
+  limit?: number;
+  sortCol?: "identificacion" | "nombre" | "apellido1" | "telefono" | "estado";
+  sortDir?: "ASC" | "DESC";
+  q?: string;
+  estado?: 0 | 1;
 }
