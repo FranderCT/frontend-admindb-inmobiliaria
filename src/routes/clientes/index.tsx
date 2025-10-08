@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import CardCliente from "@/modules/clientes/components/CardCliente";
 import FormAgregarCliente from "@/modules/clientes/components/FormAgregarCliente";
 import ClientesFiltros from "@/modules/clientes/components/ClientesFiltros";
-import { useContext, useState } from "react";
+import { FormEvent, useContext, useState } from "react";
 import { ClientesFiltersProvider } from "@/modules/clientes/context/clientesFiltrosContextProvider";
 import { useClientesPaginatedFromContext } from "@/modules/clientes/hooks/usePaginationContext";
 import ClientesFiltersContext from "@/modules/clientes/context/clientesFiltersContext";
@@ -27,7 +27,7 @@ function RouteComponent() {
   const canPrev = filters.page > 1;
   const canNext = filters.page <= pageCount;
 
-  const onSubmitSearch = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmitSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     patchFilters({ q: inputQ.trim(), page: 1 });
   };
@@ -47,7 +47,7 @@ function RouteComponent() {
         <form onSubmit={onSubmitSearch} className="w-full md:w-1/2 flex gap-2">
           <Input
             name="q"
-            placeholder="Buscar por cédula o texto"
+            placeholder="Buscar por cédula o nombre"
             value={inputQ}
             onChange={(e) => setInputQ(e.target.value)}
             className="max-w-xs"
