@@ -111,9 +111,9 @@ const CardCliente = ({ client }: ClientCardProps) => {
       <ConfirmDialog
         open={openConfirmDelete}
         onOpenChange={setOpenConfirmDelete}
-        title="Eliminar cliente"
-        description={`¿Seguro que deseas eliminar a ${client.nombre} ${client.apellido1} ${client.apellido2}? Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
+        title="Desactivar cliente"
+        description={`¿Seguro que deseas desactivar a ${client.nombre} ${client.apellido1} ${client.apellido2}? Esta acción no se puede deshacer.`}
+        confirmText="Desactivar"
         cancelText="Cancelar"
         onConfirm={handleConfirmDelete}
         loading={deleteCliente.isPending as boolean}

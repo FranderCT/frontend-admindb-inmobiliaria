@@ -16,7 +16,8 @@ import { useUpdateCliente } from "../hooks/clientesHooks";
 import { extractServerErrors } from "@/utils/serverExtract";
 import { useEffect, useState } from "react";
 import { EditClienteDialogProps } from "../types/clientTypes";
-import { Switch, SwitchIcon, SwitchThumb } from "@/components/animate-ui/primitives/base/switch";
+import { Switch, SwitchThumb } from "@/components/animate-ui/primitives/base/switch";
+import { cn } from "@/lib/utils";
 
 const FormEditCliente = ({
   open,
@@ -37,7 +38,7 @@ const FormEditCliente = ({
       apellido1: cliente.apellido1 ?? "",
       apellido2: cliente.apellido2 ?? "",
       telefono: cliente.telefono ?? "",
-      estado: Boolean(cliente.estado),
+      estado: cliente.estado ? 1 : 0,
     },
     onSubmit: async ({ value }) => {
       setFormErrors({});
@@ -72,7 +73,7 @@ const FormEditCliente = ({
       form.setFieldValue("apellido1", cliente.apellido1 ?? "");
       form.setFieldValue("apellido2", cliente.apellido2 ?? "");
       form.setFieldValue("telefono", cliente.telefono ?? "");
-      form.setFieldValue("estado", Boolean(cliente.estado));
+      form.setFieldValue("estado", cliente.estado ? 1 : 0);
       setFormErrors({});
       setFormError(null);
     }
@@ -190,44 +191,31 @@ const FormEditCliente = ({
             <span className="text-sm font-medium">Estado</span>
 
             <form.Field name="estado">
-              {(field) => (
-                <Switch
-                  checked={Boolean(field.state.value)}
-                  onCheckedChange={(v) => field.handleChange(Boolean(v))}
-                  // TRACK (fondo)
-                  className="
-          relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full
-          bg-muted-foreground/30 transition-colors
-          data-[state=checked]:bg-primary
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/30
-        "
-                  aria-label="Cambiar estado"
-                >
-                  {/* THUMB (círculo) */}
-                  <SwitchThumb
-                    className="
-            pointer-events-none inline-block h-5 w-5 translate-x-1 rounded-full bg-background shadow
-            ring-0 transition-transform
-            data-[state=checked]:translate-x-5
-          "
+              {(field) => {
+                const isChecked = field.state.value === 1;
+
+                return (
+                  <Switch
+                    checked={isChecked}
+                    onCheckedChange={(v) => field.handleChange(v ? 1 : 0)} 
+                    className={cn(
+                      'relative flex p-0.5 h-6 w-10 items-center justify-start rounded-full border transition-colors',
+                      'data-[checked]:bg-primary data-[checked]:justify-end',
+                    )}
                   >
-                    {/* ícono opcional dentro del thumb */}
-                    <SwitchIcon
-                      position="left"
-                      className="
-              h-3.5 w-3.5 text-foreground/70
-              data-[state=checked]:text-foreground
-            "
+                    <SwitchThumb
+                      className="rounded-full bg-accent h-full aspect-square"
+                      pressedAnimation={{ width: 22 }}
                     />
-                  </SwitchThumb>
-                </Switch>
-              )}
+                  </Switch>
+                );
+              }}
             </form.Field>
           </div>
 
           {!!formError && <p className="text-red-700 text-sm text-center mb-2">{formError}</p>}
 
-          <DialogFooter className="flex gap-2">
+          <DialogFooter className="flex gap-2 mt-4">
             <Button type="submit" disabled={updateCliente.isPending}>
               {updateCliente.isPending ? "Guardando..." : "Guardar cambios"}
             </Button>
