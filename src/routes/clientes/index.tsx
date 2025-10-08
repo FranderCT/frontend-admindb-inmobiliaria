@@ -25,7 +25,7 @@ function RouteComponent() {
 
   const pageCount = data?.meta?.pageCount ?? 1;
   const canPrev = filters.page > 1;
-  const canNext = filters.page < pageCount;
+  const canNext = filters.page <= pageCount;
 
   const onSubmitSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -13,10 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
 import { useUpdateCliente } from "../hooks/clientesHooks";
-import { Switch } from "@/components/animate-ui/primitives/base/switch";
 import { extractServerErrors } from "@/utils/serverExtract";
 import { useEffect, useState } from "react";
 import { EditClienteDialogProps } from "../types/clientTypes";
+import { Switch, SwitchIcon, SwitchThumb } from "@/components/animate-ui/primitives/base/switch";
 
 const FormEditCliente = ({
   open,
@@ -188,12 +188,39 @@ const FormEditCliente = ({
 
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium">Estado</span>
+
             <form.Field name="estado">
               {(field) => (
                 <Switch
                   checked={Boolean(field.state.value)}
                   onCheckedChange={(v) => field.handleChange(Boolean(v))}
-                />
+                  // TRACK (fondo)
+                  className="
+          relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full
+          bg-muted-foreground/30 transition-colors
+          data-[state=checked]:bg-primary
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/30
+        "
+                  aria-label="Cambiar estado"
+                >
+                  {/* THUMB (círculo) */}
+                  <SwitchThumb
+                    className="
+            pointer-events-none inline-block h-5 w-5 translate-x-1 rounded-full bg-background shadow
+            ring-0 transition-transform
+            data-[state=checked]:translate-x-5
+          "
+                  >
+                    {/* ícono opcional dentro del thumb */}
+                    <SwitchIcon
+                      position="left"
+                      className="
+              h-3.5 w-3.5 text-foreground/70
+              data-[state=checked]:text-foreground
+            "
+                    />
+                  </SwitchThumb>
+                </Switch>
               )}
             </form.Field>
           </div>
