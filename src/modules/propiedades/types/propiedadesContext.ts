@@ -8,7 +8,7 @@ export type PropiedadesFilters = {
   sortCol: "idPropiedad" | "ubicacion" | "precio" | "estadoPropiedad" | "tipoInmueble";
   sortDir: SortDir;
   q: string;
-  estado?: 0 | 1;             // si aplicas estado lógico
+  estado?: 0 | 1;
   estadoPropiedadId?: number; // catálogo: Disponible, Reservada, etc.
   tipoInmuebleId?: number;    // catálogo: Casa, Apto, etc.
 };

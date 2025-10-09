@@ -24,7 +24,7 @@ function RouteComponent() {
 
   const { data, isLoading, isFetching, error } = usePropiedadesPaginatedFromContext();
 
-  if (!ctx) return null;                       // 👈 valida ANTES de desestructurar
+  if (!ctx) return null;
   const pageCount = data?.meta?.pageCount ?? 1;
   const canPrev = filters.page > 1;
   const canNext = filters.page < pageCount;

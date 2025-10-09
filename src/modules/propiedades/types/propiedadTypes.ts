@@ -23,13 +23,6 @@ export const initialValuesProperty: CreateProperty = {
     idTipoInmueble: 0,
 };
 
-type Option = { label: string; value: number };
-
-export type PropiedadesFilteredProps = {
-  estadosPropiedad?: Option[]; // ej: [{label:'Disponible', value:1}, ...]
-  tiposInmueble?: Option[];    // ej: [{label:'Casa', value:1}, ...]
-};
-
 export type UpdateProperty = {
   idPropiedad: number;
   ubicacion: string;
