@@ -1,5 +1,5 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { CreatePropertyStatus, CreatePropertyType, CreateProperty, PropertyType, PropertyStatus, PropertysPaginateParams, Propiedad } from "../models/propiedad";
+import { CreatePropertyStatus, CreatePropertyType, CreateProperty, PropertyType, PropertyStatus, PropertysPaginateParams, Propiedad, UpdateProperty } from "../models/propiedad";
 
 export const createProperty = async (property: CreateProperty): Promise<CreateProperty> => {
   const response = await altosDelValleAPI.post<CreateProperty>(
@@ -60,3 +60,13 @@ export const getPropertiesFiltered = async (params: PropertysPaginateParams) => 
     meta: { total: number; page: number; limit: number; pageCount: number; hasNextPage: boolean; hasPrevPage: boolean };
   };
 };
+
+export const deleteProperty = async (idPropiedad: number): Promise<{ ok: boolean }> => {
+    const response = await altosDelValleAPI.delete<{ ok: boolean }>(`propiedad/${idPropiedad}`);
+    return response.data;
+}
+
+export const updateProperty = async (data: UpdateProperty): Promise<{ ok: boolean }> => {
+  const response = await altosDelValleAPI.patch<{ ok: boolean }>(`propiedad/${data.idPropiedad}`, data);
+  return response.data;
+}

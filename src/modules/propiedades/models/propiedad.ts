@@ -53,3 +53,11 @@ export type PropertysPaginateParams = {
   estadoPropiedadId?: number;
   tipoInmuebleId?: number;
 };
+
+export interface UpdateProperty{
+  idPropiedad: number,
+  ubicacion?: string,
+  precio?: number,
+  idEstado?: number,
+  idTipoInmueble?: number,
+}

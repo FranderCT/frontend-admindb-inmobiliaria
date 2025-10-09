@@ -1,4 +1,3 @@
-// modules/propiedades/components/PropiedadesFiltros.tsx
 import {
     Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter,
 } from "@/components/ui/sheet";
@@ -8,30 +7,46 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
+import { useGetPropertyStatuses, useGetPropertyTypes } from "../hooks/propiedadesHook";
 import PropiedadesFiltersContext from "../context/propriedadesContext";
 
-type Option = { label: string; value: number };
-type Props = {
-    estadosPropiedad?: Option[];
-    tiposInmueble?: Option[];
-};
+const toStrOrAll = (v: number | undefined) => (typeof v === "number" ? String(v) : "all");
+const fromStrOrAll = (v: string) => (v === "all" ? undefined : (Number(v) as number));
 
-const PropiedadesFiltros = ({ estadosPropiedad = [], tiposInmueble = [] }: Props) => {
+const PropiedadesFiltros = () => {
+    // 1) Validar contexto antes de destructurar
     const ctx = useContext(PropiedadesFiltersContext);
     const { filters, patchFilters, resetFilters } = ctx;
 
-    const toStrOrAll = (v: number | undefined) => (typeof v === "number" ? String(v) : "all");
-    const fromStrOrAll = (v: string) => (v === "all" ? undefined : Number(v) as number);
-
-
     const [open, setOpen] = useState(false);
+    const [hasOpened, setHasOpened] = useState(false);
     const [local, setLocal] = useState(filters);
+
+    const enabled = open || hasOpened;
+
+    const { propertyTypes, loadingPropertyTypes } = useGetPropertyTypes({ enabled });
+    const { propertyStatuses, loadingPropertyStatuses } = useGetPropertyStatuses({ enabled });
+
+    const propertyTypesData = useMemo(() => {
+        if (Array.isArray(propertyTypes)) return propertyTypes;
+        if (Array.isArray((propertyTypes as any)?.data)) return (propertyTypes as any).data;
+        return [] as Array<{ idTipoInmueble: number; nombre: string }>;
+    }, [propertyTypes]);
+
+    const propertyStatusesData = useMemo(() => {
+        if (Array.isArray(propertyStatuses)) return propertyStatuses;
+        if (Array.isArray((propertyStatuses as any)?.data)) return (propertyStatuses as any).data;
+        return [] as Array<{ idEstadoPropiedad: number; nombre: string }>;
+    }, [propertyStatuses]);
 
     if (!ctx) return null;
     const handleOpenChange = (v: boolean) => {
         setOpen(v);
-        if (v) setLocal(filters);
+        if (v) {
+            setHasOpened(true);
+            setLocal(filters);
+        }
     };
 
     const apply = () => {
@@ -70,8 +85,8 @@ const PropiedadesFiltros = ({ estadosPropiedad = [], tiposInmueble = [] }: Props
                     </SheetHeader>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-thin scrollbar-thumb-rounded
-                 scrollbar-thumb-neutral-500 scrollbar-track-transparent">
+                <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-neutral-500 scrollbar-track-transparent">
+                    {/* Buscar */}
                     <div className="grid gap-2">
                         <label className="text-sm font-medium">Buscar</label>
                         <Input
@@ -81,14 +96,11 @@ const PropiedadesFiltros = ({ estadosPropiedad = [], tiposInmueble = [] }: Props
                         />
                     </div>
 
+                    {/* Estado activo/inactivo */}
                     <div className="grid gap-2">
                         <label className="text-sm font-medium">Estado (activo/inactivo)</label>
                         <Select
-                            value={
-                                typeof local.estado === "number"
-                                    ? String(local.estado)  
-                                    : "all" 
-                            }
+                            value={typeof local.estado === "number" ? String(local.estado) : "all"}
                             onValueChange={(v) =>
                                 setLocal((p) => ({
                                     ...p,
@@ -100,68 +112,64 @@ const PropiedadesFiltros = ({ estadosPropiedad = [], tiposInmueble = [] }: Props
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Estado</SelectLabel>
-                                    <SelectItem value="all">Todos</SelectItem> 
+                                    <SelectItem value="all">Todos</SelectItem>
                                     <SelectItem value="1">Activo</SelectItem>
                                     <SelectItem value="0">Inactivo</SelectItem>
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-
                     </div>
 
+                    {/* Estado de propiedad (catálogo) */}
                     <div className="grid gap-2">
                         <label className="text-sm font-medium">Estado de propiedad</label>
                         <Select
                             value={toStrOrAll(local.estadoPropiedadId)}
-                            onValueChange={(v) =>
-                                setLocal((p) => ({
-                                    ...p,
-                                    estadoPropiedadId: fromStrOrAll(v),
-                                }))
-                            }
+                            onValueChange={(v) => setLocal((p) => ({ ...p, estadoPropiedadId: fromStrOrAll(v) }))}
+                            disabled={loadingPropertyStatuses}
                         >
-                            <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
+                            <SelectTrigger>
+                                <SelectValue placeholder={loadingPropertyStatuses ? "Cargando..." : "Todos"} />
+                            </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Estados</SelectLabel>
                                     <SelectItem value="all">Todos</SelectItem>
-                                    {estadosPropiedad.map((opt) => (
-                                        <SelectItem key={opt.value} value={String(opt.value)}>
-                                            {opt.label}
+                                    {propertyStatusesData.map((opt) => (
+                                        <SelectItem key={opt.idEstadoPropiedad} value={String(opt.idEstadoPropiedad)}>
+                                            {opt.nombre}
                                         </SelectItem>
                                     ))}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-
                     </div>
+
                     <div className="grid gap-2">
                         <label className="text-sm font-medium">Tipo de inmueble</label>
                         <Select
                             value={toStrOrAll(local.tipoInmuebleId)}
-                            onValueChange={(v) =>
-                                setLocal((p) => ({
-                                    ...p,
-                                    tipoInmuebleId: fromStrOrAll(v),
-                                }))
-                            }
+                            onValueChange={(v) => setLocal((p) => ({ ...p, tipoInmuebleId: fromStrOrAll(v) }))}
+                            disabled={loadingPropertyTypes}
                         >
-                            <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
+                            <SelectTrigger>
+                                <SelectValue placeholder={loadingPropertyTypes ? "Cargando..." : "Todos"} />
+                            </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Tipos</SelectLabel>
                                     <SelectItem value="all">Todos</SelectItem>
-                                    {tiposInmueble.map((opt) => (
-                                        <SelectItem key={opt.value} value={String(opt.value)}>
-                                            {opt.label}
+                                    {propertyTypesData.map((opt) => (
+                                        <SelectItem key={opt.idTipoInmueble} value={String(opt.idTipoInmueble)}>
+                                            {opt.nombre}
                                         </SelectItem>
                                     ))}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-
                     </div>
 
+                    {/* Orden / Dirección / Límite */}
                     <div className="grid gap-2">
                         <label className="text-sm font-medium">Ordenar por</label>
                         <Select

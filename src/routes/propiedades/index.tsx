@@ -4,8 +4,6 @@ import CardPropiedad from "@/modules/propiedades/components/CardPropiedad";
 import FormCrearEstadoPropiedad from "@/modules/propiedades/components/FormCrearEstadoPropiedad";
 import FormCrearTipoInmueble from "@/modules/propiedades/components/FormCrearTIpoInmueble";
 import FormCrearPropiedad from "@/modules/propiedades/components/FormCrearPropiedad";
-
-import { Propiedad } from "@/modules/propiedades/models/propiedad";
 import PropiedadesFiltros from "@/modules/propiedades/components/PropiedadesFiltros";
 import { PropiedadesFiltersProvider } from "@/modules/propiedades/context/propiedadesContextProvider";
 import { usePropiedadesPaginatedFromContext } from "@/modules/propiedades/hooks/usePropiedadesFromContext";
@@ -28,6 +26,7 @@ function RouteComponent() {
   const canPrev = filters.page > 1;
   const canNext = filters.page < pageCount;
 
+  const rows = Array.isArray(data?.data) ? data!.data : [];
   return (
     <div className="m-4">
       <header className="flex items-center justify-between mb-4 ml-16">
@@ -51,14 +50,14 @@ function RouteComponent() {
 
       {data && (
         <>
-          {data.data.length === 0 ? (
+          {rows.length === 0 ? (
             <div className="ml-16 text-muted-foreground">Sin resultados.</div>
           ) : (
-            <main className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {data.data.map((property: Propiedad) => (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {rows.map((property) => (
                 <CardPropiedad key={property.idPropiedad} property={property} />
               ))}
-            </main>
+            </div>
           )}
 
           <div className="flex items-center justify-between mt-6">
