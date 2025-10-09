@@ -30,3 +30,11 @@ export interface ClientesPaginateParams {
   q?: string;
   estado?: 0 | 1;
 }
+
+export interface ClientSearchPreview {
+  identificacion: number;
+  nombreCompleto?: string;
+  nombre?: string;
+  apellido1?: string;
+  apellido2?: string;
+}

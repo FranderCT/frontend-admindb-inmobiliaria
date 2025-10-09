@@ -1,10 +1,10 @@
 import { useContext, useEffect } from "react";
-import { useGetClientesPaginate } from "./clientesHooks";
+import { useGetClientsFiltered } from "./clientesHooks";
 import ClientesFiltersContext from "../context/clientesFiltersContext";
 
 export function useClientesPaginatedFromContext() {
   const { filters } = useContext(ClientesFiltersContext);
-  const query = useGetClientesPaginate(filters);
+  const query = useGetClientsFiltered(filters);
 
   useEffect(() => {
     query.prefetchNext?.();
