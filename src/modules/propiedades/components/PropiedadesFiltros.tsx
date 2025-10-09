@@ -40,7 +40,7 @@ const PropiedadesFiltros = () => {
     const handleOpenChange = (v: boolean) => {
         setOpen(v);
         if (v) {
-            setHasOpened(true);
+            //setHasOpened(true);
             setLocal(filters);
         }
     };
