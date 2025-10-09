@@ -91,11 +91,27 @@ export function useGetPropertyStatuses(
 
 
 export function useGetPropertiesFiltered(params: PropertysPaginateParams) {
-    return useQuery({
-        queryKey: ["properties", "paginate", params],
-        queryFn: () => getPropertiesFiltered(params),
-        staleTime: 60_000,
-    });
+  const normalized: PropertysPaginateParams = {
+    page: params.page ?? 1,
+    limit: params.limit ?? 9,
+    sortCol: params.sortCol ?? "idPropiedad",
+    sortDir: params.sortDir ?? "ASC",
+    q: params.q ?? "",
+    estado:
+      typeof params.estado === "string"
+        ? (Number(params.estado) as 0 | 1)
+        : params.estado,
+    estadoPropiedadId:
+      params.estadoPropiedadId != null ? Number(params.estadoPropiedadId) : undefined,
+    tipoInmuebleId:
+      params.tipoInmuebleId != null ? Number(params.tipoInmuebleId) : undefined,
+  };
+
+  return useQuery({
+    queryKey: ["properties", "paginate", normalized],
+    queryFn: () => getPropertiesFiltered(normalized),
+    staleTime: 60_000,
+  });
 }
 
 export const useDeleteProperty = () => {

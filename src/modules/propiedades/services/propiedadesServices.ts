@@ -1,5 +1,5 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { CreatePropertyStatus, CreatePropertyType, CreateProperty, PropertyType, PropertyStatus, PropertysPaginateParams, Propiedad, UpdateProperty } from "../models/propiedad";
+import { CreatePropertyStatus, CreatePropertyType, CreateProperty, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty } from "../models/propiedad";
 
 export const createProperty = async (property: CreateProperty): Promise<CreateProperty> => {
   const response = await altosDelValleAPI.post<CreateProperty>(
@@ -38,27 +38,24 @@ export const getPropertyTypes = async (): Promise<PropertyType[]> => {
   return response.data;
 };
 
-export const getPropertiesFiltered = async (params: PropertysPaginateParams) => {
-  const { data } = await altosDelValleAPI.get("/propiedad/paginate", {
-    params: {
-      page: params.page ?? 1,
-      limit: params.limit ?? 9,
-      sortCol: params.sortCol ?? "idPropiedad",
-      sortDir: params.sortDir ?? "ASC",
-      ...(params.q ? { q: params.q } : {}),
-      ...(typeof params.estado === "number" ? { estado: params.estado } : {}),
-      ...(typeof params.estadoPropiedadId === "number"
-        ? { estadoPropiedadId: params.estadoPropiedadId }
-        : {}),
-      ...(typeof params.tipoInmuebleId === "number"
-        ? { tipoInmuebleId: params.tipoInmuebleId }
-        : {}),
-    },
-  });
-  return data as {
-    data: Propiedad[];
-    meta: { total: number; page: number; limit: number; pageCount: number; hasNextPage: boolean; hasPrevPage: boolean };
+export const getPropertiesFiltered = async (p: PropertysPaginateParams) => {
+  const params: Record<string, unknown> = {
+    page: p.page ?? 1,
+    limit: p.limit ?? 9,
+    sortCol: p.sortCol ?? "idPropiedad",
+    sortDir: p.sortDir ?? "ASC",
   };
+  if (p.q) params.q = p.q;
+  if (typeof p.estado === "number") params.estado = p.estado;
+
+  if (typeof p.estadoPropiedadId === "number")
+    params.idEstadoPropiedad = p.estadoPropiedadId;
+
+  if (typeof p.tipoInmuebleId === "number")
+    params.idTipoInmueble = p.tipoInmuebleId;
+
+  const { data } = await altosDelValleAPI.get("/propiedad/paginate", { params });
+  return data;
 };
 
 export const deleteProperty = async (idPropiedad: number): Promise<{ ok: boolean }> => {

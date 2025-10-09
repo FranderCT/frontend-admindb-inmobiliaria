@@ -1,13 +1,18 @@
 import { useContext, useEffect } from "react";
 import { useGetPropertiesFiltered } from "./propiedadesHook";
-import PropiedadesFiltersContext from "../context/propriedadesContext";
+import PropiedadesFiltersContext from "@/modules/propiedades/context/propiedadesContext";
 
 export function usePropiedadesPaginatedFromContext() {
-  const { filters } = useContext(PropiedadesFiltersContext);
-  const query = useGetPropertiesFiltered(filters);
+    const ctx = useContext(PropiedadesFiltersContext);
+    if (!ctx) throw new Error("PropiedadesFiltersProvider faltante");
+    const { filters } = ctx;
 
-  useEffect(() => {
-  }, [filters.page]);
+    const query = useGetPropertiesFiltered(filters);
 
-  return query;
+    useEffect(() => {
+        // si quieres prefetch de siguiente página
+        // query.prefetchNext?.();
+    }, [filters.page]);
+
+    return query;
 }

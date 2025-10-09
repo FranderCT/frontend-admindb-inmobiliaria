@@ -7,8 +7,8 @@ import FormCrearPropiedad from "@/modules/propiedades/components/FormCrearPropie
 import PropiedadesFiltros from "@/modules/propiedades/components/PropiedadesFiltros";
 import { PropiedadesFiltersProvider } from "@/modules/propiedades/context/propiedadesContextProvider";
 import { usePropiedadesPaginatedFromContext } from "@/modules/propiedades/hooks/usePropiedadesFromContext";
-import { useContext } from "react";
-import PropiedadesFiltersContext from "@/modules/propiedades/context/propriedadesContext";
+import { useContext } from "react"
+import PropiedadesFiltersContext from "@/modules/propiedades/context/propiedadesContext";
 
 export const Route = createFileRoute("/propiedades/")({
   component: () => (
@@ -19,14 +19,18 @@ export const Route = createFileRoute("/propiedades/")({
 });
 
 function RouteComponent() {
-  const { filters, patchFilters } = useContext(PropiedadesFiltersContext);
+  const ctx = useContext(PropiedadesFiltersContext);
+  const { filters, patchFilters } = ctx;
+
   const { data, isLoading, isFetching, error } = usePropiedadesPaginatedFromContext();
 
+  if (!ctx) return null;                       // 👈 valida ANTES de desestructurar
   const pageCount = data?.meta?.pageCount ?? 1;
   const canPrev = filters.page > 1;
   const canNext = filters.page < pageCount;
 
   const rows = Array.isArray(data?.data) ? data!.data : [];
+
   return (
     <div className="m-4">
       <header className="flex items-center justify-between mb-4 ml-16">
@@ -35,8 +39,7 @@ function RouteComponent() {
 
       <nav className="flex flex-wrap gap-4 items-center justify-end mb-4 ml-16">
         <div className="flex gap-4 justify-center items-center">
-          <PropiedadesFiltros
-          />
+          <PropiedadesFiltros />
           <FormCrearEstadoPropiedad />
           <FormCrearTipoInmueble />
           <FormCrearPropiedad />
