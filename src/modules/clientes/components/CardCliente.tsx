@@ -5,12 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Edit, Trash2, IdCard, Phone } from 'lucide-react'
 import type { ClientCardProps } from '../types/clientTypes'
 import DialogDetalleCliente from './DialogDetalleCliente'
-import { useDeleteCliente } from '../hooks/clientesHooks'
+import { useDeleteClient } from '../hooks/clientesHooks'
 import ConfirmDialog from './ConfirmDialog'
 import FormEditCliente from './FormEditCliente'
 
 const CardCliente = ({ client }: ClientCardProps) => {
-  const deleteCliente = useDeleteCliente()
+  const deleteCliente = useDeleteClient()
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false)
   const [openEdit, setOpenEdit] = useState(false)

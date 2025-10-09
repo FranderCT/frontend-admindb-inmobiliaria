@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useGetCliente } from "../hooks/clientesHooks";
+import { useGetClient } from "../hooks/clientesHooks";
 import CardCliente from "./CardCliente";
 import { Loader } from "lucide-react";
 
@@ -10,7 +10,7 @@ const SearchCedula =({
   cedula: string;
   onClear: () => void;
 }) => {
-  const { cliente, loadingCliente, errorCliente } = useGetCliente(cedula);
+  const { cliente, loadingCliente, errorCliente } = useGetClient(cedula);
 
   if (loadingCliente) {
     return (

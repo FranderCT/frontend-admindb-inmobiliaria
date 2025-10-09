@@ -13,7 +13,7 @@ import {
   DialogClose,
 } from "@/components/animate-ui/components/headless/dialog";
 import { Plus } from "lucide-react";
-import { useCreateCliente } from "../hooks/clientesHooks";
+import { useCreateClient } from "../hooks/clientesHooks";
 import { initialValuesClient } from "../types/clientTypes";
 import { Label } from "@radix-ui/react-label";
 import { extractServerErrors } from "@/utils/serverExtract";
@@ -22,7 +22,7 @@ const FormAgregarCliente = () => {
   const [open, setOpen] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
-  const crear = useCreateCliente();
+  const create = useCreateClient();
 
   const form = useForm({
     defaultValues: initialValuesClient,
@@ -31,7 +31,7 @@ const FormAgregarCliente = () => {
       setFormError(null);
 
       try {
-        await crear.mutateAsync({ cliente: value });
+        await create.mutateAsync({ client: value });
         formApi.reset();
         setOpen(false);
         toast.success("Cliente creado correctamente");
@@ -75,13 +75,11 @@ const FormAgregarCliente = () => {
                       id="identificacion"
                       type="number"
                       inputMode="numeric"
-                      // evita NaN/0 al borrar
                       value={field.state.value ?? ""}
                       onChange={(e) => {
                         const v = e.currentTarget.valueAsNumber;
-                        // si está vacío, valueAsNumber es NaN
                         if (Number.isNaN(v)) field.handleChange(undefined);
-                        else field.handleChange(Math.trunc(v)); // nos aseguramos entero
+                        else field.handleChange(Math.trunc(v)); 
                       }}
                       placeholder="504440503"
                       min={1}
@@ -182,11 +180,11 @@ const FormAgregarCliente = () => {
 
             <DialogFooter className="flex gap-2">
               <Button type="submit" >
-                {crear.isPending ? "Guardando..." : "Guardar"}
+                {create.isPending ? "Guardando..." : "Guardar"}
               </Button>
 
               <DialogClose>
-                <Button type="button" variant="outline" disabled={crear.isPending}>
+                <Button type="button" variant="outline" disabled={create.isPending}>
                   Cancelar
                 </Button>
               </DialogClose>

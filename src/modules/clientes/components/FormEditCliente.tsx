@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
-import { useUpdateCliente } from "../hooks/clientesHooks";
+import { useUpdateClient } from "../hooks/clientesHooks";
 import { extractServerErrors } from "@/utils/serverExtract";
 import { useEffect, useState } from "react";
 import { EditClienteDialogProps } from "../types/clientTypes";
@@ -26,7 +26,7 @@ const FormEditCliente = ({
   showCloseButton = true,
   cliente,
 }: EditClienteDialogProps) => {
-  const updateCliente = useUpdateCliente();
+  const updateCliente = useUpdateClient();
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -46,7 +46,7 @@ const FormEditCliente = ({
 
       try {
         await updateCliente.mutateAsync({
-          cliente: {
+          client: {
             identificacion: Number(value.identificacion),
             nombre: value.nombre?.trim() ?? "",
             apellido1: value.apellido1?.trim() ?? "",

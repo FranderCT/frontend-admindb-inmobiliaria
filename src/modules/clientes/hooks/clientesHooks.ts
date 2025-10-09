@@ -1,22 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createCliente, deleteCliente, getCliente, getClientes, getClientesPaginate, updateCliente } from "../services/clientesServices";
+import { createClient, deleteClient,  getClient,  getClients,  getClientsFiltered,  updateClient } from "../services/clientesServices";
 import {  CreateClient, UpdateClient } from "../models/client";
 
 // post
 
-export const useCreateCliente = () => {
+export const useCreateClient = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: ({
-            cliente,
+            client,
         }: {
-            cliente: CreateClient;
-        }) => createCliente(cliente),
+            client: CreateClient;
+        }) => createClient(client),
 
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["clientes"],
+                queryKey: ["clients"],
             });
         },
     });
@@ -24,11 +24,11 @@ export const useCreateCliente = () => {
 
 
 
-export function useGetClientes(
+export function useGetClients(
 ) {
     const { data, isLoading, error, isPlaceholderData, isFetching } = useQuery({
-        queryKey: ["clientes"],
-        queryFn: () => getClientes(),
+        queryKey: ["clients"],
+        queryFn: () => getClients(),
     });
 
     return {
@@ -42,12 +42,14 @@ export function useGetClientes(
 
 
 
-export function useGetCliente(
-    identificacion: string
+export function useGetClient(
+    identificacion: string, opts?: { enabled?: boolean }
 ) {
+    const enabled = opts?.enabled ?? true;
     const { data, isLoading, error, isPlaceholderData, isFetching } = useQuery({
-        queryKey: ["cliente", identificacion],
-        queryFn: () => getCliente(identificacion),
+        queryKey: ["client", identificacion],
+        queryFn: () => getClient(identificacion),
+        enabled: enabled && Boolean(identificacion)
     });
 
     return {
@@ -65,8 +67,8 @@ export function useGetHistorialCliente(
     identificacion: string
 ) {
     const { data, isLoading, error, isPlaceholderData, isFetching } = useQuery({
-        queryKey: ["cliente", identificacion],
-        queryFn: () => getCliente(identificacion),
+        queryKey: ["client", identificacion],
+        queryFn: () => getClient(identificacion),
     });
 
     return {
@@ -78,7 +80,7 @@ export function useGetHistorialCliente(
     };
 }
 
-export function useGetClientesPaginate(params: {
+export function useGetClientsFiltered(params: {
     page?: number; limit?: number; sortCol?: string;
     sortDir?: "ASC" | "DESC"; q?: string; estado?: 0 | 1 | undefined;
 }) {
@@ -90,39 +92,39 @@ export function useGetClientesPaginate(params: {
     };
 
     return useQuery({
-        queryKey: ["clientes", "paginate", normalized],
-        queryFn: () => getClientesPaginate(normalized),
+        queryKey: ["clients", "paginate", normalized],
+        queryFn: () => getClientsFiltered(normalized),
         staleTime: 60_000,
     });
 }
 
-export const useDeleteCliente = () => {
+export const useDeleteClient = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (identificacion: string) => deleteCliente(identificacion),
+        mutationFn: (identificacion: string) => deleteClient(identificacion),
 
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["clientes"],
+                queryKey: ["clients"],
             });
         },
     });
 };
 
-export const useUpdateCliente = () => {
+export const useUpdateClient = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: ({
-            cliente,
+            client,
         }: {
-            cliente: UpdateClient;
-        }) => updateCliente(cliente),
+            client: UpdateClient;
+        }) => updateClient(client),
 
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["clientes"],
+                queryKey: ["clients"],
             });
         },
     });
