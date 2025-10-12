@@ -128,7 +128,6 @@ const FormEditPropiedad = ({
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Estados</SelectLabel>
-                      <SelectItem value="all">Todos</SelectItem>
                       {propertyStatuses.map((opt) => (
                         <SelectItem key={opt.idEstadoPropiedad} value={String(opt.idEstadoPropiedad)}>
                           {opt.nombre}
@@ -156,7 +155,6 @@ const FormEditPropiedad = ({
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Tipos</SelectLabel>
-                      <SelectItem value="all">Todos</SelectItem>
                       {propertyTypes.map((opt) => (
                         <SelectItem key={opt.idTipoInmueble} value={String(opt.idTipoInmueble)}>
                           {opt.nombre}

@@ -32,7 +32,7 @@ export const useCreatePropertyStatus = () => {
 
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["properties"],
+                queryKey: ["propertyStatuses"],
             });
         },
     });
@@ -50,7 +50,7 @@ export const useCreatePropertyType = () => {
 
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["properties"],
+                queryKey: ["propertyTypes"],
             });
         },
     });
@@ -118,8 +118,8 @@ export const useDeleteProperty = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => deleteProperty(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["properties", "paginate"] });
+    onSuccess: (id) => {
+      queryClient.invalidateQueries({ queryKey: ["properties", "paginate", id] });
     },
   });
 };

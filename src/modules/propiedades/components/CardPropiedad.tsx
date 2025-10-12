@@ -44,25 +44,34 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: 
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span className="truncate">{property.ubicacion}</span>
+
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4" /> Ubicación:
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-              <span className="font-semibold">{formatPrice(property.precio, 'CRC')}</span>
-            </div>
+
+            <span className="truncate font-semibold">{property.ubicacion}</span>
           </div>
 
-          <div className="flex items-center gap-2 text-sm">
-            <Home className="h-4 w-4 text-muted-foreground" />
-            <span>{property.tipoInmueble.nombre}</span>
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <DollarSign className="h-4 w-4" /> Precio:
+            </div>
+            <span className="truncate font-semibold">{formatPrice(property.precio, 'CRC')}</span>
           </div>
 
-          <div className="flex items-center gap-2 text-sm">
-            <CircleUser className="h-4 w-4 text-muted-foreground" />
-            <span>
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Home className="h-4 w-4 " /> Tipo de inmueble:
+            </div>
+            <span className="truncate font-semibold">{property.tipoInmueble.nombre}</span>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <CircleUser className="h-4 w-4 text-muted-foreground" /> Propietario:
+            </div>
+            <span className="truncate font-semibold">
               {property.cliente.nombre} {property.cliente.apellido1} {property.cliente.apellido2}
             </span>
           </div>
