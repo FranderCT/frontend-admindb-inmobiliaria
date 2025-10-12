@@ -1,5 +1,5 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { Contract, ContractType, CreateContract, RoleType } from "../models/contract";
+import { Contract, ContractParticipantsPayload, ContractType, CreateContract, RoleType } from "../models/contract";
 
 export const createContract = async (contract: CreateContract): Promise<CreateContract> => {
   const response = await altosDelValleAPI.post<CreateContract>(
@@ -8,7 +8,6 @@ export const createContract = async (contract: CreateContract): Promise<CreateCo
   );
   return response.data;
 };
-
 
 export const getContracts = async (): Promise<Contract[]> => {
   const response = await altosDelValleAPI.get<Contract[]>(`/contrato`);
@@ -26,3 +25,8 @@ export const getContractType = async (): Promise<ContractType[]> => {
     const response = await altosDelValleAPI.get<ContractType[]>(`/tipo-contrato`);
     return response.data;
 };
+
+export async function assignContractParticipants(payload: ContractParticipantsPayload) {
+  const { data } = await altosDelValleAPI.post("/cliente-contrato/varios-clientes", payload);
+  return data;
+}

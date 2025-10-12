@@ -21,9 +21,9 @@ function RouteComponent() {
           <h1 className="text-4xl font-bold">Contratos</h1>
         </header>
 
-        <nav className="flex flex-wrap gap-4 items-center justify-between mb-4 ml-16">
-          <div className="flex gap-4 justify-center items-center">
-            <FormCrearContrato />
+        <nav className="flex flex-wrap gap-4 items-center justify-end mb-4 ml-16">
+          <FormCrearContrato />
+          <div className="flex gap-4 justify-between items-center">
           </div>
         </nav>
 

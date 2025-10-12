@@ -1,12 +1,12 @@
 export interface CreateContract {
-    fechaInicio: string;
-    fechaFin: string;
-    fechaFirma: string;
-    fechaPago: string;
-    idTipoContrato: number;
-    idPropiedad: number;
-    idAgente: number;
-    condiciones: string[]
+  fechaInicio: string;
+  fechaFin: string;
+  fechaFirma: string;
+  fechaPago: string;
+  idTipoContrato: number;
+  idPropiedad: number;
+  idAgente: number;
+  condiciones: string[];
 }
 
 export interface Contract{
@@ -35,4 +35,11 @@ export interface RoleType {
 export interface ContractType {
     idTipoContrato: number;
     nombre: string;
+}
+export interface ContractParticipantsPayload {
+  participantes: Array<{
+    identificacion: number;
+    idRol: number;
+    idContrato: number;
+  }>;
 }
