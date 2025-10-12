@@ -26,3 +26,13 @@ export interface Contract{
       }
     ]
 }
+
+
+export interface RoleType {
+    idRol: number;
+    nombre: string;
+}
+export interface ContractType {
+    idTipoContrato: number;
+    nombre: string;
+}
