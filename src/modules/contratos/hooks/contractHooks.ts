@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { assignContractParticipants, createContract, getAgentsPreview, getContractRoleType, getContracts, getContractType } from "../services/contractServices";
+import { assignContractParticipants, createContract, getAgentsPreview, getContract, getContractRoleType, getContracts, getContractType } from "../services/contractServices";
 import { AgentPreview, ContractParticipantsPayload, CreateContract } from "../models/contract";
 
 
@@ -43,6 +43,20 @@ export function useGetContracts() {
         loadingContracts: isLoading,
         fetchingContracts: isFetching,
         errorContracts: error,
+    };
+}
+
+export function useGetContract(idContrato: number) {
+    const { data, isLoading, error, isFetching } = useQuery({
+        queryKey: ["contract", idContrato],
+        queryFn: () => getContract(idContrato),
+    });
+
+    return {
+        contract: data,
+        loadingContract: isLoading,
+        fetchingContract: isFetching,
+        errorContract: error,
     };
 }
 

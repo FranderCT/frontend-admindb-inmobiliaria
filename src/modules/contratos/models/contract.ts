@@ -1,4 +1,5 @@
 export interface CreateContract {
+  idContrato?: number;
   fechaInicio: string;
   fechaFin: string;
   fechaFirma: string;
@@ -6,6 +7,10 @@ export interface CreateContract {
   idTipoContrato: number;
   idPropiedad: number;
   idAgente: number;
+  montoTotal: number;
+  deposito: number;
+  porcentajeComision: number;
+  estado: null;
   condiciones: string[];
 }
 
@@ -16,6 +21,7 @@ export interface Contract{
     fechaFirma: string,
     fechaPago: string,
     TipoContrato: string,
+    idPropiedad: number,
     Propiedad: string,
     NombreAgente: string,
     ApellidoAgente: string,
@@ -25,6 +31,48 @@ export interface Contract{
         textoCondicion: string
       }
     ]
+}
+
+export interface ContractProperty {
+  idPropiedad: number,
+  ubicacion: string,
+  precio: number,
+  idEstadoPropiedad: number,
+  nombreEstadoPropiedad: string,
+  idTipoInmueble: number,
+  nombreTipoInmueble: string,
+}
+
+export interface ContractParticipants {
+  identificacion: number;
+  nombre: string;
+  apellido1: string;
+  apellido2?: string;
+  idRol: number;
+  rol: string;
+}
+
+export interface ContractDetails {
+  idContrato: number,
+  fechaInicio: string,
+  fechaFin: string,
+  fechaFirma: string,
+  fechaPago: string,
+  tipoContrato: string,
+  idPropiedad: number,
+  idAgente: number,
+  montoTotal: number,
+  deposito: number,
+  porcentajeComision: number,
+  estado: string,
+  propiedad: ContractProperty
+  participantes: ContractParticipants[]
+  condiciones: [
+    {
+      idCondicion: number,
+      textoCondicion: string
+    }
+  ]
 }
 
 export type AgentPreview = {

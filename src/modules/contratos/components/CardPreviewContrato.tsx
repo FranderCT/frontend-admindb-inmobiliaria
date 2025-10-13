@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
-import { Edit, CalendarDays, FileText, BriefcaseBusiness, LandPlot, Signature } from 'lucide-react'
+import { Edit, CalendarDays, FileText, BriefcaseBusiness, LandPlot, Signature, MapPin } from 'lucide-react'
 import type { CardContractProps } from '../types/contractTypes'
 import DialogDetalleContrato from './DialogDetalleContrato'
 import { getEstado } from '@/utils/contractStatus'
@@ -36,9 +36,15 @@ const CardPreviewContrato = ({ contract, onEdit }: CardContractProps) => {
                     <div className="text-muted-foreground flex gap-2 items-center">  
                         <LandPlot className="h-4 w-4" /> Propiedad: 
                     </div>
+                    <span className="font-medium">{contract.idPropiedad}</span>
+                    
+                </div>
+                <div className="flex items-center justify-between text-sm ml-10">
+                    <div className="text-muted-foreground flex gap-2 items-center">
+                        <MapPin className="h-4 w-4" /> Ubicacion:
+                    </div>
                     <span className="font-medium">{contract.Propiedad}</span>
                 </div>
-
                 <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2 text-muted-foreground">
                         <CalendarDays size={16} />
@@ -93,11 +99,11 @@ const CardPreviewContrato = ({ contract, onEdit }: CardContractProps) => {
 
     return (
         <DialogDetalleContrato
-            from="bottom"
+            
             open={open}
             onOpenChange={setOpen}
             trigger={Trigger}
-            contract={contract}
+            idContrato={contract.idContrato}
         />
     )
 }
