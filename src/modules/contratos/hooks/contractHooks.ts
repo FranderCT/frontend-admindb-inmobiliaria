@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { assignContractParticipants, createContract, getContractRoleType, getContracts, getContractType } from "../services/contractServices";
-import { ContractParticipantsPayload, CreateContract } from "../models/contract";
+import { assignContractParticipants, createContract, getAgentsPreview, getContractRoleType, getContracts, getContractType } from "../services/contractServices";
+import { AgentPreview, ContractParticipantsPayload, CreateContract } from "../models/contract";
 
 
 export const useCreateContract = () => {
@@ -74,37 +74,20 @@ export function useGetContractType() {
     };
 }
 
-export function useGetAgent(identificacion: string, opts?: { enabled?: boolean }
-) {
-    const enabled = opts?.enabled ?? true;
-    const { data, isLoading, error, isFetching } = useQuery({
-        queryKey: ["client", identificacion],
-        queryFn: () => getClient(identificacion),
-        enabled: enabled && Boolean(identificacion)
-    });
+export function useGetAgentPreview(identificacion?: string) {
+  const ced = identificacion?.trim() ?? "";
+  const key = ["agent-preview", ced.length >= 3 ? ced : "list"];
 
-    return {
-        agente: data,
-        loadingAgente: isLoading,
-        fetchingAgente: isFetching,
-        errorAgente: error,
-    };
+  const { data, isLoading, isFetching, error } = useQuery({
+    queryKey: key,
+    queryFn: () => getAgentsPreview(ced.length >= 3 ? ced : undefined),
+    staleTime: 60_000,
+  });
+
+  return {
+    agents: (data ?? []) as AgentPreview[],
+    loadingAgents: isLoading,
+    fetchingAgents: isFetching,
+    errorAgents: error,
+  };
 }
-
-export function useGetAgents() {
-    const { data, isLoading, error, isFetching } = useQuery({
-        queryKey: ["agents"],
-        queryFn: () => getAgents(),
-    });
-
-    return {
-        agentes: data,
-        loadingAgentes: isLoading,
-        fetchingAgentes: isFetching,
-        errorAgentes: error,
-    };
-}
-
-
-
-

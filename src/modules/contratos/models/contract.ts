@@ -27,7 +27,13 @@ export interface Contract{
     ]
 }
 
-
+export type AgentPreview = {
+  identificacion: number;
+  nombre?: string;
+  apellido1?: string;
+  apellido2?: string;
+  nombreCompleto?: string;
+};
 export interface RoleType {
     idRol: number;
     nombre: string;
