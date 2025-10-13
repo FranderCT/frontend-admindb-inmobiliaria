@@ -1,7 +1,25 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin 'tailwind-scrollbar';
+@page {
+  size: A4;
+  margin: 12mm;
+}
 
+@media print {
+
+  html,
+  body {
+    height: auto;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .avoid-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
 @custom-variant dark (&:is(.dark *));
 
 :root {

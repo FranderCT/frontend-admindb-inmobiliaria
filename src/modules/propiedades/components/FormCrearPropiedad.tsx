@@ -31,15 +31,7 @@ import {
 } from "@/components/ui/select";
 import { ClientSearchPreview } from "@/modules/clientes/models/client";
 import { useGetClient, useGetClients } from "@/modules/clientes/hooks/clientesHooks";
-
-function useDebounced<T>(value: T, delay = 400) {
-    const [v, setV] = useState(value);
-    useEffect(() => {
-        const id = setTimeout(() => setV(value), delay);
-        return () => clearTimeout(id);
-    }, [value, delay]);
-    return v;
-}
+import { useDebounced } from "@/utils/debounce";
 
 const FormCrearPropiedad = () => {
     const [open, setOpen] = useState(false);
