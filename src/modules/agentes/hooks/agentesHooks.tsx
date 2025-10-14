@@ -12,11 +12,10 @@ import {
   getAgent,
   getAgents,
   updateAgent,
+  activateAgent,
 } from "../services/agentesServices";
 
-
 function useQueryAgent() {
-  
   return useQueryClient();
 }
 
@@ -32,6 +31,14 @@ export const useDeleteAgent = () => {
   const queryClient = useQueryAgent();
   return useMutation({
     mutationFn: (identificacion: string) => deleteAgent(identificacion),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agents"] }),
+  });
+};
+
+export const useActivateAgent = () => {
+  const queryClient = useQueryAgent();
+  return useMutation({
+    mutationFn: (identificacion: string) => activateAgent(identificacion),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agents"] }),
   });
 };
@@ -111,7 +118,7 @@ type FiltersInput = {
   sortCol?: string;
   sortDir?: "ASC" | "DESC";
   q?: string;
-  estado?: 0 | 1 | undefined | string; 
+  estado?: 0 | 1 | undefined | string;
 };
 
 type AgentsPageResponse = {

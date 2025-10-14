@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 import { Switch, SwitchThumb } from "@/components/animate-ui/primitives/base/switch";
 import { cn } from "@/lib/utils";
 import { EditAgenteDialogProps } from "../types/agentTypes";
-import { useUpdateAgent } from "../hooks/agentesHooks";
+import { useUpdateAgent, useActivateAgent, useDeleteAgent } from "../hooks/agentesHooks"; // 👈 importar hooks
 
 const FormEditAgente = ({
   open,
@@ -27,6 +27,8 @@ const FormEditAgente = ({
   agente,
 }: EditAgenteDialogProps) => {
   const updateAgente = useUpdateAgent();
+  const activateAgente = useActivateAgent();
+  const deleteAgente = useDeleteAgent();
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -45,6 +47,21 @@ const FormEditAgente = ({
       setFormError(null);
 
       try {
+        const originalActivo = Boolean(agente.estado);
+        const nuevoActivo = Boolean(value.estado);
+
+        
+        if (originalActivo !== nuevoActivo) {
+          if (nuevoActivo) {
+            await activateAgente.mutateAsync(String(value.identificacion));
+            toast.success("Agente activado");
+          } else {
+            await deleteAgente.mutateAsync(String(value.identificacion));
+            toast.success("Agente desactivado");
+          }
+        }
+
+        
         await updateAgente.mutateAsync({
           agent: {
             identificacion: Number(value.identificacion),
@@ -53,7 +70,7 @@ const FormEditAgente = ({
             apellido2: value.apellido2?.trim() ?? "",
             telefono: value.telefono?.trim() ?? "",
             estado: Boolean(value.estado),
-          }
+          },
         });
 
         toast.success("Cliente actualizado correctamente");
@@ -78,6 +95,9 @@ const FormEditAgente = ({
       setFormError(null);
     }
   }, [open, agente]);
+
+  const isMutating =
+    updateAgente.isPending || activateAgente.isPending || deleteAgente.isPending;
 
   return (
     <Dialog open={open} onClose={onOpenChange}>
@@ -196,10 +216,10 @@ const FormEditAgente = ({
                 return (
                   <Switch
                     checked={isChecked}
-                    onCheckedChange={(v) => field.handleChange(v ? 1 : 0)} 
+                    onCheckedChange={(v) => field.handleChange(v ? 1 : 0)}
                     className={cn(
-                      'relative flex p-0.5 h-6 w-10 items-center justify-start rounded-full border transition-colors',
-                      'data-[checked]:bg-primary data-[checked]:justify-end',
+                      "relative flex p-0.5 h-6 w-10 items-center justify-start rounded-full border transition-colors",
+                      "data-[checked]:bg-primary data-[checked]:justify-end"
                     )}
                   >
                     <SwitchThumb
@@ -215,12 +235,12 @@ const FormEditAgente = ({
           {!!formError && <p className="text-red-700 text-sm text-center mb-2">{formError}</p>}
 
           <DialogFooter className="flex gap-2 mt-4">
-            <Button type="submit" disabled={updateAgente.isPending}>
-              {updateAgente.isPending ? "Guardando..." : "Guardar cambios"}
+            <Button type="submit" disabled={isMutating}>
+              {isMutating ? "Guardando..." : "Guardar cambios"}
             </Button>
 
             <DialogClose>
-              <Button type="button" variant="outline" disabled={updateAgente.isPending}>
+              <Button type="button" variant="outline" disabled={isMutating}>
                 Cancelar
               </Button>
             </DialogClose>
@@ -229,5 +249,5 @@ const FormEditAgente = ({
       </DialogPanel>
     </Dialog>
   );
-}
+};
 export default FormEditAgente;
