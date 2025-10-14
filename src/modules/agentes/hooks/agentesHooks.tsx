@@ -14,11 +14,9 @@ import {
   updateAgent,
 } from "../services/agentesServices";
 
-/* ────────────────────────────────────────────────────────────────────────────
-   Helpers
-──────────────────────────────────────────────────────────────────────────── */
+
 function useQueryAgent() {
-  // Devuelve el queryClient (antes lanzaba error).
+  
   return useQueryClient();
 }
 
@@ -29,7 +27,7 @@ export const useCreateAgent = () => {
   const queryClient = useQueryAgent();
   return useMutation({
     mutationFn: ({ agent }: { agent: CreateAgent }) => createAgent(agent),
-    // onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agents"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agents"] }),
   });
 };
 
@@ -37,7 +35,7 @@ export const useDeleteAgent = () => {
   const queryClient = useQueryAgent();
   return useMutation({
     mutationFn: (identificacion: string) => deleteAgent(identificacion),
-    // onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agents"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agents"] }),
   });
 };
 
@@ -60,14 +58,11 @@ export const useUpdateAgent = () => {
         ...dto,
       } as UpdateAgent & { identificacion: string });
     },
-    // onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agents"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agents"] }),
   });
 };
 
-/* ────────────────────────────────────────────────────────────────────────────
-   Queries simples (tal como los tenías)
-──────────────────────────────────────────────────────────────────────────── */
-export function useGetAgent() {
+export function useGetAgents() {
   const { data, isLoading, error, isPlaceholderData, isFetching } = useQuery({
     queryKey: ["agents"],
     queryFn: () => getAgents(),
@@ -82,7 +77,7 @@ export function useGetAgent() {
   };
 }
 
-export function useGetAgents(
+export function useGetAgent(
   identificacion: string,
   opts?: { enabled?: boolean }
 ) {

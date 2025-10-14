@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { AgentesFilters, AgentesProviderType, defaultFilters } from "../types/agentesContext";
 import AgentesFiltersContext from "./agentesFiltersContext";
-
+import { AgentesFilters, AgentesProviderType, defaultFilters } from "../types/agentesContext";
 
 export function AgentesFiltersProvider({ children }: AgentesProviderType) {
   const [filters, setFilters] = useState<AgentesFilters>(defaultFilters);

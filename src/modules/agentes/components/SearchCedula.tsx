@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Loader } from "lucide-react";
-import { useGetAgents } from "../hooks/agentesHooks";
+import { useGetAgent } from "../hooks/agentesHooks";
 import CardAgente from "./CardAgente";
 
 const SearchCedula =({
@@ -10,7 +10,7 @@ const SearchCedula =({
   cedula: string;
   onClear: () => void;
 }) => {
-  const { agente, loadingAgente, errorAgente } = useGetAgents(cedula);
+  const { agente, loadingAgente, errorAgente } = useGetAgent(cedula);
 
   if (loadingAgente) {
     return (

@@ -46,7 +46,7 @@ export type EditAgenteDialogProps = {
 };
 
 
-export type ClientesPaginateParams = {
+export type AgentesPaginateParams = {
   page?: number
   limit?: number
   sortCol?: string

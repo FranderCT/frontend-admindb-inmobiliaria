@@ -2,12 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormEvent, useContext, useState } from "react";
-import { AgentesFiltersProvider } from "@/modules/agentes/context/agentesFiltrosContextProvider";
-import AgentesFiltersContext from "@/modules/agentes/context/agentesFiltersContext";
 import CardAgente from "@/modules/agentes/components/CardAgente";
 import FormAgregarAgente from "@/modules/agentes/components/FormAgregarAgente";
-import AgentesFiltros from "@/modules/agentes/components/AgentesFiltros";
 import { useAgentesPaginatedFromContext } from "@/modules/agentes/hooks/usePaginationContext";
+import AgentesFiltros from "@/modules/agentes/components/AgentesFiltros";
+import { AgentesFiltersProvider } from "@/modules/agentes/context/agentesFiltrosContextProvider";
+import AgentesFiltersContext from "@/modules/agentes/context/agentesFiltersContext";
 
 export const Route = createFileRoute("/agentes/")({
   component: () => (
