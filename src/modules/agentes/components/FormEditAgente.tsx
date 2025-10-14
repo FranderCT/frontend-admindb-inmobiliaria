@@ -77,7 +77,6 @@ const FormEditAgente = ({
       setFormErrors({});
       setFormError(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, agente]);
 
   return (

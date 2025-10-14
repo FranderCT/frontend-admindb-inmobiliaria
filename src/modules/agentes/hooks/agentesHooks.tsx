@@ -20,9 +20,6 @@ function useQueryAgent() {
   return useQueryClient();
 }
 
-/* ────────────────────────────────────────────────────────────────────────────
-   Mutations
-──────────────────────────────────────────────────────────────────────────── */
 export const useCreateAgent = () => {
   const queryClient = useQueryAgent();
   return useMutation({
@@ -42,17 +39,13 @@ export const useDeleteAgent = () => {
 export const useUpdateAgent = () => {
   const queryClient = useQueryAgent();
   return useMutation({
-    // Mantén tu forma de llamar: { agent }
     mutationFn: ({ agent }: { agent: UpdateAgent }) => {
-      // Aseguramos que venga la identificación y aceptamos string | number
       const anyAgent = agent as UpdateAgent & { identificacion: string | number };
       const { identificacion, ...dto } = anyAgent;
 
       if (identificacion === undefined || identificacion === null) {
         throw new Error("Falta 'identificacion' para actualizar el agente.");
       }
-
-      // El service espera { identificacion, ...dto }
       return updateAgent({
         identificacion: String(identificacion),
         ...dto,
@@ -112,18 +105,13 @@ export function useGetHistorialAgente(identificacion: string) {
   };
 }
 
-/* ────────────────────────────────────────────────────────────────────────────
-   Query filtrado/paginado (NORMALIZADO)
-   - Siempre retorna { data, meta } para que tu UI no falle
-   - Mantiene prefetchNext()
-──────────────────────────────────────────────────────────────────────────── */
 type FiltersInput = {
   page?: number;
   limit?: number;
   sortCol?: string;
   sortDir?: "ASC" | "DESC";
   q?: string;
-  estado?: 0 | 1 | undefined | string; // permitimos string porque lo normalizas abajo
+  estado?: 0 | 1 | undefined | string; 
 };
 
 type AgentsPageResponse = {
@@ -146,7 +134,6 @@ export function useGetAgentsFiltered(
         : params?.estado,
   };
 
-  // Fetcher que normaliza la respuesta del service a { data, meta }
   const fetchNormalized = async (): Promise<AgentsPageResponse> => {
     const res: any = await getAgents(normalized);
     if (Array.isArray(res)) {
@@ -160,7 +147,6 @@ export function useGetAgentsFiltered(
         },
       };
     }
-    // Si ya viene con { data, meta }, lo respetamos
     return res as AgentsPageResponse;
   };
 
@@ -170,7 +156,6 @@ export function useGetAgentsFiltered(
     placeholderData: keepPreviousData,
   });
 
-  // Prefetch de la próxima página (misma normalización)
   const prefetchNext = () => {
     const nextPage = (normalized.page ?? 1) + 1;
     const nextFilters = { ...normalized, page: nextPage };

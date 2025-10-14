@@ -20,7 +20,7 @@ export const createAgent = async (agent: CreateAgent): Promise<Agent> => {
 };
 
 export const getAgents = async (params?: AgentsListParams): Promise<any> => {
-  let url = "/agente/todos";
+  let url = "/agente/paginate";
 
   if (params && Object.keys(params).length > 0) {
     const qs = new URLSearchParams();
