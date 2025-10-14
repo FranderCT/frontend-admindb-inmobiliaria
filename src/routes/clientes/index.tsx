@@ -6,8 +6,9 @@ import FormAgregarCliente from "@/modules/clientes/components/FormAgregarCliente
 import ClientesFiltros from "@/modules/clientes/components/ClientesFiltros";
 import { FormEvent, useContext, useState } from "react";
 import { ClientesFiltersProvider } from "@/modules/clientes/context/clientesFiltrosContextProvider";
-import { useClientesPaginatedFromContext } from "@/modules/clientes/hooks/usePaginationContext";
+
 import ClientesFiltersContext from "@/modules/clientes/context/clientesFiltersContext";
+import { useClientesPaginatedFromContext } from "@/modules/clientes/hooks/usePaginationContext";
 
 export const Route = createFileRoute("/clientes/")({
   component: () => (

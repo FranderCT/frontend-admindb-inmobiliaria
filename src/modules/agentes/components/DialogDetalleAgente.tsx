@@ -2,17 +2,14 @@ import {
   AlertDialog,
   AlertDialogTrigger,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogFooter,
   AlertDialogCancel,
 } from '@/components/animate-ui/components/radix/alert-dialog'
-
-import { DialogAgenteProps } from '../types/agentTypes'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
+import ContenidoHistorial from './ContenidoHistorial'
+import { HistorialAgenteProps } from '../types/agentTypes'
 
-const DialogDetalleCliente = ({from = 'bottom', trigger, agent}: DialogAgenteProps) => {
+const DialogDetalleAgente = ({ from = 'bottom', trigger, agent, identificacion }: HistorialAgenteProps) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
@@ -20,55 +17,17 @@ const DialogDetalleCliente = ({from = 'bottom', trigger, agent}: DialogAgentePro
       <AlertDialogContent from={from}>
         <div className="absolute right-3 top-3">
           <AlertDialogCancel asChild>
-            <Button variant="ghost" size="icon">
-              <X />
+            <Button variant="ghost" size="icon" aria-label="Cerrar">
+              <X className="h-4 w-4" />
             </Button>
           </AlertDialogCancel>
         </div>
 
-        <AlertDialogHeader className="mb-2 pr-10">
-          <AlertDialogTitle className="text-lg">
-            Historial del cliente
-          </AlertDialogTitle>
-        </AlertDialogHeader>
-
-        <div className="space-y-4 text-sm">
-          <section className="space-y-1">
-            <h3 className="font-semibold">{agent.name} {agent.lastname1} {agent.lastname2}</h3>
-            <p className="text-muted-foreground">{agent.id}</p>
-            <p className="text-muted-foreground">{agent.accumulatedcommission}</p>
-          </section>
-
-          <section className="space-y-2">
-            <h3 className="font-semibold">Historial de contratos</h3>
-
-            <div className="space-y-1">
-              <p className="font-semibold">Contrato 1</p>
-              <p className="text-muted-foreground">Propiedades asociadas al contrato</p>
-              <p className="text-muted-foreground">Rol en el contrato</p>
-            </div>
-
-            <div className="space-y-1">
-              <p className="font-semibold">Contrato 2</p>
-              <p className="text-muted-foreground">Propiedades asociadas al contrato</p>
-              <p className="text-muted-foreground">Rol en el contrato</p>
-            </div>
-
-            <div className="space-y-1">
-              <p className="font-semibold">Contrato 3</p>
-              <p className="text-muted-foreground">Propiedades asociadas al contrato</p>
-              <p className="text-muted-foreground">Rol en el contrato</p>
-            </div>
-          </section>
-        </div>
-
-        <AlertDialogFooter className="mt-6">
-          <AlertDialogCancel asChild>
-            <Button variant="outline">Cerrar</Button>
-          </AlertDialogCancel>
-        </AlertDialogFooter>
+        <ContenidoHistorial agenteNombre={agent.nombre} telefono={agent.telefono} identificacion={identificacion} />
       </AlertDialogContent>
     </AlertDialog>
   )
 }
-export default DialogDetalleCliente
+
+export default DialogDetalleAgente
+
