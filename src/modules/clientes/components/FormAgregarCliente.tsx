@@ -47,7 +47,7 @@ const FormAgregarCliente = () => {
           client:
           {
             ...parsed.data,
-            identificacion: parsed.data.identificacion!,
+            identificacion: String(parsed.data.identificacion),
             telefono: parsed.data.telefono ?? ""
           }
         });
@@ -94,11 +94,7 @@ const FormAgregarCliente = () => {
                       type="number"
                       inputMode="numeric"
                       value={field.state.value ?? ""}
-                      onChange={(e) => {
-                        const v = e.currentTarget.valueAsNumber;
-                        if (Number.isNaN(v)) field.handleChange(undefined);
-                        else field.handleChange(Math.trunc(v));
-                      }}
+                      onChange={(e) => field.handleChange(String(e.target.value))}
                       placeholder="504440503"
                       min={1}
                       step={1}

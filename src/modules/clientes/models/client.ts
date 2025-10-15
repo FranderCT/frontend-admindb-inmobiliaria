@@ -8,7 +8,7 @@ export interface Client {
 }
 
 export interface CreateClient {
-  identificacion: number;
+  identificacion: string;
   nombre: string;
   apellido1: string;
   apellido2?: string;

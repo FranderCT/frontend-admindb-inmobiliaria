@@ -29,7 +29,7 @@ const ClientesFiltros = () => {
   const clear = () => {
     resetFilters();
     setLocal({
-      page: 1, limit: 9, sortCol: "identificacion", sortDir: "ASC", q: "", estado: "1",
+      page: 1, limit: 6, sortCol: "identificacion", sortDir: "ASC", q: "", estado: "1",
     });
   };
 
