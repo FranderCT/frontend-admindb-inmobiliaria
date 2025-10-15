@@ -12,17 +12,10 @@ import { ClientSearchPreview } from "@/modules/clientes/models/client";
 import { useDebounced } from "@/utils/debounce";
 import { RoleType } from "../models/contract";
 import { assignParticipantsSchema } from "../schema/contractValidators";
+import { FormAsignClientContractProps, ClientContractRow } from "../types/contractTypes";
 
-type Props = {
-  idContrato: number;
-  onSuccess?: () => void;
-  onCancel?: () => void;
-};
-
-type Row = { identificacion?: number; idRol?: number; };
-
-export default function FormAsignarParticipantes({ idContrato, onSuccess, onCancel }: Props) {
-  const [rows, setRows] = useState<Row[]>([]);
+export default function FormAsignarParticipantes({ idContrato, onSuccess, onCancel }: FormAsignClientContractProps) {
+  const [rows, setRows] = useState<ClientContractRow[]>([]);
   const [cedulaQuery, setCedulaQuery] = useState<string>("");
   const assign = useAssignContractParticipants();
   const { contractRoleTypes = [], loadingContractRoleTypes, errorContractRoleTypes } = useGetContractRoleType();

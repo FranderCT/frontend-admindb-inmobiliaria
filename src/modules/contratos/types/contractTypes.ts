@@ -27,3 +27,52 @@ export type DialogContractDetailProps = {
   open?: boolean
   onOpenChange?: (v: boolean) => void
 }
+export type EditContractProps = {
+  initial: {
+    idContrato: number;
+    fechaInicio?: string;
+    fechaFin?: string;
+    fechaFirma?: string;
+    fechaPago?: string;
+    idTipoContrato?: number;
+    idPropiedad?: number;
+    idAgente?: number;
+    montoTotal?: number;
+    deposito?: number;
+    porcentajeComision?: number;
+    estado?: string | null;
+    condiciones?: string[];
+  };
+  onSuccess?: () => void; 
+};
+
+export type FormEditContractProps = {
+  open: boolean
+  onOpenChange: (v: boolean) => void
+  initial: {
+    idContrato: number
+    fechaInicio?: string
+    fechaFin?: string
+    fechaFirma?: string
+    fechaPago?: string
+    idTipoContrato?: number
+    idPropiedad?: number
+    idAgente?: number
+    montoTotal?: number
+    deposito?: number
+    porcentajeComision?: number
+    estado?: string | null
+    condiciones?: string[]
+  }
+}
+
+
+
+
+export type FormAsignClientContractProps = {
+  idContrato: number;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+};
+
+export type ClientContractRow = { identificacion?: number; idRol?: number; };

@@ -1,4 +1,3 @@
-// FormEditarContratoDialog.tsx
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -10,28 +9,9 @@ import {
   DialogClose,
 } from '@/components/animate-ui/components/headless/dialog'
 import FormEditarContrato from './FormEditarContrato'
+import { FormEditContractProps } from '../types/contractTypes'
 
-type Props = {
-  open: boolean
-  onOpenChange: (v: boolean) => void
-  initial: {
-    idContrato: number
-    fechaInicio?: string
-    fechaFin?: string
-    fechaFirma?: string
-    fechaPago?: string
-    idTipoContrato?: number
-    idPropiedad?: number
-    idAgente?: number
-    montoTotal?: number
-    deposito?: number
-    porcentajeComision?: number
-    estado?: string | null
-    condiciones?: string[]
-  }
-}
-
-export default function DialogEditarContrato({ open, onOpenChange, initial }: Props) {
+export default function DialogEditarContrato({ open, onOpenChange, initial }: FormEditContractProps) {
   return (
     <Dialog open={open} onClose={(v) => onOpenChange(Boolean(v))}>
       <DialogPanel className="max-h-[95vh] rounded-2xl overflow-hidden p-0">

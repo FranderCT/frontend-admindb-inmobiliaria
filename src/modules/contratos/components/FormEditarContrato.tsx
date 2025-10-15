@@ -10,29 +10,11 @@ import { toast } from "sonner";
 import { useState, useMemo } from "react";
 import { useUpdateContract, useGetContractType, useGetAvailableProperties, useGetAgentPreview } from "../hooks/contractHooks";
 import type { AgentPreview, AvailableProperty, ContractType, UpdateContract } from "../models/contract";
-
-type Props = {
-  initial: {
-    idContrato: number;
-    fechaInicio?: string;
-    fechaFin?: string;
-    fechaFirma?: string;
-    fechaPago?: string;
-    idTipoContrato?: number;
-    idPropiedad?: number;
-    idAgente?: number;
-    montoTotal?: number;
-    deposito?: number;
-    porcentajeComision?: number;
-    estado?: string | null;
-    condiciones?: string[];
-  };
-  onSuccess?: () => void; 
-};
+import { EditContractProps } from "../types/contractTypes";
 
 const toTextBlock = (arr?: string[]) => (arr?.length ? arr.join("\n") : "");
 
-export default function FormEditarContrato({ initial, onSuccess }: Props) {
+export default function FormEditarContrato({ initial, onSuccess }: EditContractProps) {
   const update = useUpdateContract();
   const { contractTypes, loadingContractTypes } = useGetContractType();
   const { availableProperties, loadingAvailableProperties } = useGetAvailableProperties();
