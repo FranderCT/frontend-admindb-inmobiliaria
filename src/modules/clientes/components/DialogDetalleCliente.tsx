@@ -9,7 +9,6 @@ import { X } from 'lucide-react'
 import type { HistorialClienteProps } from '../types/clientTypes'
 import ContenidoHistorial from './ContenidoHistorial'
 
-
 const DialogDetalleCliente = ({ from = 'bottom', trigger, client, identificacion }: HistorialClienteProps) => {
   return (
     <AlertDialog>

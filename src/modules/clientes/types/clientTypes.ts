@@ -45,6 +45,20 @@ export type EditClienteDialogProps = {
   };
 };
 
+export type ConfirmDialogProps = {
+  open: boolean
+  onOpenChange: (v: boolean) => void
+  title: string
+  description?: string
+  confirmText?: string
+  cancelText?: string
+  from?: React.ComponentProps<typeof DialogPanel>['from']
+  showCloseButton?: boolean
+  onConfirm: () => Promise<void> | void
+  loading?: boolean
+}
+
+
 
 export type ClientesPaginateParams = {
   page?: number

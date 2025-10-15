@@ -8,19 +8,7 @@ import {
 } from "@/components/animate-ui/components/headless/dialog";
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
-
-type ConfirmDialogProps = {
-  open: boolean
-  onOpenChange: (v: boolean) => void
-  title: string
-  description?: string
-  confirmText?: string
-  cancelText?: string
-  from?: React.ComponentProps<typeof DialogPanel>['from']
-  showCloseButton?: boolean
-  onConfirm: () => Promise<void> | void
-  loading?: boolean
-}
+import { ConfirmDialogProps } from "../types/clientTypes";
 
 export default function ConfirmDialog({
   open,

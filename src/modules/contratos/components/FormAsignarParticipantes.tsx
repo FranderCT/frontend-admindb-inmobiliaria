@@ -57,7 +57,7 @@ export default function FormAsignarParticipantes({ idContrato, onSuccess, onCanc
 
   const addRow = () => setRows((p) => [...p, {}]);
   const removeRow = (idx: number) => setRows((p) => p.filter((_, i) => i !== idx));
-  const patchRow = (idx: number, patch: Partial<Row>) => setRows((p) => p.map((r, i) => i === idx ? { ...r, ...patch } : r));
+  const patchRow = (idx: number, patch: Partial<ClientContractRow>) => setRows((p) => p.map((r, i) => i === idx ? { ...r, ...patch } : r));
 
   const totalReady = rows.filter(r => r.identificacion && r.idRol).length;
 
