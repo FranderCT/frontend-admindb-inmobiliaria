@@ -10,9 +10,9 @@ function App({ children }: { children: React.ReactNode }) {
       <AppSidebar isOpen={open} setIsOpen={setOpen} />
       <main
         className={cn(
-          "relative min-h-screen px-4 pb-4 pt-0 pr-4",          // sin espacio arriba
+          "relative min-h-screen px-4 pb-4 pt-0 pr-4",
           "transition-[padding] duration-300 ease-in-out",
-          open ? "lg:pl-64" : "lg:pl-4"                           // ¡válido! 64 = 16rem
+          open ? "lg:pl-64" : "lg:pl-4" 
         )}
       >
         {children}

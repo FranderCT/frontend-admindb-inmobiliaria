@@ -103,7 +103,7 @@ export default function FormEditarContrato({ initial, onSuccess }: EditContractP
       try {
         await update.mutateAsync({ contract: payload });
         toast.success("Contrato actualizado.");
-        onSuccess?.(); // <- cierra el diálogo desde el padre
+        onSuccess?.(); 
       } catch {
         toast.error("Error actualizando contrato.");
       }

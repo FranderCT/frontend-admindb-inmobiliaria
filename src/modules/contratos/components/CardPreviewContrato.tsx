@@ -89,9 +89,9 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
               variant="ghost"
               aria-label="Editar"
               onClick={(e) => {
-                e.stopPropagation() // 👈 evita abrir el detalle
+                e.stopPropagation()
                 e.preventDefault()
-                setOpenEdit(true)   // 👈 abre el diálogo de edición
+                setOpenEdit(true)
               }}
             >
               <Edit size={18} />
