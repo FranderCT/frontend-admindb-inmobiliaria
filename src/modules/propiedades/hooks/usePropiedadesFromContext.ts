@@ -10,8 +10,6 @@ export function usePropiedadesPaginatedFromContext() {
     const query = useGetPropertiesFiltered(filters);
 
     useEffect(() => {
-        // si quieres prefetch de siguiente página
-        // query.prefetchNext?.();
     }, [filters.page]);
 
     return query;

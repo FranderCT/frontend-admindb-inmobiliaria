@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const asNumber = (requiredMsg: string) =>
   z.preprocess(
-    (v) => (v ?? ""), // undefined/null -> ""
+    (v) => (v ?? ""), 
     z.union([z.string(), z.number()])
       .transform((v) => {
         if (typeof v === "number") return v;
