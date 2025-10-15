@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { assignContractParticipants, createContract, getAgentsPreview, getContract, getContractRoleType, getContracts, getContractType } from "../services/contractServices";
-import { AgentPreview, ContractParticipantsPayload, CreateContract } from "../models/contract";
-
+import { assignContractParticipants, createContract, getAgentsPreview, getAvailableProperties, getContract, getContractRoleType, getContracts, getContractType, patchUpdateContract } from "../services/contractServices";
+import { AgentPreview, ContractParticipantsPayload, CreateContract, UpdateContract } from "../models/contract";
 
 export const useCreateContract = () => {
     const queryClient = useQueryClient();
@@ -32,6 +31,7 @@ export const useAssignContractParticipants = () => {
         },
     });
 };
+
 export function useGetContracts() {
     const { data, isLoading, error, isFetching } = useQuery({
         queryKey: ["contracts"],
@@ -105,3 +105,26 @@ export function useGetAgentPreview(identificacion?: string) {
     errorAgents: error,
   };
 }
+export function useGetAvailableProperties() {
+    const { data, isLoading, error, isFetching } = useQuery({
+        queryKey: ["availableProperties"],
+        queryFn: () => getAvailableProperties(),
+    });
+
+    return {
+        availableProperties: data,
+        loadingAvailableProperties: isLoading,
+        fetchingAvailableProperties: isFetching,
+        errorAvailableProperties: error,
+    };
+}
+
+export const useUpdateContract = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+      mutationFn: (payload: { contract: UpdateContract }) => patchUpdateContract(payload.contract),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contracts", ] });
+    },
+  });
+};

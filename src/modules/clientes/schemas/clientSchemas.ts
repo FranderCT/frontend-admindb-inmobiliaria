@@ -1,19 +1,54 @@
 import { z } from "zod";
 
-export const createClienteSchema = z.object({
-  identificacion: z.coerce
-    .number()
-    .int({ message: "La cédula debe ser un número entero" })
-    .positive({ message: "La cédula debe ser positiva" }),
-  nombre: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  apellido1: z.string().min(2, "El primer apellido es obligatorio"),
-  apellido2: z.string().optional().or(z.literal("")),
-  telefono: z
-    .string()
-    .min(8, "El teléfono es muy corto")
-    .max(20, "El teléfono es muy largo")
-    .regex(/^[0-9+\-\s]+$/, "Formato de teléfono inválido"),
+const asNumber = (requiredMsg: string) =>
+  z.preprocess(
+    (v) => (v ?? ""), 
+    z.union([z.string(), z.number()])
+      .transform((v) => {
+        if (typeof v === "number") return v;
+        const t = v.trim();
+        if (t === "") return NaN;
+        const n = Number(t);
+        return Number.isNaN(n) ? NaN : n;
+      })
+      .refine((n) => !Number.isNaN(n), requiredMsg)
+  );
+
+const requiredInt = (msg: string) =>
+  asNumber(msg)
+    .refine((n) => Number.isInteger(n), "Debe ser un número entero")
+    .refine((n) => n > 0, "Debe ser mayor a 0");
+
+const emptyToUndef = z
+  .string()
+  .transform((s) => (s.trim() === "" ? undefined : s.trim()))
+  .optional();
+
+export const createClientSchema = z.object({
+  identificacion: requiredInt("La identificación es obligatoria"),
+  nombre: z.string().min(1, "El nombre es obligatorio"),
+  apellido1: z.string().min(1, "El primer apellido es obligatorio"),
+  apellido2: emptyToUndef,
+  telefono: emptyToUndef,
 });
 
+export type CreateClientFormValues = z.infer<typeof createClientSchema>;
 
-export type CreateClient = z.infer<typeof createClienteSchema>;
+const asBoolean = z.preprocess(
+  (v) => (v === 1 || v === "1" || v === true ? true : false),
+  z.boolean()
+);
+
+export const editClientSchema = z.object({
+  identificacion: requiredInt("La identificación es obligatoria"),
+  nombre: z.string().min(1, "El nombre es obligatorio"),
+  apellido1: z.string().min(1, "El primer apellido es obligatorio"),
+  apellido2: emptyToUndef.optional(), 
+  telefono: emptyToUndef.refine(
+    (v) => !v || /^\d{8}$/.test(v), 
+    "El teléfono debe tener 8 dígitos"
+  ),
+  estado: asBoolean, 
+});
+
+export type EditClientPayload = z.infer<typeof editClientSchema>;

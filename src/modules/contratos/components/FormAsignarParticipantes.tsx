@@ -1,33 +1,25 @@
 import { useMemo, useState } from "react";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { DialogFooter, DialogHeader, DialogTitle, DialogDescription, Dialog } from "@/components/ui/dialog";
 import { useAssignContractParticipants, useGetContractRoleType } from "../hooks/contractHooks";
 import { useGetClient, useGetClients } from "@/modules/clientes/hooks/clientesHooks";
 import { ClientSearchPreview } from "@/modules/clientes/models/client";
 import { useDebounced } from "@/utils/debounce";
 import { RoleType } from "../models/contract";
+import { assignParticipantsSchema } from "../schema/contractValidators";
+import { FormAsignClientContractProps, ClientContractRow } from "../types/contractTypes";
 
-type Props = {
-  idContrato: number;
-  onSuccess?: () => void;
-  onCancel?: () => void;
-};
-
-type Row = { identificacion?: number; idRol?: number; };
-
-export default function FormAsignarParticipantes({ idContrato, onSuccess, onCancel }: Props) {
-  const [rows, setRows] = useState<Row[]>([]);
+export default function FormAsignarParticipantes({ idContrato, onSuccess, onCancel }: FormAsignClientContractProps) {
+  const [rows, setRows] = useState<ClientContractRow[]>([]);
   const [cedulaQuery, setCedulaQuery] = useState<string>("");
-
   const assign = useAssignContractParticipants();
   const { contractRoleTypes = [], loadingContractRoleTypes, errorContractRoleTypes } = useGetContractRoleType();
 
-  // búsqueda clientes — MISMO patrón
   const debouncedCedula = useDebounced(cedulaQuery.trim(), 450);
   const enabledSearch = debouncedCedula.length >= 3;
 
@@ -65,44 +57,49 @@ export default function FormAsignarParticipantes({ idContrato, onSuccess, onCanc
 
   const addRow = () => setRows((p) => [...p, {}]);
   const removeRow = (idx: number) => setRows((p) => p.filter((_, i) => i !== idx));
-  const patchRow = (idx: number, patch: Partial<Row>) => setRows((p) => p.map((r, i) => i === idx ? { ...r, ...patch } : r));
+  const patchRow = (idx: number, patch: Partial<ClientContractRow>) => setRows((p) => p.map((r, i) => i === idx ? { ...r, ...patch } : r));
 
   const totalReady = rows.filter(r => r.identificacion && r.idRol).length;
 
   const handleSave = async () => {
-    if (totalReady === 0) {
-      toast.error("Selecciona al menos un cliente y su rol.");
+    const participantes = rows
+      .filter(r => r.identificacion && r.idRol)
+      .map(r => ({
+        identificacion: r.identificacion!,
+        idRol: r.idRol!,
+        idContrato, 
+      }));
+
+    const result = assignParticipantsSchema.safeParse({
+      idContrato,
+      participantes: participantes.map(({ identificacion, idRol }) => ({ identificacion, idRol })),
+    });
+
+    if (!result.success) {
+      const first = result.error.issues[0];
+      toast.error(first?.message ?? "Revisa los participantes antes de guardar.");
       return;
     }
-    const payload = {
-      participantes: rows
-        .filter(r => r.identificacion && r.idRol)
-        .map(r => ({
-          identificacion: Number(r.identificacion),
-          idRol: Number(r.idRol),
-          idContrato,
-        })),
-    };
+
     try {
-      await assign.mutateAsync(payload);
+      await assign.mutateAsync({ participantes });
       toast.success("Participantes asignados correctamente.");
       setRows([]);
       setCedulaQuery("");
       onSuccess?.();
     } catch (err) {
-      toast.error("Error asignando participantes.", err);
+      toast.error("Error asignando participantes."+ err);
     }
   };
 
   return (
-    <>
+    <Dialog>
       <DialogHeader>
         <DialogTitle>Asignar participantes</DialogTitle>
         <DialogDescription>Contrato #{idContrato}. Agrega clientes y su rol en el contrato.</DialogDescription>
       </DialogHeader>
 
       <div className="space-y-2 rounded-md border p-3 mb-4">
-        <Label className="font-semibold">Buscar clientes</Label>
 
         <div className="flex items-end gap-2">
           <div className="flex-1">
@@ -120,7 +117,7 @@ export default function FormAsignarParticipantes({ idContrato, onSuccess, onCanc
         </div>
 
         <div className="flex items-center gap-2">
-          <Button type="button" variant="secondary" onClick={addRow}>+ Agregar fila</Button>
+          <Button type="button" variant="secondary" onClick={addRow}><Plus/> Agregar fila</Button>
           <span className="text-sm text-muted-foreground">Completa cédula y rol por cada fila.</span>
         </div>
       </div>
@@ -130,7 +127,7 @@ export default function FormAsignarParticipantes({ idContrato, onSuccess, onCanc
           <p className="text-sm opacity-70">Sin filas. Usa “Agregar fila”.</p>
         ) : (
           rows.map((row, idx) => (
-            <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end border p-3 rounded-md">
+            <div key={idx} className=" flex justify-between items-center">
               <div>
                 <Label className="text-sm mb-1">Seleccionar cliente</Label>
                 <Select
@@ -235,6 +232,6 @@ export default function FormAsignarParticipantes({ idContrato, onSuccess, onCanc
           Volver
         </Button>
       </DialogFooter>
-    </>
+    </Dialog>
   );
 }

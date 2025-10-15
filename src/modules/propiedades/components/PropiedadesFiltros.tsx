@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
 import { useContext, useState } from "react";
-//import { useGetPropertyStatuses, useGetPropertyTypes } from "../hooks/propiedadesHook";
 import PropiedadesFiltersContext from "../context/propiedadesContext";
 
 const PropiedadesFiltros = () => {
@@ -16,31 +15,12 @@ const PropiedadesFiltros = () => {
     const { filters, patchFilters, resetFilters } = ctx;
 
     const [open, setOpen] = useState(false);
-    //const [hasOpened, setHasOpened] = useState(false);
     const [local, setLocal] = useState(filters);
-
-    //const enabled = open || hasOpened;
-
-    //const { propertyTypes, loadingPropertyTypes } = useGetPropertyTypes({ enabled });
-    //const { propertyStatuses, loadingPropertyStatuses } = useGetPropertyStatuses({ enabled });
-
-    //const propertyTypesData = useMemo(() => {
-    //    if (Array.isArray(propertyTypes)) return propertyTypes;
-    //    if (Array.isArray((propertyTypes as any)?.data)) return (propertyTypes as any).data;
-    //    return [] as Array<{ idTipoInmueble: number; nombre: string }>;
-    //}, [propertyTypes]);
-
-    //const propertyStatusesData = useMemo(() => {
-    //    if (Array.isArray(propertyStatuses)) return propertyStatuses;
-    //    if (Array.isArray((propertyStatuses as any)?.data)) return (propertyStatuses as any).data;
-    //    return [] as Array<{ idEstadoPropiedad: number; nombre: string }>;
-    //}, [propertyStatuses]);
 
     if (!ctx) return null;
     const handleOpenChange = (v: boolean) => {
         setOpen(v);
         if (v) {
-            //setHasOpened(true);
             setLocal(filters);
         }
     };
@@ -55,7 +35,7 @@ const PropiedadesFiltros = () => {
         setLocal({
             ...filters,
             page: 1,
-            limit: 9,
+            limit: 6,
             sortCol: "idPropiedad",
             sortDir: "ASC",
             q: "",
@@ -82,7 +62,6 @@ const PropiedadesFiltros = () => {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-neutral-500 scrollbar-track-transparent">
-                    {/* Buscar */}
                     <div className="grid gap-2">
                         <label className="text-sm font-medium">Buscar</label>
                         <Input
@@ -92,7 +71,6 @@ const PropiedadesFiltros = () => {
                         />
                     </div>
 
-                    {/* Estado activo/inactivo */}
                     <div className="grid gap-2">
                         <label className="text-sm font-medium">Estado (activo/inactivo)</label>
                         <Select
@@ -116,7 +94,6 @@ const PropiedadesFiltros = () => {
                         </Select>
                     </div>
 
-                    {/* Orden / Dirección / Límite */}
                     <div className="grid gap-2">
                         <label className="text-sm font-medium">Ordenar por</label>
                         <Select

@@ -1,5 +1,5 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { AgentPreview, Contract, ContractDetails, ContractParticipantsPayload, ContractType, CreateContract, RoleType } from "../models/contract";
+import { AgentPreview, AvailableProperty, Contract, ContractDetails, ContractParticipantsPayload, ContractType, CreateContract, RoleType, UpdateContract } from "../models/contract";
 import { normalize, RawAgent } from "../types/contractTypes";
 
 export const createContract = async (contract: CreateContract): Promise<CreateContract> => {
@@ -47,3 +47,15 @@ export const getAgentsPreview = async (identificacion?: string): Promise<AgentPr
   });
   return normalize(data);
 };
+
+export const getAvailableProperties = async (): Promise<AvailableProperty[]> => {
+  const response = await altosDelValleAPI.get<AvailableProperty[]>(`/propiedad/available-properties`);
+  return response.data;
+};
+
+//patch
+
+export const patchUpdateContract = async (data: UpdateContract): Promise<{ ok: boolean }> => {
+  const response = await altosDelValleAPI.patch<{ ok: boolean }>(`contrato/${data.idContrato}`, data);
+  return response.data;
+}
