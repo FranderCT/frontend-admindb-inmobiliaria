@@ -8,9 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { extractServerErrors } from "@/utils/serverExtract";
 import { useDebounced } from "@/utils/debounce";
-import { useCreateContract, useGetAgentPreview, useGetContractType } from "../hooks/contractHooks";
+import { useCreateContract, useGetAgentPreview, useGetAvailableProperties, useGetContractType } from "../hooks/contractHooks";
 import FormAsignarParticipantes from "./FormAsignarParticipantes";
-import { AgentPreview, ContractType, CreateContract } from "../models/contract";
+import { AgentPreview, AvailableProperty, ContractType, CreateContract } from "../models/contract";
 import { useState } from "react";
 import {
   Dialog,
@@ -21,6 +21,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/animate-ui/components/headless/dialog";
+import { createContractSchema } from "../schema/contractValidators";
 
 type Step = "create" | "assign";
 const hoyISO = () => new Date().toISOString().slice(0, 10);
@@ -29,6 +30,8 @@ export default function FormCrearContrato() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("create");
   const [createdContractId, setCreatedContractId] = useState<number | null>(null);
+  
+  const { availableProperties, loadingAvailableProperties } = useGetAvailableProperties();
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -68,6 +71,18 @@ export default function FormCrearContrato() {
     onSubmit: async ({ value }) => {
       setFormErrors({});
       setFormError(null);
+
+      const result = createContractSchema.safeParse(value);
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        for (const i of result.error.issues) {
+          const k = i.path.join(".");
+          if (!fieldErrors[k]) fieldErrors[k] = i.message;
+        }
+        setFormErrors(fieldErrors);
+        return;
+      }
+
       try {
         const payload: CreateContract = {
           fechaInicio: value.fechaInicio,
@@ -98,7 +113,7 @@ export default function FormCrearContrato() {
         setFormErrors(fieldErrors);
         setFormError(formError ?? "Error creando contrato.");
       }
-    },
+    }
   });
 
   const resetAll = () => {
@@ -192,21 +207,27 @@ export default function FormCrearContrato() {
                     )}
                   </form.Field>
 
+                  
                   <form.Field name="idPropiedad">
                     {(field) => (
                       <div>
-                        <Label className="font-semibold">ID Propiedad</Label>
-                        <Input
-                          type="number"
-                          min={1}
-                          step={1}
-                          value={field.state.value ?? ""}
-                          onChange={(e) => {
-                            const v = e.currentTarget.valueAsNumber;
-                            field.handleChange(Number.isNaN(v) ? undefined : Math.trunc(v));
-                          }}
-                          placeholder="Ej. 3"
-                        />
+                        <Label className="font-semibold">Propiedad</Label>
+                        <Select
+                          value={field.state.value ? String(field.state.value) : ""}
+                          onValueChange={(v) => field.handleChange(Number(v))}
+                          disabled={loadingAvailableProperties}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={loadingAvailableProperties ? "Cargando..." : "Selecciona una propiedad"} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableProperties.map((p: AvailableProperty) => (
+                              <SelectItem key={p.idPropiedad} value={String(p.idPropiedad)}>
+                                {p.idPropiedad} - {p.ubicacion}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         {formErrors.idPropiedad && <p className="text-red-700 text-sm">{formErrors.idPropiedad}</p>}
                       </div>
                     )}

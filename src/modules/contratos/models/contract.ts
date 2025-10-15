@@ -14,23 +14,25 @@ export interface CreateContract {
   condiciones: string[];
 }
 
-export interface Contract{
-    idContrato: number,
-    fechaInicio: string,
-    fechaFin: string,
-    fechaFirma: string,
-    fechaPago: string,
-    TipoContrato: string,
-    idPropiedad: number,
-    Propiedad: string,
-    NombreAgente: string,
-    ApellidoAgente: string,
-    condiciones: [
-      {
-        idCondicion: number,
-        textoCondicion: string
-      }
-    ]
+export interface Contract {
+  idContrato: number,
+  fechaInicio: string,
+  fechaFin: string,
+  fechaFirma: string,
+  fechaPago: string,
+  idTipoContrato: number,
+  TipoContrato: string,
+  idPropiedad: number,
+  Propiedad: string,
+  idAgente: number,
+  NombreAgente: string,
+  ApellidoAgente: string,
+  condiciones: [
+    {
+      idCondicion: number,
+      textoCondicion: string
+    }
+  ]
 }
 
 export interface ContractProperty {
@@ -83,12 +85,12 @@ export type AgentPreview = {
   nombreCompleto?: string;
 };
 export interface RoleType {
-    idRol: number;
-    nombre: string;
+  idRol: number;
+  nombre: string;
 }
 export interface ContractType {
-    idTipoContrato: number;
-    nombre: string;
+  idTipoContrato: number;
+  nombre: string;
 }
 export interface ContractParticipantsPayload {
   participantes: Array<{
@@ -96,4 +98,25 @@ export interface ContractParticipantsPayload {
     idRol: number;
     idContrato: number;
   }>;
+}
+
+export interface AvailableProperty {
+  idPropiedad: number;
+  ubicacion: string;
+}
+
+export interface UpdateContract {
+  idContrato: number;
+  fechaInicio?: string;
+  fechaFin?: string;
+  fechaFirma?: string;
+  fechaPago?: string;
+  idTipoContrato?: number;
+  idPropiedad?: number;
+  idAgente?: number;
+  montoTotal?: number;
+  deposito?: number;
+  porcentajeComision?: number;
+  estado?: string | null;
+  condiciones?: string[];
 }

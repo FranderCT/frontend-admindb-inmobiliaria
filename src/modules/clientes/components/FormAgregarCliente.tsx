@@ -17,6 +17,7 @@ import { useCreateClient } from "../hooks/clientesHooks";
 import { initialValuesClient } from "../types/clientTypes";
 import { Label } from "@radix-ui/react-label";
 import { extractServerErrors } from "@/utils/serverExtract";
+import { createClientSchema } from "../schemas/clientSchemas";
 
 const FormAgregarCliente = () => {
   const [open, setOpen] = useState(false);
@@ -30,8 +31,26 @@ const FormAgregarCliente = () => {
       setFormErrors({});
       setFormError(null);
 
+      const parsed = createClientSchema.safeParse(value);
+      if (!parsed.success) {
+        const errs: Record<string, string> = {};
+        for (const i of parsed.error.issues) {
+          const k = i.path.join(".");
+          if (!errs[k]) errs[k] = i.message;
+        }
+        setFormErrors(errs);
+        return;
+      }
+
       try {
-        await create.mutateAsync({ client: value });
+        await create.mutateAsync({
+          client:
+          {
+            ...parsed.data,
+            identificacion: parsed.data.identificacion!,
+            telefono: parsed.data.telefono ?? ""
+          }
+        });
         formApi.reset();
         setOpen(false);
         toast.success("Cliente creado correctamente");
@@ -42,7 +61,6 @@ const FormAgregarCliente = () => {
       }
     },
   });
-
 
   return (
     <>
@@ -79,7 +97,7 @@ const FormAgregarCliente = () => {
                       onChange={(e) => {
                         const v = e.currentTarget.valueAsNumber;
                         if (Number.isNaN(v)) field.handleChange(undefined);
-                        else field.handleChange(Math.trunc(v)); 
+                        else field.handleChange(Math.trunc(v));
                       }}
                       placeholder="504440503"
                       min={1}

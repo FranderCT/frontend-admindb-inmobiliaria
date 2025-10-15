@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ import {
 import { ClientSearchPreview } from "@/modules/clientes/models/client";
 import { useGetClient, useGetClients } from "@/modules/clientes/hooks/clientesHooks";
 import { useDebounced } from "@/utils/debounce";
+import { createPropertySchema } from "../schema/propertyValidators";
 
 const FormCrearPropiedad = () => {
     const [open, setOpen] = useState(false);
@@ -84,6 +85,18 @@ const FormCrearPropiedad = () => {
         onSubmit: async ({ value, formApi }) => {
             setFormErrors({});
             setFormError(null);
+
+            const result = createPropertySchema.safeParse(value);
+            if (!result.success) {
+                const errs: Record<string, string> = {};
+                for (const i of result.error.issues) {
+                    const k = i.path.join(".");
+                    if (!errs[k]) errs[k] = i.message; 
+                }
+                setFormErrors(errs);
+                return; 
+            }
+
             try {
                 await create.mutateAsync({ property: value });
                 formApi.reset();
@@ -95,7 +108,7 @@ const FormCrearPropiedad = () => {
                 setFormErrors(fieldErrors);
                 setFormError(formError ?? null);
             }
-        },
+        }
     });
 
     return (

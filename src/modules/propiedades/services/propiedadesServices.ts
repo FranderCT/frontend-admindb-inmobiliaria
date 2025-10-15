@@ -1,6 +1,8 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
 import { CreatePropertyStatus, CreatePropertyType, CreateProperty, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty } from "../models/propiedad";
 
+
+// post
 export const createProperty = async (property: CreateProperty): Promise<CreateProperty> => {
   const response = await altosDelValleAPI.post<CreateProperty>(
     `/propiedad`,
@@ -25,7 +27,7 @@ export const createPropertyStatus = async (status: CreatePropertyStatus): Promis
   return response.data;
 };
 
-
+// get
 
 export const getPropertyStatuses = async (): Promise<PropertyStatus[]> => {
   const response = await altosDelValleAPI.get<PropertyStatus[]>(`estado-propiedad`);
@@ -58,11 +60,14 @@ export const getPropertiesFiltered = async (p: PropertysPaginateParams) => {
   return data;
 };
 
+//delete
 export const deleteProperty = async (idPropiedad: number): Promise<{ ok: boolean }> => {
     const response = await altosDelValleAPI.delete<{ ok: boolean }>(`propiedad/${idPropiedad}`);
     return response.data;
 }
 
+
+// patch
 export const updateProperty = async (data: UpdateProperty): Promise<{ ok: boolean }> => {
   const response = await altosDelValleAPI.patch<{ ok: boolean }>(`propiedad/${data.idPropiedad}`, data);
   return response.data;
