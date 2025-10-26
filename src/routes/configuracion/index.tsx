@@ -1,7 +1,9 @@
-import TileCard from '@/components/TileCard';
+import { Can } from '@/modules/seguridad/components/Can';
+import CardUser from '@/modules/seguridad/components/CardUser';
+import FormRegister from '@/modules/seguridad/components/FormRegister';
+import { useGetUsers } from '@/modules/seguridad/hooks/usuariosHooks';
 import { protectRoute } from '@/modules/seguridad/utils/authGuard';
 import { createFileRoute } from '@tanstack/react-router'
-import { User } from 'lucide-react';
 
 export const Route = createFileRoute('/configuracion/')({
   beforeLoad: ({ location }) => {
@@ -12,13 +14,23 @@ export const Route = createFileRoute('/configuracion/')({
 })
 
 function RouteComponent() {
+  const { users, loadingUsers, errorUsers } = useGetUsers();
   return (<section className="m-4">
     <header className="flex items-center justify-between mb-4 ml-16">
-      <h1 className="text-4xl font-bold">Configuración</h1>
+      <h1 className="text-4xl font-bold">Gestionar usuarios</h1>
+      <nav>
+        <Can resource="seguridad" action="create">
+          <FormRegister />
+        </Can>
+      </nav>
     </header>
 
     <main className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      <TileCard icon={<User />} title='Usuarios' desc='Gestión de usuarios' to='usuarios' />
+      {loadingUsers && <p>Cargando usuarios...</p>}
+      {errorUsers && <p>Error al cargar usuarios: {errorUsers.message}</p>}
+      {users && users.map(user => (
+        <CardUser key={user.idUsuario} user={user} />
+      ))}
     </main>
   </section>
   );

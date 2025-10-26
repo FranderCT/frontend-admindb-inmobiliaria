@@ -1,6 +1,7 @@
 import CardPreviewContrato from '@/modules/contratos/components/CardPreviewContrato';
 import FormCrearContrato from '@/modules/contratos/components/FormCrearContrato';
 import { useGetContracts } from '@/modules/contratos/hooks/contractHooks';
+import { Can } from '@/modules/seguridad/components/Can';
 import { protectRoute } from '@/modules/seguridad/utils/authGuard';
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react';
@@ -30,7 +31,9 @@ function RouteComponent() {
       </header>
 
       <nav className="flex flex-wrap gap-4 items-center justify-end mb-4 ml-16">
-        <FormCrearContrato />
+          <Can resource="contratos" action="create">
+            <FormCrearContrato />
+          </Can>
       </nav>
 
       <main className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

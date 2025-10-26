@@ -10,6 +10,7 @@ import { usePropiedadesPaginatedFromContext } from "@/modules/propiedades/hooks/
 import { useContext } from "react"
 import PropiedadesFiltersContext from "@/modules/propiedades/context/propiedadesContext";
 import { protectRoute } from "@/modules/seguridad/utils/authGuard";
+import { Can } from "@/modules/seguridad/components/Can";
 
 export const Route = createFileRoute("/propiedades/")({
   beforeLoad: ({ location }) => {
@@ -45,9 +46,15 @@ function RouteComponent() {
       <nav className="flex flex-wrap gap-4 items-center justify-end mb-4 ml-16">
         <div className="flex gap-4 justify-center items-center">
           <PropiedadesFiltros />
-          <FormCrearEstadoPropiedad />
-          <FormCrearTipoInmueble />
-          <FormCrearPropiedad />
+          <Can resource="propiedades" action="create">
+            <FormCrearEstadoPropiedad />
+          </Can>
+          <Can resource="propiedades" action="create">
+            <FormCrearTipoInmueble />
+          </Can>
+          <Can resource="propiedades" action="create">
+            <FormCrearPropiedad />
+          </Can>
         </div>
       </nav>
 

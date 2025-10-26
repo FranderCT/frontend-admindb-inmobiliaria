@@ -1,13 +1,32 @@
-import { useMemo } from 'react'
-import { decodeJwt, getRolesFromPayload, getToken, isExpired, Role } from './auth'
+import { useMemo } from "react"
+import { decodeJwt, getRolesFromPayload, getToken, isExpired, type Role } from "../utils/auth"
 
-type Action = 'view' | 'create' | 'update' | 'delete'
-type Resource = 'clientes' | 'contratos' | 'propiedades' | 'facturas' | 'otros'
+export type Action = "view" | "create" | "update" | "delete"
+export type Resource = "clientes" | "contratos" | "propiedades" | "facturas" | "agentes" | "seguridad" | "estadisticas"
 
 const PERMISSIONS: Record<Role, Partial<Record<Resource, Action[]>>> = {
-  ADMINISTRADOR: { clientes: ['view','create','update','delete'], contratos: ['view','create','update','delete'], propiedades: ['view','create','update','delete'], facturas: ['view','create','update','delete'], otros: ['view','create','update','delete'] },
-  AGENTE:        { clientes: ['view','create','update','delete'], contratos: ['view','create','update','delete'], propiedades: ['view','create','update','delete'], facturas: ['view','create','update','delete'] },
-  LECTOR:       { clientes: ['view'], contratos: ['view'], propiedades: ['view'], facturas: ['view'] },
+  ADMINISTRADOR: {
+    clientes: ["view", "create", "update", "delete"],
+    contratos: ["view", "create", "update", "delete"],
+    propiedades: ["view", "create", "update", "delete"],
+    facturas: ["view", "create", "update", "delete"],
+    agentes: ["view", "create", "update", "delete"],
+    seguridad: ["view", "create", "update", "delete"],
+    estadisticas: ["view"],
+  },
+  AGENTE: {
+    clientes: ["view", "create", "update", "delete"],
+    contratos: ["view", "create", "update", "delete"],
+    propiedades: ["view", "create", "update", "delete"],
+    facturas: ["view", "create", "update", "delete"],
+  },
+  LECTOR: {
+    clientes: ["view"],
+    contratos: ["view"],
+    propiedades: ["view"],
+    facturas: ["view"],
+    estadisticas: ["view"],
+  },
 }
 
 export function useCan(resource: Resource, action: Action) {
@@ -18,6 +37,6 @@ export function useCan(resource: Resource, action: Action) {
     const roles = getRolesFromPayload(payload)
     if (roles.length === 0) return false
 
-    return roles.some(role => PERMISSIONS[role]?.[resource]?.includes(action))
+    return roles.some((role) => PERMISSIONS[role]?.[resource]?.includes(action))
   }, [resource, action])
 }

@@ -9,6 +9,7 @@ import AgentesFiltros from "@/modules/agentes/components/AgentesFiltros";
 import { AgentesFiltersProvider } from "@/modules/agentes/context/agentesFiltrosContextProvider";
 import AgentesFiltersContext from "@/modules/agentes/context/agentesFiltersContext";
 import { protectRoute } from "@/modules/seguridad/utils/authGuard";
+import { Can } from "@/modules/seguridad/components/Can";
 
 export const Route = createFileRoute("/agentes/")({
   beforeLoad: ({ location }) => {
@@ -68,7 +69,9 @@ function RouteComponent() {
         </form>
         <div className="flex gap-4 justify-center items-center">
           <AgentesFiltros />
-          <FormAgregarAgente />
+          <Can resource="agentes" action="create">
+            <FormAgregarAgente />
+          </Can>
         </div>
       </nav>
 
