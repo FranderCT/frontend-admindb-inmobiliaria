@@ -9,8 +9,13 @@ import { ClientesFiltersProvider } from "@/modules/clientes/context/clientesFilt
 
 import ClientesFiltersContext from "@/modules/clientes/context/clientesFiltersContext";
 import { useClientesPaginatedFromContext } from "@/modules/clientes/hooks/usePaginationContext";
+import { protectRoute } from "@/modules/seguridad/utils/authGuard";
 
 export const Route = createFileRoute("/clientes/")({
+  beforeLoad: ({ location }) => {
+    protectRoute(location.pathname, ['AGENTE', 'ADMINISTRADOR', 'LECTOR'])
+  },
+
   component: () => (
     <ClientesFiltersProvider>
       <RouteComponent />

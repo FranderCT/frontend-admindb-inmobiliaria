@@ -1,22 +1,18 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Edit, CalendarDays, FileText, BriefcaseBusiness, LandPlot, Signature, MapPin } from 'lucide-react'
 import type { CardContractProps } from '../types/contractTypes'
 import DialogDetalleContrato from './DialogDetalleContrato'
-import { getEstado } from '@/utils/contractStatus'
+// import { getEstado } from '@/utils/contractStatus'
 import { formatDate } from '@/utils/dates'
 import DialogEditarContrato from './DialogEditarContrato'
+import { estadoContratoVariant } from '@/utils/statusVariants'
 
 const CardPreviewContrato = ({ contract }: CardContractProps) => {
   const [openDetalle, setOpenDetalle] = useState(false)
   const [openEdit, setOpenEdit] = useState(false)
-
-  const estado = useMemo(
-    () => getEstado(contract.fechaInicio, contract.fechaFin),
-    [contract.fechaInicio, contract.fechaFin]
-  )
 
   const Trigger = (
     <Card
@@ -32,7 +28,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
               <FileText size={15} /> {contract.TipoContrato}
             </CardDescription>
           </div>
-          <Badge variant={estado.variant}>{estado.text}</Badge>
+          <Badge variant={estadoContratoVariant[contract.estado]}>{contract.estado}</Badge>
         </div>
       </CardHeader>
 
@@ -93,6 +89,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
                 e.preventDefault()
                 setOpenEdit(true)
               }}
+              disabled={contract.estado.toLowerCase() === "pendiente"}
             >
               <Edit size={18} />
             </Button>

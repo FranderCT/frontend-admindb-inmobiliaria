@@ -8,6 +8,7 @@ import { formatPrice } from '../utils/formatters'
 import FormEditPropiedad from './FormEditPropiedad'
 import { useDeleteProperty } from '../hooks/propiedadesHook'
 import ConfirmDialog from '@/modules/clientes/components/ConfirmDialog'
+import { estadoPropiedadVariant } from '@/utils/statusVariants'
 
 const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: PropiedadCardProps) => {
   const deleteProp = useDeleteProperty()
@@ -39,7 +40,7 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: 
               <CardTitle className="text-lg line-clamp-2">{property.ubicacion}</CardTitle>
               <CardDescription className="font-mono text-xs">{property.idPropiedad}</CardDescription>
             </div>
-            <Badge>{property.estadoPropiedad.nombre}</Badge>
+            <Badge variant={estadoPropiedadVariant[property.estadoPropiedad.nombre]}>{property.estadoPropiedad.nombre}</Badge>
           </div>
         </CardHeader>
 

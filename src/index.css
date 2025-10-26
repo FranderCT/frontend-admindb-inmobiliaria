@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin 'tailwind-scrollbar';
+
 @page {
   size: A4;
   margin: 12mm;
@@ -20,6 +21,7 @@
     page-break-inside: avoid;
   }
 }
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -149,5 +151,100 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Geist Sans', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  }
+}
+
+.page-wrap {
+  min-height: 100dvh;
+  padding: 30px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  .page-not-found {
+    /* más ancho para que quepa "Acceso denegado" en una sola línea */
+    width: min(92vw, 680px);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+
+    .img-key {
+      /* imagen más pequeña y responsiva */
+      width: clamp(120px, 28vw, 220px);
+      height: auto;
+      margin-bottom: 0;
+    }
+
+    h1.text-grande {
+      color: #000;
+      text-transform: uppercase;
+      line-height: 50px;
+      font-size: 160px;
+      font-weight: 800;
+      letter-spacing: -28px;
+      text-shadow: -6px 4px 0px #fff;
+      margin-left: -20px;
+      margin-top: 50px;
+      margin-bottom: 50px;
+    }
+
+    h4.text-mediano,
+    h4.text-peq {
+      letter-spacing: 0.38px;
+      font-weight: 300;
+      line-height: 1.4;
+      font-size: 14px;
+      text-transform: none;
+      color: rgba(0, 0, 0, 0.6);
+      margin: 0;
+      width: 100%;
+
+      a {
+        color: #1177bd;
+        text-decoration: underline;
+        font-weight: 700;
+
+        &:hover,
+        &:focus {
+          text-decoration: none;
+        }
+      }
+    }
+
+    h4.text-mediano {
+      /* que no se monte sobre el 403 y tenga más ancho legible */
+      font-size: clamp(22px, 5vw, 42px);
+      font-weight: 700;
+      color: #1177bd;
+      margin-top: 8px;
+      line-height: 1.1;
+      word-break: keep-all;
+      text-wrap: balance;
+      /* mejor reparto de línea */
+    }
+
+    h4.text-sm-btm {
+      bottom: 40px;
+    }
+  }
+}
+
+/* móvil */
+@media (max-width: 768px) {
+  .page-wrap {
+    .page-not-found {
+      h1.text-grande {
+        font-size: clamp(72px, 24vw, 120px);
+        letter-spacing: -8px;
+        margin-bottom: 8px;
+      }
+
+      h4.text-mediano {
+        font-size: clamp(20px, 6vw, 30px);
+      }
+    }
   }
 }

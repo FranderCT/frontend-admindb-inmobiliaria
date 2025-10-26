@@ -8,8 +8,13 @@ import { useAgentesPaginatedFromContext } from "@/modules/agentes/hooks/usePagin
 import AgentesFiltros from "@/modules/agentes/components/AgentesFiltros";
 import { AgentesFiltersProvider } from "@/modules/agentes/context/agentesFiltrosContextProvider";
 import AgentesFiltersContext from "@/modules/agentes/context/agentesFiltersContext";
+import { protectRoute } from "@/modules/seguridad/utils/authGuard";
 
 export const Route = createFileRoute("/agentes/")({
+  beforeLoad: ({ location }) => {
+    protectRoute(location.pathname, ['ADMINISTRADOR', 'LECTOR'])
+  },
+
   component: () => (
     <AgentesFiltersProvider>
       <RouteComponent />

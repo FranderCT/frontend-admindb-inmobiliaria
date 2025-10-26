@@ -9,8 +9,13 @@ import { PropiedadesFiltersProvider } from "@/modules/propiedades/context/propie
 import { usePropiedadesPaginatedFromContext } from "@/modules/propiedades/hooks/usePropiedadesFromContext";
 import { useContext } from "react"
 import PropiedadesFiltersContext from "@/modules/propiedades/context/propiedadesContext";
+import { protectRoute } from "@/modules/seguridad/utils/authGuard";
 
 export const Route = createFileRoute("/propiedades/")({
+  beforeLoad: ({ location }) => {
+    protectRoute(location.pathname, ['AGENTE', 'ADMINISTRADOR', 'LECTOR'])
+  },
+
   component: () => (
     <PropiedadesFiltersProvider>
       <RouteComponent />

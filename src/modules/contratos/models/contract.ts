@@ -27,6 +27,7 @@ export interface Contract {
   idAgente: number,
   NombreAgente: string,
   ApellidoAgente: string,
+  estado: string,
   condiciones: [
     {
       idCondicion: number,

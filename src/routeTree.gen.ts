@@ -9,14 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as R403RouteImport } from './routes/403'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StatisticsIndexRouteImport } from './routes/statistics/index'
 import { Route as PropiedadesIndexRouteImport } from './routes/propiedades/index'
 import { Route as FacturacionIndexRouteImport } from './routes/facturacion/index'
 import { Route as ContratosIndexRouteImport } from './routes/contratos/index'
+import { Route as ConfiguracionIndexRouteImport } from './routes/configuracion/index'
 import { Route as ClientesIndexRouteImport } from './routes/clientes/index'
 import { Route as AgentesIndexRouteImport } from './routes/agentes/index'
+import { Route as ConfiguracionUsuariosRouteImport } from './routes/configuracion/usuarios'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const R403Route = R403RouteImport.update({
+  id: '/403',
+  path: '/403',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -42,6 +56,11 @@ const ContratosIndexRoute = ContratosIndexRouteImport.update({
   path: '/contratos/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfiguracionIndexRoute = ConfiguracionIndexRouteImport.update({
+  id: '/configuracion/',
+  path: '/configuracion/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClientesIndexRoute = ClientesIndexRouteImport.update({
   id: '/clientes/',
   path: '/clientes/',
@@ -52,11 +71,20 @@ const AgentesIndexRoute = AgentesIndexRouteImport.update({
   path: '/agentes/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfiguracionUsuariosRoute = ConfiguracionUsuariosRouteImport.update({
+  id: '/configuracion/usuarios',
+  path: '/configuracion/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/403': typeof R403Route
+  '/login': typeof LoginRoute
+  '/configuracion/usuarios': typeof ConfiguracionUsuariosRoute
   '/agentes': typeof AgentesIndexRoute
   '/clientes': typeof ClientesIndexRoute
+  '/configuracion': typeof ConfiguracionIndexRoute
   '/contratos': typeof ContratosIndexRoute
   '/facturacion': typeof FacturacionIndexRoute
   '/propiedades': typeof PropiedadesIndexRoute
@@ -64,8 +92,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/403': typeof R403Route
+  '/login': typeof LoginRoute
+  '/configuracion/usuarios': typeof ConfiguracionUsuariosRoute
   '/agentes': typeof AgentesIndexRoute
   '/clientes': typeof ClientesIndexRoute
+  '/configuracion': typeof ConfiguracionIndexRoute
   '/contratos': typeof ContratosIndexRoute
   '/facturacion': typeof FacturacionIndexRoute
   '/propiedades': typeof PropiedadesIndexRoute
@@ -74,8 +106,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/403': typeof R403Route
+  '/login': typeof LoginRoute
+  '/configuracion/usuarios': typeof ConfiguracionUsuariosRoute
   '/agentes/': typeof AgentesIndexRoute
   '/clientes/': typeof ClientesIndexRoute
+  '/configuracion/': typeof ConfiguracionIndexRoute
   '/contratos/': typeof ContratosIndexRoute
   '/facturacion/': typeof FacturacionIndexRoute
   '/propiedades/': typeof PropiedadesIndexRoute
@@ -85,8 +121,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/403'
+    | '/login'
+    | '/configuracion/usuarios'
     | '/agentes'
     | '/clientes'
+    | '/configuracion'
     | '/contratos'
     | '/facturacion'
     | '/propiedades'
@@ -94,8 +134,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/403'
+    | '/login'
+    | '/configuracion/usuarios'
     | '/agentes'
     | '/clientes'
+    | '/configuracion'
     | '/contratos'
     | '/facturacion'
     | '/propiedades'
@@ -103,8 +147,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/403'
+    | '/login'
+    | '/configuracion/usuarios'
     | '/agentes/'
     | '/clientes/'
+    | '/configuracion/'
     | '/contratos/'
     | '/facturacion/'
     | '/propiedades/'
@@ -113,8 +161,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  R403Route: typeof R403Route
+  LoginRoute: typeof LoginRoute
+  ConfiguracionUsuariosRoute: typeof ConfiguracionUsuariosRoute
   AgentesIndexRoute: typeof AgentesIndexRoute
   ClientesIndexRoute: typeof ClientesIndexRoute
+  ConfiguracionIndexRoute: typeof ConfiguracionIndexRoute
   ContratosIndexRoute: typeof ContratosIndexRoute
   FacturacionIndexRoute: typeof FacturacionIndexRoute
   PropiedadesIndexRoute: typeof PropiedadesIndexRoute
@@ -123,6 +175,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/403': {
+      id: '/403'
+      path: '/403'
+      fullPath: '/403'
+      preLoaderRoute: typeof R403RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -158,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContratosIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/configuracion/': {
+      id: '/configuracion/'
+      path: '/configuracion'
+      fullPath: '/configuracion'
+      preLoaderRoute: typeof ConfiguracionIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clientes/': {
       id: '/clientes/'
       path: '/clientes'
@@ -172,13 +245,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/configuracion/usuarios': {
+      id: '/configuracion/usuarios'
+      path: '/configuracion/usuarios'
+      fullPath: '/configuracion/usuarios'
+      preLoaderRoute: typeof ConfiguracionUsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  R403Route: R403Route,
+  LoginRoute: LoginRoute,
+  ConfiguracionUsuariosRoute: ConfiguracionUsuariosRoute,
   AgentesIndexRoute: AgentesIndexRoute,
   ClientesIndexRoute: ClientesIndexRoute,
+  ConfiguracionIndexRoute: ConfiguracionIndexRoute,
   ContratosIndexRoute: ContratosIndexRoute,
   FacturacionIndexRoute: FacturacionIndexRoute,
   PropiedadesIndexRoute: PropiedadesIndexRoute,

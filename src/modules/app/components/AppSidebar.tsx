@@ -1,7 +1,8 @@
 "use client"
 
+import { useMemo } from "react"
 import { Link } from "@tanstack/react-router"
-import { Menu, X, Settings, LogOut } from "lucide-react"
+import { Menu, X, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { SidebarProps } from "../types/sidebarTypes"
 import { navigation } from "./navigation"
@@ -19,10 +20,33 @@ import {
   SidebarGroupLabel,
 } from "@/components/animate-ui/components/radix/sidebar"
 
+import LogoutButton from "@/modules/seguridad/components/LogoutButton"
+import { decodeJwt, getRolesFromPayload, getToken, isExpired, type Role } from "@/modules/seguridad/utils/auth"
+
+function useUserRoles(): Role[] {
+  return useMemo(() => {
+    const token = getToken()
+    const payload = token ? decodeJwt(token) : null
+    if (!payload || isExpired(payload)) return []
+    return getRolesFromPayload(payload)
+  }, [])
+}
+
 export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
+  const roles = useUserRoles()
+
+  const filteredNav = useMemo(
+    () =>
+      navigation.filter((item) =>
+        !item.allowed ? true : item.allowed.some((r) => roles.includes(r))
+      ),
+    [roles]
+  )
+
+  const canSeeSettings = roles.includes("ADMINISTRADOR") 
+
   return (
     <>
-      {/* Botón único: se mueve con translate-x igual que el sidebar */}
       <button
         type="button"
         aria-label="Abrir/Cerrar menú"
@@ -37,7 +61,6 @@ export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
-      {/* Sidebar fijo; el PROVIDER va DENTRO del aside */}
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-40 w-64 border-r border-gray-200 bg-white shadow-sm",
@@ -65,7 +88,7 @@ export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
               <SidebarGroup>
                 <SidebarGroupLabel>Navegación</SidebarGroupLabel>
                 <SidebarMenu>
-                  {navigation.map((item) => (
+                  {filteredNav.map((item) => (
                     <SidebarMenuItem key={item.name}>
                       <SidebarMenuButton asChild>
                         <Link
@@ -92,20 +115,31 @@ export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
 
             <SidebarFooter>
               <SidebarMenu>
+                {canSeeSettings && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        to="/configuracion/"
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                          "text-slate-900 hover:bg-gray-100",
+                          "[&.active]:text-blue-600 [&.active]:bg-transparent",
+                          "[&_svg]:text-inherit"
+                        )}
+                        onClick={() => {
+                          if (window.innerWidth < 1024) setIsOpen(false)
+                        }}
+                      >
+                        <Settings className="h-4 w-4" />
+                        <span>Configuración</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
+
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-900 hover:bg-gray-100">
-                      <Settings className="h-4 w-4" />
-                      <span>Configuración</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-900 hover:bg-gray-100">
-                      <LogOut className="h-4 w-4" />
-                      <span>Cerrar Sesión</span>
-                    </button>
+                    <LogoutButton />
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>

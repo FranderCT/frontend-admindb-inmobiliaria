@@ -1,10 +1,14 @@
 import CardPreviewContrato from '@/modules/contratos/components/CardPreviewContrato';
 import FormCrearContrato from '@/modules/contratos/components/FormCrearContrato';
 import { useGetContracts } from '@/modules/contratos/hooks/contractHooks';
+import { protectRoute } from '@/modules/seguridad/utils/authGuard';
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react';
 
 export const Route = createFileRoute('/contratos/')({
+  beforeLoad: ({ location }) => {
+    protectRoute(location.pathname, ['AGENTE', 'ADMINISTRADOR', 'LECTOR'])
+  },
   component: RouteComponent,
 })
 

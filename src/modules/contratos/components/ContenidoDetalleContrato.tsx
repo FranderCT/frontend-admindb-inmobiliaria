@@ -8,6 +8,7 @@ import { ContractDetailProps } from "../types/contractTypes";
 import { formatDate } from "@/utils/dates";
 import { fmtCRC } from "@/utils/moneyFormatter";
 import { ContractParticipants } from "../models/contract";
+import { estadoContratoVariant } from '@/utils/statusVariants'
 
 export default function ContenidoDetalleContrato({ contractID }: ContractDetailProps) {
   const { contract: detail, loadingContract, errorContract } = useGetContract(contractID);
@@ -19,8 +20,6 @@ export default function ContenidoDetalleContrato({ contractID }: ContractDetailP
 
     for (const p of lista) {
       const key = `${p.rol || "Participante"}`;
-
-
       const nombre = [p.nombre, p.apellido1, p.apellido2?.trim() ? p.apellido2 : undefined]
         .filter(Boolean)
         .join(" ");
@@ -41,30 +40,43 @@ export default function ContenidoDetalleContrato({ contractID }: ContractDetailP
   return (
     <div className="max-h-[85vh] overflow-y-auto pr-4
         scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-700
-         scrollbar-track-gray-100 print:scrollbar-none print:overflow-hidden print:p-0">
-    
-        <div className="flex h-10 items-center justify-between border-b bg-muted/30 
-        rounded-t-lg print:hidden pb-3">
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            <div className="">
-              <h2 className="text-lg font-semibold">
+         scrollbar-track-gray-100 print:scrollbar-none print:overflow-visible print:max-h-none">
+
+      <style>{`
+          @media print {
+            @page {
+              margin: 1.5cm;
+              size: letter;
+            }
+            body {
+              print-color-adjust: exact;
+              -webkit-print-color-adjust: exact;
+            }
+          }
+        `}</style>
+
+      <div className="flex h-10 items-center justify-between border-b bg-muted/30 
+        rounded-t-lg print:hidden pb-3 mt-2">
+        <div className="flex items-center gap-2">
+          <FileText className="h-5 w-5" />
+          <div className="">
+            <h2 className="text-lg font-semibold">
               Contrato #{detail.idContrato}
-              </h2>
-              <p className="text-xs text-muted-foreground">
+            </h2>
+            <p className="text-xs text-muted-foreground">
               {formatDate(detail.fechaFirma)}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge>{detail.estado}</Badge>
-            <Button variant="outline" size="sm" onClick={() => window.print()}>
-              <Printer className="h-4 w-4 mr-2" /> Imprimir
-            </Button>
+            </p>
           </div>
         </div>
+        <div className="flex items-center gap-2">
+          <Badge variant={estadoContratoVariant[detail.estado]}>{detail.estado}</Badge>
+          <Button variant="outline" size="sm" onClick={() => window.print()}>
+            <Printer className="h-4 w-4 mr-2" /> Imprimir
+          </Button>
+        </div>
+      </div>
 
-        <div className="pt-5 print:px-0 print:py-0">
+      <div className="pt-5 print:pt-0 print:px-0">
           <header className="mb-6 text-center">
             <h1 className="text-xl font-bold tracking-wide uppercase">CONTRATO DE {detail.tipoContrato}</h1>
             <div className="flex justify-between mt-2 items-center gap-4">
