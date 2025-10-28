@@ -128,7 +128,8 @@ export default function FacturacionPage() {
 
                   <li className="flex items-center gap-2">
                     <User className="w-4 h-4" />
-                    <span><span className="text-gray-500">Cliente:</span> {cliente.id} • {cliente.role}</span>
+                    {/* ↓ Único cambio visual: mostramos el texto igual que back */}
+                    <span><span className="text-gray-500">Cliente:</span> {cliente.text}</span>
                   </li>
                 </ul>
 

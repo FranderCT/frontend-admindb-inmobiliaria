@@ -1,80 +1,86 @@
-// src/modules/facturacion/models/invoice.model.ts
 import { InvoiceItem, InvoiceStatus, RolCliente } from "../types/facturasType";
 
-/** API -> UI mapper
- * Estructura esperada desde GET /facturas/todas o /filtradas:
- * {
- *   idFactura: number, tipoContrato: "Venta"|"Alquiler", idPropiedad: number,
- *   nombreAgente: string, porcentajeComision: number, fechaEmision: string, fechaPago: string,
- *   estadoPago: boolean, idContrato: number, clientes: string, montoPagado: number
- * }
- */
 export function mapFacturaApiToInvoice(api: any): InvoiceItem {
-  const estado: InvoiceStatus = api?.estadoPago ? "Pagada" : "Pendiente";
+  const estado: InvoiceStatus = api.estadoPago ? "Pagada" : "Pendiente";
+
+
+  const parsed = parseClientePrincipal(api?.clientePrincipal);
 
   return {
-    id: api?.idFactura,
-    tipo: api?.tipoContrato,
-    propiedadId: api?.idPropiedad,
-    periodo: { inicio: api?.fechaEmision, fin: api?.fechaEmision },
-    agente: api?.nombreAgente ?? "",
-    comisionPct: api?.porcentajeComision ?? 0,
-    fechaEmision: api?.fechaEmision,
-    fechaPago: api?.fechaPago,
-    contratoId: api?.idContrato,
-    montoTotal: api?.montoPagado ?? 0,
+    id: api.idFactura,
+    tipo: api.tipoContrato,
+    propiedadId: api.idPropiedad,
+    periodo: { inicio: api.fechaEmision ?? null, fin: api.fechaEmision ?? null },
+    agente: api.nombreAgente ?? "",
+    comisionPct: Number(api.porcentajeComision ?? 0),
+    fechaEmision: api.fechaEmision ?? null,
+    fechaPago: api.fechaPago ?? null,
+    contratoId: api.idContrato,
+    montoTotal: Number(api.montoPagado ?? 0),
     estado,
 
-    // 🔹 Necesario para cumplir con InvoiceItem
-    clientes: String(api?.clientes ?? ""), // <<--- agregado
+    // Conserva cualquier string de clientes que envíe el back
+    clientes: api.clientes ?? api.clientePrincipal ?? "",
 
-    // Derivados a partir del string "clientes" (opcionales en el tipo)
-    clienteId: deriveClienteId(api),
-    rolCliente: deriveRolCliente(api),
+    // Guardamos el cliente principal desglosado
+    clienteId: parsed?.id ?? undefined,
+    clienteNombre: parsed?.name ?? undefined,
+    rolCliente: parsed?.rol ?? undefined,
   };
 }
 
-/** Deriva el ID de cliente desde el string `clientes`
- *  Ej: "904487878 - Nixon Pérez (Vendedor)"  -> "904487878"
- */
-function deriveClienteId(api: any): string | undefined {
-  if (!api?.clientes) return undefined;
-  const match = String(api.clientes).match(/^(\d+)/);
-  return match ? match[1] : undefined;
-}
 
-/** Deriva el rol desde el string `clientes`
- *  Ej: "... (Vendedor)" -> "Vendedor"
- */
-function deriveRolCliente(api: any): RolCliente | undefined {
-  if (!api?.clientes) return undefined;
-  const m = String(api.clientes).match(/\(([^)]+)\)\s*$/);
-  if (!m) return undefined;
-  const role = m[1].trim();
-  if (role === "Vendedor" || role === "Comprador" || role === "Inquilino" || role === "Arrendatario") {
-    return role as RolCliente;
+function parseClientePrincipal(
+  src: unknown
+): { id: string; name?: string; rol?: RolCliente } | null {
+  if (!src) return null;
+  const s = String(src).trim();
+  if (!s || s.toLowerCase() === "no asignado") return null;
+
+
+  const m = s.match(/^\s*(\d+)\s*-\s*(.*?)\s*\(([^)]+)\)\s*$/);
+  if (m) {
+    const id = m[1];
+    const name = m[2];
+    const rol = m[3] as RolCliente;
+    return { id, name, rol };
   }
-  return undefined;
+
+  
+  const m2 = s.match(/^\s*(\d+)\s*-\s*(.+)\s*$/);
+  if (m2) {
+    return { id: m2[1], name: m2[2] };
+  }
+
+  const m3 = s.match(/^(\d+)/);
+  return m3 ? { id: m3[1] } : null;
 }
 
-/** Helper usado por la tarjeta para mostrar ID y rol cuando no vienen explícitos */
-export function deriveClienteInfo(f: InvoiceItem) {
-  const id = f.clienteId ?? `CL-${String(f.contratoId).padStart(3, "0")}`;
-  const role: RolCliente =
-    f.rolCliente ?? (f.tipo === "Alquiler" ? "Inquilino" : "Comprador");
-  return { id, role } as const;
-}
-
-/** Formateadores */
+/** Formatea colones */
 export const formatMoney = (n: number) =>
   new Intl.NumberFormat("es-CR", {
     style: "currency",
     currency: "CRC",
     maximumFractionDigits: 0,
-  }).format(n);
+  }).format(Number(n || 0));
 
+/** Formatea fechas ISO o null */
 export const formatDate = (iso?: string | null) => {
   if (!iso) return "—";
   const d = new Date(iso);
-  return isNaN(d.getTime()) ? "—" : d.toLocaleDateString("es-CR");
+  return isNaN(d.getTime()) ? "Invalid Date" : d.toLocaleDateString("es-CR");
 };
+
+
+export function deriveClienteInfo(f: InvoiceItem): { id: string; role: string; text: string } {
+  const id = f.clienteId ?? "";
+  const name = f.clienteNombre ?? "";
+  const role = f.rolCliente ?? "";
+
+  const text =
+    id
+      ? `${id}${name ? ` - ${name}` : ""}${role ? ` (${role})` : ""}`
+      : "—";
+
+  return { id, role, text };
+}

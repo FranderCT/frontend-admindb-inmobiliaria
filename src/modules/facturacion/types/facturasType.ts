@@ -1,5 +1,3 @@
-// src/modules/facturacion/types/facturasType.ts
-
 export type InvoiceStatus = "Pendiente" | "Pagada";
 export type RolCliente = "Inquilino" | "Arrendatario" | "Comprador" | "Vendedor";
 
@@ -17,11 +15,12 @@ export interface InvoiceItem {
   montoTotal: number;
   estado: InvoiceStatus;
 
-  // String original que viene de la API con los clientes (lo estabas usando ya)
+  // String original que puede venir de la API
   clientes: string;
 
-  // 🔹 NUEVO: campos derivados (opcionales) que agregas en mapFacturaApiToInvoice
+  // ↓ NUEVOS opcionales para mostrar el cliente principal igual que en el back
   clienteId?: string;
+  clienteNombre?: string;
   rolCliente?: RolCliente;
 }
 

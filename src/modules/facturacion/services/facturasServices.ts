@@ -42,12 +42,6 @@ export async function getFilteredInvoices(filters: InvoiceFilters): Promise<Invo
   return Array.isArray(json) ? json.map(mapFacturaApiToInvoice) : [];
 }
 
-/**
- * POST /facturas/crear
- * IMPORTANTE: el SP no devuelve tipoContrato / propiedad / agente / comisión,
- * así que NO usamos esta respuesta para pintar la card. Solo creamos y luego
- * hacemos un refetch con GET /facturas/todas o /filtradas.
- */
 export async function createInvoice(body: CreateInvoiceForm): Promise<void> {
   const res = await fetch(`${API_BASE}/facturas/crear`, {
     method: "POST",
@@ -63,7 +57,7 @@ export async function createInvoice(body: CreateInvoiceForm): Promise<void> {
     const text = await res.text().catch(() => "");
     throw new Error(text || "No se pudo crear la factura");
   }
-  // no retornamos el payload; el hook hará un refetch
+  
 }
 
 /** PATCH /facturas/pagar/:id  → tras marcar, devolvemos la lista fresca con GET */
@@ -76,6 +70,5 @@ export async function markInvoiceAsPaidAndFetch(id: number, filters: InvoiceFilt
     const text = await res.text().catch(() => "");
     throw new Error(text || "No se pudo marcar como pagada");
   }
-  // Refrescamos usando los filtros actuales
   return await getFilteredInvoices(filters);
 }

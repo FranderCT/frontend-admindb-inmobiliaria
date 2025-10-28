@@ -47,19 +47,15 @@ export function useInvoices() {
 
   useEffect(() => {
     fetchList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [filters.estado, filters.idContrato, filters.idCliente, filters.fecha]);
 
-  // acciones públicas para la página
   const setEstado = (estado: "Todos" | InvoiceStatus) =>
     setFilters((s) => ({ ...s, estado }));
   const setContratoIdText = (v: string) => setFilters((s) => ({ ...s, idContrato: v }));
   const setClienteIdText = (v: string) => setFilters((s) => ({ ...s, idCliente: v }));
   const setFecha = (v: string) => setFilters((s) => ({ ...s, fecha: v }));
 
-  // Guardar nueva factura:
-  // 1) POST /facturas/crear (sin usar su payload para la card)
-  // 2) Refetch con GET /facturas/todas o /filtradas
 const save = async () => {
   try {
     const idNum = Number(form.idContrato);
@@ -81,7 +77,7 @@ const save = async () => {
 
 
 
-  // Marcar pagada y refrescar lista
+  
   const pagar = async (id: number) => {
     try {
       setLoading(true);
