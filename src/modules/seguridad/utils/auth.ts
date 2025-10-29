@@ -7,8 +7,8 @@ export interface JwtPayload {
   sub: number
   email: string
   exp: number 
-  rol?: Role | Role[]
-  roles?: Role[]
+  rol?: Role
+  name: string
 }
 
 export const getToken = () => localStorage.getItem('token') ?? null

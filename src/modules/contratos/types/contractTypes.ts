@@ -64,8 +64,21 @@ export type FormEditContractProps = {
     estado?: string | null
     condiciones?: string[]
   }
+  participantes?: boolean
 }
 
+
+export type FormGestionParticipantesContratoProps = {
+  idContrato: number
+  onSuccess?: () => void
+  onCancel?: () => void
+}
+export type ParticipanteMin = {
+  idClienteContrato: number
+  identificacion: number
+  nombreCliente: string
+  rol: string
+}
 
 
 

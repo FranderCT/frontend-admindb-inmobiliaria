@@ -4,7 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/statistics/')({
   beforeLoad: ({ location }) => {
-    protectRoute(location.pathname, ['ADMINISTRADOR', 'LECTOR'])
+    protectRoute(location.pathname, [ 'ADMINISTRADOR', 'LECTOR'])
   },
 
   component: RouteComponent,

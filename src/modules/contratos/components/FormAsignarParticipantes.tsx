@@ -1,24 +1,62 @@
-import { useMemo, useState } from "react";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter, DialogHeader, DialogTitle, DialogDescription, Dialog } from "@/components/ui/dialog";
-import { useAssignContractParticipants, useGetContractRoleType } from "../hooks/contractHooks";
+import { useAssignContractParticipants, useGetContractPrev, useGetContractRoleType } from "../hooks/contractHooks";
 import { useGetClient, useGetClients } from "@/modules/clientes/hooks/clientesHooks";
 import { ClientSearchPreview } from "@/modules/clientes/models/client";
 import { useDebounced } from "@/utils/debounce";
-import { RoleType } from "../models/contract";
 import { assignParticipantsSchema } from "../schema/contractValidators";
-import { FormAsignClientContractProps, ClientContractRow } from "../types/contractTypes";
+import { FormAsignClientContractProps } from "../types/contractTypes";
+import { useGetPropertyById } from "@/modules/propiedades/hooks/propiedadesHook";
 
-export default function FormAsignarParticipantes({ idContrato, onSuccess, onCancel }: FormAsignClientContractProps) {
-  const [rows, setRows] = useState<ClientContractRow[]>([]);
+export default function FormAsignarParticipantes({
+  idContrato,
+  onSuccess,
+  onCancel,
+}: FormAsignClientContractProps) {
   const [cedulaQuery, setCedulaQuery] = useState<string>("");
-  const assign = useAssignContractParticipants();
-  const { contractRoleTypes = [], loadingContractRoleTypes, errorContractRoleTypes } = useGetContractRoleType();
+
+  const { contrato, loadingContrato, fetchingContrato, errorContrato } =
+    useGetContractPrev(idContrato, { enabled: !!idContrato });
+
+  const esVenta = (contrato?.TipoContrato ?? "").toLowerCase() === "venta";
+
+  const idPropiedad = contrato?.idPropiedad;
+  const { propiedad, loadingProp, fetchingProp, errorProp } =
+    useGetPropertyById(idPropiedad, { enabled: !!idPropiedad });
+
+  const propietarioId = propiedad?.cliente?.identificacion;
+  const propietarioNombre = propiedad
+    ? [propiedad.cliente?.nombre, propiedad.cliente?.apellido1, propiedad.cliente?.apellido2]
+      .filter(Boolean)
+      .join(" ")
+    : "";
+
+  const { contractRoleTypes = [], loadingContractRoleTypes } = useGetContractRoleType();
+
+  const roleIdByName = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const r of contractRoleTypes ?? []) {
+      if (r?.nombre) map.set(r.nombre.trim().toLowerCase(), r.idRol);
+    }
+    return map;
+  }, [contractRoleTypes]);
+
+  const rolPropietarioId = esVenta
+    ? roleIdByName.get("vendedor")
+    : roleIdByName.get("arrendatario");
+
+  const rolClienteId = esVenta
+    ? roleIdByName.get("comprador")
+    : roleIdByName.get("inquilino");
+
+  const rolPropietarioNombre = esVenta ? "Vendedor" : "Arrendatario";
+  const rolClienteNombre = esVenta ? "Comprador" : "Inquilino";
 
   const debouncedCedula = useDebounced(cedulaQuery.trim(), 450);
   const enabledSearch = debouncedCedula.length >= 3;
@@ -47,34 +85,60 @@ export default function FormAsignarParticipantes({ idContrato, onSuccess, onCanc
   const opcionesClientes = useMemo(() => {
     if (usarBusqueda) {
       const arr = Array.isArray(clienteBuscado) ? clienteBuscado : [clienteBuscado];
-      return arr.filter(Boolean) as ClientSearchPreview[];
+      return arr.filter(Boolean).filter(c => Number(c?.identificacion) !== Number(propietarioId)) as ClientSearchPreview[];
     }
-    return clientesListado as ClientSearchPreview[];
-  }, [usarBusqueda, clienteBuscado, clientesListado]);
+    return (clientesListado as ClientSearchPreview[]).filter(c => Number(c?.identificacion) !== Number(propietarioId));
+  }, [usarBusqueda, clienteBuscado, clientesListado, propietarioId]);
 
   const cargandoClientesUI =
     loadingClientes || fetchingClientes || (enabledSearch && (loadingCliente || fetchingCliente));
 
-  const addRow = () => setRows((p) => [...p, {}]);
-  const removeRow = (idx: number) => setRows((p) => p.filter((_, i) => i !== idx));
-  const patchRow = (idx: number, patch: Partial<ClientContractRow>) => setRows((p) => p.map((r, i) => i === idx ? { ...r, ...patch } : r));
+  const [clienteSel, setClienteSel] = useState<number | undefined>(undefined);
 
-  const totalReady = rows.filter(r => r.identificacion && r.idRol).length;
+  useEffect(() => {
+    setClienteSel(undefined);
+    setCedulaQuery("");
+  }, [idContrato, idPropiedad]);
+
+  const assign = useAssignContractParticipants();
+
+  const isLoadingAll =
+    loadingContrato || fetchingContrato || loadingProp || fetchingProp || loadingContractRoleTypes;
 
   const handleSave = async () => {
-    const participantes = rows
-      .filter(r => r.identificacion && r.idRol)
-      .map(r => ({
-        identificacion: r.identificacion!,
-        idRol: r.idRol!,
-        idContrato, 
-      }));
+    if (!idContrato || !propietarioId) {
+      toast.error("No fue posible determinar propietario o contrato.");
+      return;
+    }
+    if (!rolPropietarioId || !rolClienteId) {
+      toast.error("No fue posible determinar los roles desde el servidor.");
+      return;
+    }
+    if (!clienteSel) {
+      toast.error(`Selecciona el ${rolClienteNombre.toLowerCase()}.`);
+      return;
+    }
+
+    const participantes = [
+      {
+        identificacion: Number(propietarioId),
+        idRol: Number(rolPropietarioId),
+        idContrato,
+      },
+      {
+        identificacion: Number(clienteSel),
+        idRol: Number(rolClienteId),
+        idContrato,
+      },
+    ];
 
     const result = assignParticipantsSchema.safeParse({
       idContrato,
-      participantes: participantes.map(({ identificacion, idRol }) => ({ identificacion, idRol })),
+      participantes: participantes.map(({ identificacion, idRol }) => ({
+        identificacion: Number(identificacion),
+        idRol: Number(idRol),
+      })),
     });
-
     if (!result.success) {
       const first = result.error.issues[0];
       toast.error(first?.message ?? "Revisa los participantes antes de guardar.");
@@ -82,154 +146,153 @@ export default function FormAsignarParticipantes({ idContrato, onSuccess, onCanc
     }
 
     try {
-      await assign.mutateAsync({ participantes });
+      await assign.mutateAsync({
+        participantes: participantes.map(({ identificacion, idRol, idContrato }) => ({
+          identificacion: Number(identificacion),
+          idRol: Number(idRol),
+          idContrato,
+        })),
+      });
       toast.success("Participantes asignados correctamente.");
-      setRows([]);
+      setClienteSel(undefined);
       setCedulaQuery("");
       onSuccess?.();
     } catch (err) {
-      toast.error("Error asignando participantes."+ err);
+      toast.error("Error asignando participantes. " + err);
     }
   };
 
   return (
     <Dialog>
-      <DialogHeader>
+      <DialogHeader className="mb-2">
         <DialogTitle>Asignar participantes</DialogTitle>
-        <DialogDescription>Contrato #{idContrato}. Agrega clientes y su rol en el contrato.</DialogDescription>
+        <DialogDescription>
+          Contrato #{idContrato}. Completa los datos del propietario y del {rolClienteNombre.toLowerCase()}.
+        </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-2 rounded-md border p-3 mb-4">
+      {isLoadingAll && (
+        <p className="text-sm opacity-70 flex items-center gap-2 mb-3">
+          <Loader2 className="h-4 w-4 animate-spin" /> Cargando contrato/propiedad/roles…
+        </p>
+      )}
+      {(errorContrato || errorProp) && (
+        <p className="text-sm text-red-600 mb-3">
+          No se pudo cargar {errorContrato ? "el contrato" : "la propiedad"}.
+        </p>
+      )}
 
-        <div className="flex items-end gap-2">
-          <div className="flex-1">
-            <Label htmlFor="buscarCedula" className="text-sm">Buscar por cédula (mín. 3 dígitos)</Label>
-            <Input
-              id="buscarCedula"
-              placeholder="Ej. 1 2345 6789"
-              value={cedulaQuery}
-              onChange={(e) => setCedulaQuery(e.target.value)}
-            />
-          </div>
-          <Button type="button" variant="outline" onClick={() => setCedulaQuery("")}>
-            Limpiar
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button type="button" variant="secondary" onClick={addRow}><Plus/> Agregar fila</Button>
-          <span className="text-sm text-muted-foreground">Completa cédula y rol por cada fila.</span>
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        {rows.length === 0 ? (
-          <p className="text-sm opacity-70">Sin filas. Usa “Agregar fila”.</p>
-        ) : (
-          rows.map((row, idx) => (
-            <div key={idx} className=" flex justify-between items-center">
-              <div>
-                <Label className="text-sm mb-1">Seleccionar cliente</Label>
-                <Select
-                  value={row.identificacion ? String(row.identificacion) : ""}
-                  onValueChange={(v) => patchRow(idx, { identificacion: Number(v) })}
-                  disabled={cargandoClientesUI}
-                >
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        cargandoClientesUI
-                          ? "Cargando clientes…"
-                          : usarBusqueda
-                            ? "Selecciona el cliente encontrado"
-                            : "Selecciona un cliente"
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {opcionesClientes?.length > 0 ? (
-                      opcionesClientes.map((c) => (
-                        <SelectItem key={c.identificacion} value={String(c.identificacion)}>
-                          {c.nombreCompleto ??
-                            [c.nombre, c.apellido1, c.apellido2].filter(Boolean).join(" ") ??
-                            c.identificacion}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <div className="px-3 py-1 text-sm opacity-70">
-                        {enabledSearch
-                          ? (errorCliente ? "Error al buscar por cédula." : "No se encontraron clientes.")
-                          : (errorClientes ? "Error cargando clientes." : "Sin clientes para mostrar.")}
-                      </div>
-                    )}
-                  </SelectContent>
-                </Select>
-                {(fetchingClientes || fetchingCliente) && (
-                  <p className="text-xs opacity-60 mt-1">Actualizando lista…</p>
-                )}
-              </div>
-
-              <div>
-                <Label className="text-sm mb-1">Rol en el contrato</Label>
-                <Select
-                  value={row.idRol ? String(row.idRol) : ""}
-                  onValueChange={(v) => patchRow(idx, { idRol: Number(v) })}
-                  disabled={loadingContractRoleTypes}
-                >
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        loadingContractRoleTypes ? "Cargando roles…" : "Selecciona rol"
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {errorContractRoleTypes && (
-                      <div className="px-3 py-1 text-sm text-red-600">
-                        Error al cargar roles.
-                      </div>
-                    )}
-                    {(contractRoleTypes ?? []).map((r: RoleType) => (
-                      <SelectItem key={r.idRol} value={String(r.idRol)}>
-                        {r.nombre}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button type="button" variant="destructive" onClick={() => removeRow(idx)}>
-                  <Trash2 className="h-4 w-4" /> Quitar
-                </Button>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {/* Propietario (readonly) */}
+        <div className="rounded-md border p-3">
+          <h4 className="font-semibold mb-2">Propietario</h4>
+          <hr />
+          <div className="space-y-2 mt-2">
+            <div>
+              <Label className="text-sm">Cédula</Label>
+              <Input value={propietarioId ? String(propietarioId) : ""} disabled />
             </div>
-          ))
-        )}
-      </div>
 
-      <DialogFooter className="mt-4">
-        <div className="mr-auto text-sm text-muted-foreground">
-          Listas para guardar: <span className="font-medium">{totalReady}</span>
+            <div>
+              <Label className="text-sm">Nombre completo</Label>
+              <Input value={propietarioNombre ?? ""} disabled />
+            </div>
+
+            <div>
+              <Label className="text-sm">Rol</Label>
+              <Input value={rolPropietarioNombre} disabled />
+            </div>
+          </div>
         </div>
 
-        <Button
-          variant="outline"
-          onClick={() => setRows([])}
-          disabled={assign.isPending || rows.length === 0}
-        >
-          Limpiar todo
-        </Button>
+        <div className="rounded-md border p-3">
+          <h4 className="font-semibold mb-2">{rolClienteNombre}</h4>
+          <hr />
 
+          <div className="space-y-2 mt-2 rounded-md border p-3">
+            <Label htmlFor="buscarCedula" className="text-sm">
+              Buscar por cédula
+            </Label>
+            <div className="flex items-end gap-2 w-full">
+              <div className="w-96">
+                <Input
+                  id="buscarCedula"
+                  placeholder="Ej. 1 2345 6789"
+                  value={cedulaQuery}
+                  onChange={(e) => setCedulaQuery(e.target.value)}
+                />
+              </div>
+              <Button type="button" variant="outline" onClick={() => setCedulaQuery("")}>
+                Limpiar
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-3">
+            <Label className="text-sm mb-1">Seleccionar {rolClienteNombre.toLowerCase()}</Label>
+            <Select
+              value={clienteSel ? String(clienteSel) : ""}
+              onValueChange={(v) => setClienteSel(Number(v))}
+              disabled={cargandoClientesUI}
+            >
+              <SelectTrigger>
+                <SelectValue
+                  placeholder={
+                    cargandoClientesUI
+                      ? "Cargando clientes…"
+                      : (enabledSearch ? "Selecciona el cliente encontrado" : "Selecciona un cliente")
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {opcionesClientes?.length > 0 ? (
+                  opcionesClientes.map((c) => (
+                    <SelectItem key={c.identificacion} value={String(c.identificacion)}>
+                      {c.nombreCompleto ??
+                        [c.nombre, c.apellido1, c.apellido2].filter(Boolean).join(" ") ??
+                        c.identificacion}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <div className="px-3 py-1 text-sm opacity-70">
+                    {enabledSearch
+                      ? (errorCliente ? "Error al buscar por cédula." : "No se encontraron clientes.")
+                      : (errorClientes ? "Error cargando clientes." : "Sin clientes para mostrar.")}
+                  </div>
+                )}
+              </SelectContent>
+            </Select>
+
+            <div className="mt-3">
+              <Label className="text-sm">Rol</Label>
+              <Input value={rolClienteNombre} disabled />
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <DialogFooter className="mt-2">
+        <Button variant="secondary" onClick={onCancel} disabled={assign.isPending}>
+          Cancelar
+        </Button>
         <Button
           onClick={handleSave}
-          disabled={assign.isPending || totalReady === 0}
+          disabled={
+            assign.isPending ||
+            !propietarioId ||
+            !clienteSel ||
+            !rolPropietarioId ||
+            !rolClienteId
+          }
         >
-          {assign.isPending ? (<><Loader2 className="h-4 w-4 animate-spin mr-2" /> Guardando…</>) : "Guardar"}
-        </Button>
-
-        <Button variant="secondary" onClick={onCancel} disabled={assign.isPending}>
-          Volver
+          {assign.isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin mr-2" /> Guardando…
+            </>
+          ) : (
+            "Guardar"
+          )}
         </Button>
       </DialogFooter>
     </Dialog>

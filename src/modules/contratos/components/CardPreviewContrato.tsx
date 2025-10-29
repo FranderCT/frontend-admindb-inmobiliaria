@@ -90,7 +90,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
                 e.preventDefault()
                 setOpenEdit(true)
               }}
-              disabled={contract.estado.toLowerCase() === "pendiente"}
+              disabled={contract.estado.toLowerCase() !== "pendiente"}
             >
               <Edit size={18} />
             </Button>

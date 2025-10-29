@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import CardPropiedad from "@/modules/propiedades/components/CardPropiedad";
-import FormCrearEstadoPropiedad from "@/modules/propiedades/components/FormCrearEstadoPropiedad";
 import FormCrearTipoInmueble from "@/modules/propiedades/components/FormCrearTIpoInmueble";
 import FormCrearPropiedad from "@/modules/propiedades/components/FormCrearPropiedad";
 import PropiedadesFiltros from "@/modules/propiedades/components/PropiedadesFiltros";
@@ -46,9 +45,6 @@ function RouteComponent() {
       <nav className="flex flex-wrap gap-4 items-center justify-end mb-4 ml-16">
         <div className="flex gap-4 justify-center items-center">
           <PropiedadesFiltros />
-          <Can resource="propiedades" action="create">
-            <FormCrearEstadoPropiedad />
-          </Can>
           <Can resource="propiedades" action="create">
             <FormCrearTipoInmueble />
           </Can>

@@ -59,9 +59,9 @@ const FormLogin = () => {
           >
               <div className="relative hidden md:block ">
                   <img
-                      src="https://images.pexels.com/photos/7599735/pexels-photo-7599735.jpeg"
+            src="https://i.pinimg.com/736x/70/29/5a/70295ac1a86e4a1a0fe325c09ee34598.jpg"
                       alt="Banner"
-                      className="h-full w-full object-cover"
+                      className="h-[522px] w-full object-cover"
                   />
               </div>
 

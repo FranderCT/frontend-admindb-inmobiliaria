@@ -1,11 +1,16 @@
 import TileCard from '@/components/TileCard'
 import { cn } from '@/lib/utils'
+import { getUserInfoFromToken, protectRoute } from '@/modules/seguridad/utils/authGuard'
 import { createFileRoute } from '@tanstack/react-router'
 import { BarChart3, Building2, FileText, Receipt, Users } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
-  component: RouteComponent,
+  component: RouteComponent,  
+  beforeLoad: ({ location }) => {
+      protectRoute(location.pathname, ['AGENTE', 'ADMINISTRADOR', 'LECTOR'])
+    },
 })
+
 const tiles = [
   {
     to: '/propiedades/',
@@ -39,12 +44,14 @@ const tiles = [
   },
 ];
 function RouteComponent() {
+  const userInfo = getUserInfoFromToken();
+  
   return <div className="m-4">
     <main className={cn("flex-1 transition-all duration-300 pt-16 lg:pt-6")}>
       <div className="p-6 lg:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Hola, {}</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Hola, {userInfo?.name}</h1>
             <p className="text-muted-foreground">Bienvenido al sistema de gestión de la Inmobiliaria Altos del Valle</p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

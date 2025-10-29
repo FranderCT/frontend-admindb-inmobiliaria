@@ -1,5 +1,5 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { CreatePropertyStatus, CreatePropertyType, CreateProperty, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty } from "../models/propiedad";
+import { CreatePropertyStatus, CreatePropertyType, CreateProperty, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty, Propiedad } from "../models/propiedad";
 
 
 // post
@@ -34,6 +34,10 @@ export const getPropertyStatuses = async (): Promise<PropertyStatus[]> => {
   return response.data;
 };
 
+export const getProperty = async (idPropiedad: number): Promise<Propiedad> => {
+  const response = await altosDelValleAPI.get<Propiedad>(`propiedad/${idPropiedad}`);
+  return response.data;
+};
 
 export const getPropertyTypes = async (): Promise<PropertyType[]> => {
   const response = await altosDelValleAPI.get<PropertyType[]>(`tipo-inmueble`);

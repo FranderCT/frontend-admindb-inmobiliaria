@@ -1,5 +1,5 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { AgentPreview, AvailableProperty, Contract, ContractDetails, ContractParticipantsPayload, ContractType, CreateContract, RoleType, UpdateContract } from "../models/contract";
+import { AgentPreview, AvailableProperty, Contract, ContractDetails, ContractParticipant, ContractParticipantsPayload, ContractType, CreateContract, RoleType, UpdateContract } from "../models/contract";
 import { normalize, RawAgent } from "../types/contractTypes";
 
 export const createContract = async (contract: CreateContract): Promise<CreateContract> => {
@@ -21,6 +21,10 @@ export const getContracts = async (): Promise<Contract[]> => {
 
 export const getContract = async (idContrato: number): Promise<ContractDetails> => {
   const response = await altosDelValleAPI.get<ContractDetails>(`/contrato/vista/${idContrato}`);
+  return response.data;
+};
+export const getContractPrev = async (idContrato: number): Promise<Contract> => {
+  const response = await altosDelValleAPI.get<Contract>(`/contrato/vista-previa/${idContrato}`);
   return response.data;
 };
 
@@ -53,9 +57,20 @@ export const getAvailableProperties = async (): Promise<AvailableProperty[]> => 
   return response.data;
 };
 
+export const getContractParticipants = async (idContrato: number): Promise<ContractParticipant[]> => {
+  const response = await altosDelValleAPI.get<ContractParticipant[]>
+  (`/cliente-contrato/contrato/${idContrato}`);
+  return response.data;
+};
+
 //patch
 
 export const patchUpdateContract = async (data: UpdateContract): Promise<{ ok: boolean }> => {
   const response = await altosDelValleAPI.patch<{ ok: boolean }>(`contrato/${data.idContrato}`, data);
   return response.data;
+}
+
+export const updateContractParticipants = async (payload: ContractParticipantsPayload) => {
+  const { data } = await altosDelValleAPI.patch("/cliente-contrato", payload);
+  return data;
 }

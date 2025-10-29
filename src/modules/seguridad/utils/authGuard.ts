@@ -24,3 +24,11 @@ export function protectRoute(locationPath: string, allowedRoles?: Role[]) {
 
   return payload
 }
+
+export function getUserInfoFromToken() {
+  const token = getToken()
+  if (!token) return null
+  const payload = decodeJwt(token)
+  if (!payload || isExpired(payload)) return null
+  return payload
+}
