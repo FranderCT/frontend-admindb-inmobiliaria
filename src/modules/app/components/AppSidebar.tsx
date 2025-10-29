@@ -96,7 +96,7 @@ export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
                           className={cn(
                             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                             "text-slate-900 hover:bg-gray-100",
-                            "[&.active]:text-blue-600 [&.active]:bg-transparent",
+                            "[&.active]:text-[#5c9048] [&.active]:bg-transparent",
                             "[&_svg]:text-inherit"
                           )}
                           onClick={() => {
@@ -123,7 +123,7 @@ export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
                         className={cn(
                           "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                           "text-slate-900 hover:bg-gray-100",
-                          "[&.active]:text-blue-600 [&.active]:bg-transparent",
+                          "[&.active]:text-[#5c9048] [&.active]:bg-transparent",
                           "[&_svg]:text-inherit"
                         )}
                         onClick={() => {

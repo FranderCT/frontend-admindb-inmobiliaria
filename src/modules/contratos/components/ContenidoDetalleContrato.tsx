@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, FileText, Home, Printer, UserRound } from "lucide-react";
+import { BadgeCent, CalendarDays, FileText, Home, Printer, UserRound } from "lucide-react";
 import { useMemo } from "react";
 import { useGetContract } from "../hooks/contractHooks";
 import { ContractDetailProps } from "../types/contractTypes";
@@ -34,7 +34,6 @@ export default function ContenidoDetalleContrato({ contractID }: ContractDetailP
   }, [detail?.participantes]);
 
 
-  // If we have only a preview cached (detail exists but lacks propiedad), wait for the full fetch.
   if (loadingContract || (fetchingContract && !detail?.propiedad)) return <div className="p-6">Cargando contrato…</div>;
   if (errorContract || !detail) return <div className="p-6 text-red-600">No fue posible cargar el contrato.</div>;
 
@@ -144,7 +143,7 @@ export default function ContenidoDetalleContrato({ contractID }: ContractDetailP
 
         <section className="mb-6">
           <h3 className="text-[11px] tracking-widest font-semibold uppercase flex items-center gap-2">
-            <CalendarDays className="h-4 w-4" /> Vigencia y Pagos
+            <CalendarDays className="h-4 w-4" /> Vigencia
           </h3>
           <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm">
             <div className="flex items-center justify-between">
@@ -173,6 +172,11 @@ export default function ContenidoDetalleContrato({ contractID }: ContractDetailP
             </div>
           )}
 
+        </section>
+        <section className="mb-8">
+          <h3 className="text-[11px] tracking-widest font-semibold uppercase flex items-center gap-2">
+            <BadgeCent className="h-4 w-4" /> {detail.tipoContrato === 'Alquiler' ? 'Mensualidades' : 'Pago'}
+          </h3>
           <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm">
             {detail.tipoContrato === 'Alquiler' && (
               <>
@@ -184,22 +188,25 @@ export default function ContenidoDetalleContrato({ contractID }: ContractDetailP
                 )}
               </>
             )}
-            {detail.montoTotal && (
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Monto total</span>
-                <span className="font-medium">{fmtCRC(detail.montoTotal)}</span>
-              </div>
-            )}
-            {detail.tipoContrato === 'Alquiler' && (
-              <div></div>
-            )}
             {detail.porcentajeComision && (
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Porcentaje de comisión al agente</span>
                 <span className="font-medium">{detail.porcentajeComision}%</span>
               </div>
             )}
-          </div>
+
+            {detail.tipoContrato === 'Alquiler' && (
+              <div></div>
+            )}
+
+            {detail.montoTotal && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Monto total</span>
+                <span className="font-medium">{fmtCRC(detail.montoTotal)}</span>
+              </div>
+            )}
+            </div>
+          
         </section>
 
         <section className="mb-8">

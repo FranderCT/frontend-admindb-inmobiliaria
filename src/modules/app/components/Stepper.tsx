@@ -37,7 +37,7 @@ export default function Stepper({ steps, currentKey }: StepperProps) {
               <div
                 className={cn(
                   "h-10 w-10 rounded-full flex items-center justify-center ring-1 ring-muted-foreground/10",
-                  isCurrent ? "bg-foreground text-background" : "bg-muted text-foreground/70"
+                  isCurrent ? "bg-[#5c9048] text-background" : "bg-muted text-foreground/70"
                 )}
               >
                 <s.Icon className="h-5 w-5" aria-hidden="true" />

@@ -15,18 +15,34 @@ export interface Login {
 export interface LoginResponse {
     access_token: string;
 }
-
+export interface rolUsuario{
+    idRolUsuario: number;
+    nombre: string;
+}
 export interface User {
     idUsuario: number;
     nombre: string;
     apellido1: string;
     apellido2: string;
     email: string;
-    idRolUsuario: number;
+    rolUsuario: rolUsuario;
     estado: boolean;
 }
+export type UsersMeta = {
+    total: number;
+    page: number;
+    limit: number;
+    pageCount: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+};
 
+export type UsersResponse = {
+data: User[];
+meta: UsersMeta;
+};
 export interface Role {
     idRolUsuario: number;
     nombre: string;
 }
+

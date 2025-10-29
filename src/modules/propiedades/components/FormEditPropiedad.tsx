@@ -14,13 +14,13 @@ import { extractServerErrors } from "@/utils/serverExtract";
 import { useGetPropertyStatuses, useGetPropertyTypes, useUpdateProperty } from "../hooks/propiedadesHook";
 
 const FormEditPropiedad = ({
-  open, onOpenChange, from = "bottom", showCloseButton = true, property,
+  open, onOpenChange, from = "bottom", showCloseButton = true, property, disabled = false,
 }: EditPropiedadDialogProps) => {
   const updateProp = useUpdateProperty();
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
-      const { propertyTypes } = useGetPropertyTypes();
-      const { propertyStatuses } = useGetPropertyStatuses();
+  const { propertyTypes } = useGetPropertyTypes();
+  const { propertyStatuses } = useGetPropertyStatuses();
 
   const form = useForm({
     defaultValues: {
@@ -91,7 +91,7 @@ const FormEditPropiedad = ({
                   id="ubicacion"
                   value={field.state.value ?? ""}
                   onChange={(e) => field.handleChange(e.target.value)}
-                />
+                  disabled={disabled} />
                 {!!formErrors.ubicacion && <p className="text-red-700 text-sm">{formErrors.ubicacion}</p>}
               </div>
             )}
@@ -110,7 +110,7 @@ const FormEditPropiedad = ({
                   placeholder="₡1 400 000"
                   min={1}
                   step={1}
-                />
+                  disabled={disabled} />
                 {!!formErrors.precio && <p className="text-red-700 text-sm">{formErrors.precio}</p>}
               </div>
             )}
@@ -123,7 +123,7 @@ const FormEditPropiedad = ({
                 <Select
                   value={field.state.value ? String(field.state.value) : "all"}
                   onValueChange={(v) => field.handleChange(v === "all" ? undefined : Number(v))}
-                >
+                  disabled={disabled}>
                   <SelectTrigger><SelectValue placeholder="Selecciona un estado" /></SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
@@ -150,7 +150,7 @@ const FormEditPropiedad = ({
                 <Select
                   value={field.state.value ? String(field.state.value) : "all"}
                   onValueChange={(v) => field.handleChange(v === "all" ? undefined : Number(v))}
-                >
+                  disabled={disabled}>
                   <SelectTrigger><SelectValue placeholder="Selecciona un tipo" /></SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
@@ -173,7 +173,7 @@ const FormEditPropiedad = ({
           {!!formError && <p className="text-red-700 text-sm text-center">{formError}</p>}
 
           <DialogFooter className="flex gap-2">
-            <Button type="submit" disabled={updateProp.isPending}>
+            <Button type="submit" disabled={updateProp.isPending || disabled}>
               {updateProp.isPending ? "Guardando..." : "Guardar cambios"}
             </Button>
             <DialogClose>

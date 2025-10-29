@@ -1,5 +1,5 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { CreateUser, Login, LoginResponse, Role, User } from "../models/usuario";
+import { CreateUser, Login, LoginResponse, Role, UsersResponse } from "../models/usuario";
 
 export const createUser = async (user: CreateUser): Promise<CreateUser> => {
   const response = await altosDelValleAPI.post<CreateUser>(
@@ -24,9 +24,18 @@ export const getRoles = async (): Promise<Role[]> => {
   return response.data;
 }
 
-export const getUsers = async (): Promise<User[]> => {
-  const response = await altosDelValleAPI.get<User[]>(
-    `/usuarios`
+export const getUsers = async (
+  page: number,
+  limit: number,
+  estado: boolean
+): Promise<UsersResponse> => {
+  const { data } = await altosDelValleAPI.get<UsersResponse>(
+    `/usuario/all?page=${page}&limit=${limit}&estado=${estado}`
   );
-  return response.data;
+  return data;
+};
+
+
+export const deactivateUser = async (idUsuario: number): Promise<void> => {
+  await altosDelValleAPI.patch(`/usuario/desactive/${idUsuario}`);
 }

@@ -32,6 +32,9 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: 
     setOpenEdit(true)
   }
 
+  const estadoNombre = String(property.estadoPropiedad?.nombre ?? "").trim();
+  const isLocked = /^(Vendido|Reservado)$/i.test(estadoNombre);
+
   return (
     <>
       <Card key={property.idPropiedad} className="hover:shadow-md transition-shadow hover:cursor-default">
@@ -81,7 +84,7 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: 
           <div className="flex items-center justify-between pt-2 border-t">
             <p className="text-sm text-muted-foreground">Acciones</p>
             <div className="flex gap-1">
-              <Button variant="ghost" size="sm" aria-label="Editar" onClick={onEditClick}>
+              <Button variant="ghost" size="sm" aria-label="Editar" onClick={onEditClick} disabled={isLocked} title={isLocked ? 'No se puede editar una propiedad vendida o reservada' : undefined}>
                 <Edit className="h-4 w-4" />
               </Button>
               <Button
@@ -100,13 +103,25 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: 
 
       {/* Modal editar */}
       <Can resource="propiedades" action="update">
-        <FormEditPropiedad
-          open={openEdit}
-          onOpenChange={setOpenEdit}
-          property={property}
-          estadosPropiedad={estadosPropiedad}
-          tiposInmueble={tiposInmueble}
-        />
+        {/* disable editing when property is sold or reserved */}
+        {(() => {
+          const estadoNombre = String(property.estadoPropiedad?.nombre ?? "").trim();
+          const isLocked = /^(Vendido|Reservado)$/i.test(estadoNombre);
+          return (
+            <>
+              <FormEditPropiedad
+                open={openEdit}
+                onOpenChange={setOpenEdit}
+                property={property}
+                estadosPropiedad={estadosPropiedad}
+                tiposInmueble={tiposInmueble}
+                disabled={isLocked}
+              />
+              {/* Ensure Edit button is disabled visually */}
+              {/* We can't easily access the button above here, so also disable via props on render */}
+            </>
+          );
+        })()}
       </Can>
       {/* Confirm eliminar */}
       <Can resource="propiedades" action="delete">
