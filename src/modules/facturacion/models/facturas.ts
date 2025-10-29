@@ -3,7 +3,7 @@ import { InvoiceItem, InvoiceStatus, RolCliente } from "../types/facturasType";
 export function mapFacturaApiToInvoice(api: any): InvoiceItem {
   const estado: InvoiceStatus = api.estadoPago ? "Pagada" : "Pendiente";
 
-  // ⬇️ Cambio mínimo: aceptar ambos alias del back
+  
   const parsed = parseClientePrincipal(api?.cliente ?? api?.clientePrincipal);
 
   return {
@@ -19,10 +19,8 @@ export function mapFacturaApiToInvoice(api: any): InvoiceItem {
     montoTotal: Number(api.montoPagado ?? 0),
     estado,
 
-    // ⬇️ Cambio mínimo: normalizar string de cliente desde /todas (clientePrincipal) o /filtradas (cliente)
+    
     clientes: api.clientes ?? api.cliente ?? api.clientePrincipal ?? "",
-
-    // Guardamos el cliente principal desglosado
     clienteId: parsed?.id ?? undefined,
     clienteNombre: parsed?.name ?? undefined,
     rolCliente: parsed?.rol ?? undefined,
