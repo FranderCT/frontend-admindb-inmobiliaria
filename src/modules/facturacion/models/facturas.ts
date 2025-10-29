@@ -3,8 +3,8 @@ import { InvoiceItem, InvoiceStatus, RolCliente } from "../types/facturasType";
 export function mapFacturaApiToInvoice(api: any): InvoiceItem {
   const estado: InvoiceStatus = api.estadoPago ? "Pagada" : "Pendiente";
 
-
-  const parsed = parseClientePrincipal(api?.clientePrincipal);
+  // ⬇️ Cambio mínimo: aceptar ambos alias del back
+  const parsed = parseClientePrincipal(api?.cliente ?? api?.clientePrincipal);
 
   return {
     id: api.idFactura,
@@ -19,8 +19,8 @@ export function mapFacturaApiToInvoice(api: any): InvoiceItem {
     montoTotal: Number(api.montoPagado ?? 0),
     estado,
 
-    // Conserva cualquier string de clientes que envíe el back
-    clientes: api.clientes ?? api.clientePrincipal ?? "",
+    // ⬇️ Cambio mínimo: normalizar string de cliente desde /todas (clientePrincipal) o /filtradas (cliente)
+    clientes: api.clientes ?? api.cliente ?? api.clientePrincipal ?? "",
 
     // Guardamos el cliente principal desglosado
     clienteId: parsed?.id ?? undefined,
@@ -29,14 +29,12 @@ export function mapFacturaApiToInvoice(api: any): InvoiceItem {
   };
 }
 
-
 function parseClientePrincipal(
   src: unknown
 ): { id: string; name?: string; rol?: RolCliente } | null {
   if (!src) return null;
   const s = String(src).trim();
   if (!s || s.toLowerCase() === "no asignado") return null;
-
 
   const m = s.match(/^\s*(\d+)\s*-\s*(.*?)\s*\(([^)]+)\)\s*$/);
   if (m) {
@@ -46,7 +44,6 @@ function parseClientePrincipal(
     return { id, name, rol };
   }
 
-  
   const m2 = s.match(/^\s*(\d+)\s*-\s*(.+)\s*$/);
   if (m2) {
     return { id: m2[1], name: m2[2] };
@@ -64,28 +61,22 @@ export const formatMoney = (n: number) =>
     maximumFractionDigits: 0,
   }).format(Number(n || 0));
 
-
 export const formatDate = (iso?: string | null) => {
   if (!iso) return "—";
-
 
   const dateLike = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T00:00:00` : iso;
   const d = new Date(dateLike);
   return isNaN(d.getTime()) ? "Invalid Date" : d.toLocaleDateString("es-CR");
 };
 
+export function deriveClienteInfo(f: InvoiceItem): { text: string } {
+  const anyF = f as any;
+  const raw: string =
+    anyF?.clienteText ??
+    anyF?.cliente ??
+    anyF?.clientePrincipal ??
+    anyF?.clientes ??
+    "";
 
-export function deriveClienteInfo(f: InvoiceItem): { id: string; role: string; text: string } {
-  const id = f.clienteId ?? "";
-  const name = f.clienteNombre ?? "";
-  const role = f.rolCliente ?? "";
-
-  const text =
-    id
-      ? `${id}${name ? ` - ${name}` : ""}${role ? ` (${role})` : ""}`
-      : "—";
-
-  return { id, role, text };
+  return { text: raw?.trim() ? raw : "—" };
 }
-
-
