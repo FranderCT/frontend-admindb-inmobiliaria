@@ -64,10 +64,13 @@ export const formatMoney = (n: number) =>
     maximumFractionDigits: 0,
   }).format(Number(n || 0));
 
-/** Formatea fechas ISO o null */
+
 export const formatDate = (iso?: string | null) => {
   if (!iso) return "—";
-  const d = new Date(iso);
+
+
+  const dateLike = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T00:00:00` : iso;
+  const d = new Date(dateLike);
   return isNaN(d.getTime()) ? "Invalid Date" : d.toLocaleDateString("es-CR");
 };
 
@@ -84,3 +87,5 @@ export function deriveClienteInfo(f: InvoiceItem): { id: string; role: string; t
 
   return { id, role, text };
 }
+
+
