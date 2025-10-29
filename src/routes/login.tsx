@@ -26,5 +26,8 @@ export const Route = createFileRoute('/login')({
 function RouteComponent() {
   return <div className="relative h-screen w-full">
     <FormLogin />
+    <p className='ml-2'> admin@altosdelvalle.com
+       </p>
+    <p className='ml-2'>password123</p>
   </div>
 }

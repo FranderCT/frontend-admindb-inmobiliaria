@@ -13,7 +13,7 @@ export const Route = createFileRoute('/configuracion/usuarios')({
 })
 
 function RouteComponent() {
-  const { users, loadingUsers, errorUsers } = useGetUsers();
+  const { users, loadingUsers, errorUsers } = useGetUsers(1,1 ,true);
   return (<section className="m-4">
     <header className="flex items-center justify-between mb-4 ml-16">
       <h1 className="text-4xl font-bold">Gestionar usuarios</h1>

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CreateUser, Login, LoginResponse } from "../models/usuario";
-import { createUser, getRoles, getUsers, loginUser } from "../services/usuariosServices";
+import { CreateUser, Login, LoginResponse, UsersMeta, UsersResponse } from "../models/usuario";
+import { createUser, deactivateUser, getRoles, getUsers, loginUser } from "../services/usuariosServices";
 import altosDelValleAPI from "@/api/altosdelvalle";
 
 export const useCreateUser = () => {
@@ -52,16 +52,40 @@ export function useGetRoles() {
     };
 }
 
-export const useGetUsers = () => {
-    const { data, isLoading, error, isFetching } = useQuery({
-        queryKey: ["users"],
-        queryFn: () => getUsers(),
-    });
+const EMPTY_META: UsersMeta = {
+  total: 0, page: 1, limit: 10, pageCount: 1, hasNextPage: false, hasPrevPage: false,
+};
 
-    return {
-        users: data,
-        loadingUsers: isLoading,
-        fetchingUsers: isFetching,
-        errorUsers: error,
-    };
-}
+export const useGetUsers = (page: number, limit: number, estado: boolean) => {
+  const { data, isLoading, error, isFetching, isRefetching } = useQuery<UsersResponse>({
+    queryKey: ["users", page, limit, estado],
+    queryFn: () => getUsers(page, limit, estado),
+    // evita parpadeos y estados undefined al paginar
+    placeholderData: (prev) => prev ?? { data: [], meta: EMPTY_META },
+  });
+
+  const safeData = data ?? { data: [], meta: EMPTY_META };
+
+  return {
+    usersResponse: safeData,
+    users: safeData.data,
+    meta: safeData.meta,
+    loadingUsers: isLoading,
+    fetchingUsers: isFetching || isRefetching,
+    errorUsers: error,
+  };
+};
+
+export const useDeactivateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (idUsuario: number) => deactivateUser(idUsuario),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+      });
+    },
+  });
+};
