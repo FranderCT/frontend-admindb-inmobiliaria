@@ -1,22 +1,19 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Edit, CalendarDays, FileText, BriefcaseBusiness, LandPlot, Signature, MapPin } from 'lucide-react'
 import type { CardContractProps } from '../types/contractTypes'
 import DialogDetalleContrato from './DialogDetalleContrato'
-import { getEstado } from '@/utils/contractStatus'
+// import { getEstado } from '@/utils/contractStatus'
 import { formatDate } from '@/utils/dates'
 import DialogEditarContrato from './DialogEditarContrato'
+import { estadoContratoVariant } from '@/utils/statusVariants'
+import { Can } from '@/modules/seguridad/components/Can'
 
 const CardPreviewContrato = ({ contract }: CardContractProps) => {
   const [openDetalle, setOpenDetalle] = useState(false)
   const [openEdit, setOpenEdit] = useState(false)
-
-  const estado = useMemo(
-    () => getEstado(contract.fechaInicio, contract.fechaFin),
-    [contract.fechaInicio, contract.fechaFin]
-  )
 
   const Trigger = (
     <Card
@@ -32,7 +29,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
               <FileText size={15} /> {contract.TipoContrato}
             </CardDescription>
           </div>
-          <Badge variant={estado.variant}>{estado.text}</Badge>
+          <Badge variant={estadoContratoVariant[contract.estado]}>{contract.estado}</Badge>
         </div>
       </CardHeader>
 
@@ -84,7 +81,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
 
         <div className="flex items-center justify-between pt-3 mt-1 border-t">
           <div className="text-sm text-muted-foreground">Acciones</div>
-          <div className="flex gap-1">
+          <div className="flex gap-1"><Can resource="contratos" action="update">
             <Button
               variant="ghost"
               aria-label="Editar"
@@ -93,9 +90,11 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
                 e.preventDefault()
                 setOpenEdit(true)
               }}
+              disabled={contract.estado.toLowerCase() !== "pendiente"}
             >
               <Edit size={18} />
             </Button>
+          </Can>
           </div>
         </div>
       </CardContent>
@@ -119,7 +118,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
           fechaFin: contract.fechaFin?.slice(0, 10),
           fechaFirma: contract.fechaFirma?.slice(0, 10),
           fechaPago: contract.fechaPago?.slice(0, 10),
-          idTipoContrato: contract.idTipoContrato, 
+          idTipoContrato: contract.idTipoContrato,
           idPropiedad: contract.idPropiedad,
           idAgente: contract.idAgente,
           condiciones: contract.condiciones?.map((c) => c.textoCondicion),

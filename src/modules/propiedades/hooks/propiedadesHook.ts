@@ -1,5 +1,5 @@
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { createProperty, createPropertyStatus, createPropertyType, deleteProperty, getPropertiesFiltered, getPropertyStatuses, getPropertyTypes, updateProperty } from "../services/propiedadesServices";
+import { createProperty, createPropertyStatus, createPropertyType, deleteProperty, getPropertiesFiltered, getProperty, getPropertyStatuses, getPropertyTypes, updateProperty } from "../services/propiedadesServices";
 import { CreateProperty, CreatePropertyStatus, CreatePropertyType, PropertysPaginateParams, UpdateProperty,  } from "../models/propiedad";
 
 export const useCreateProperty = () => {
@@ -88,6 +88,22 @@ export function useGetPropertyStatuses(
         errorPropertyStatuses: error,
     };
 }
+
+export function useGetPropertyById(idPropiedad?: number, opts?: { enabled?: boolean }) {
+    const { data, isLoading, error, isFetching } = useQuery({
+        queryKey: ["property", idPropiedad],
+        queryFn: () => getProperty(idPropiedad!),
+        enabled: !!idPropiedad && (opts?.enabled ?? true),
+    });
+
+    return {
+        propiedad: data,
+        loadingProp: isLoading,
+        fetchingProp: isFetching,
+        errorProp: error,
+    };
+}
+
 
 
 export function useGetPropertiesFiltered(params: PropertysPaginateParams) {

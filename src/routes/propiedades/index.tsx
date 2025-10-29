@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import CardPropiedad from "@/modules/propiedades/components/CardPropiedad";
-import FormCrearEstadoPropiedad from "@/modules/propiedades/components/FormCrearEstadoPropiedad";
 import FormCrearTipoInmueble from "@/modules/propiedades/components/FormCrearTIpoInmueble";
 import FormCrearPropiedad from "@/modules/propiedades/components/FormCrearPropiedad";
 import PropiedadesFiltros from "@/modules/propiedades/components/PropiedadesFiltros";
@@ -9,8 +8,14 @@ import { PropiedadesFiltersProvider } from "@/modules/propiedades/context/propie
 import { usePropiedadesPaginatedFromContext } from "@/modules/propiedades/hooks/usePropiedadesFromContext";
 import { useContext } from "react"
 import PropiedadesFiltersContext from "@/modules/propiedades/context/propiedadesContext";
+import { protectRoute } from "@/modules/seguridad/utils/authGuard";
+import { Can } from "@/modules/seguridad/components/Can";
 
 export const Route = createFileRoute("/propiedades/")({
+  beforeLoad: ({ location }) => {
+    protectRoute(location.pathname, ['AGENTE', 'ADMINISTRADOR', 'LECTOR'])
+  },
+
   component: () => (
     <PropiedadesFiltersProvider>
       <RouteComponent />
@@ -40,9 +45,12 @@ function RouteComponent() {
       <nav className="flex flex-wrap gap-4 items-center justify-end mb-4 ml-16">
         <div className="flex gap-4 justify-center items-center">
           <PropiedadesFiltros />
-          <FormCrearEstadoPropiedad />
-          <FormCrearTipoInmueble />
-          <FormCrearPropiedad />
+          <Can resource="propiedades" action="create">
+            <FormCrearTipoInmueble />
+          </Can>
+          <Can resource="propiedades" action="create">
+            <FormCrearPropiedad />
+          </Can>
         </div>
       </nav>
 

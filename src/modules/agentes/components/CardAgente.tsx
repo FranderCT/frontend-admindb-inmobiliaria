@@ -8,6 +8,7 @@ import { AgentCardProps } from '../types/agentTypes'
 import { useDeleteAgent } from '../hooks/agentesHooks'
 import DialogDetalleAgente from './DialogDetalleAgente'
 import FormEditAgente from './FormEditAgente'
+import { Can } from '@/modules/seguridad/components/Can'
 
 
 const CardAgente = ({ agent }: AgentCardProps) => {
@@ -70,17 +71,21 @@ const CardAgente = ({ agent }: AgentCardProps) => {
         <div className="flex items-center justify-between pt-3 mt-1 border-t">
           <div className="text-sm text-muted-foreground">Acciones</div>
           <div className="flex gap-1">
-            <Button variant="ghost" aria-label="Editar" onClick={onEditClick}>
-              <Edit size={18} />
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-destructive hover:text-destructive"
-              aria-label="Eliminar"
-              onClick={onDeleteClick}
-            >
-              <Trash2 />
-            </Button>
+            <Can resource="agentes" action="update">
+              <Button variant="ghost" aria-label="Editar" onClick={onEditClick}>
+                <Edit size={18} />
+              </Button>
+            </Can>
+            <Can resource="agentes" action="delete">
+              <Button
+                variant="ghost"
+                className="text-destructive hover:text-destructive"
+                aria-label="Eliminar"
+                onClick={onDeleteClick}
+              >
+                <Trash2 />
+              </Button>
+            </Can>
           </div>
         </div>
       </CardContent>

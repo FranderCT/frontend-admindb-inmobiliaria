@@ -1,17 +1,30 @@
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Plus, Loader2, UserRound, FileText, Landmark, Users } from "lucide-react";
+import { useMemo, useState, useEffect } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+
 import { extractServerErrors } from "@/utils/serverExtract";
 import { useDebounced } from "@/utils/debounce";
-import { useCreateContract, useGetAgentPreview, useGetAvailableProperties, useGetContractType } from "../hooks/contractHooks";
+import {
+  useCreateContract,
+  useGetAgentPreview,
+  useGetAvailableProperties,
+  useGetContractType,
+} from "../hooks/contractHooks";
 import FormAsignarParticipantes from "./FormAsignarParticipantes";
-import { AgentPreview, AvailableProperty, ContractType, CreateContract } from "../models/contract";
-import { useState } from "react";
+
+import {
+  AgentPreview,
+  AvailableProperty,
+  CreateContract,
+} from "../models/contract";
+
 import {
   Dialog,
   DialogPanel,
@@ -21,38 +34,65 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/animate-ui/components/headless/dialog";
-import { createContractSchema } from "../schema/contractValidators";
+import Stepper, { StepDef } from "@/modules/app/components/Stepper";
+import { datosVentaSchema, datosAlquilerSchema } from "../schema/contractValidators";
+import { set } from "zod";
 
-type Step = "create" | "assign";
+
+type WizardStep = "tipo" | "datos" | "condiciones" | "assign";
+type TipoContratoLocal = "venta" | "alquiler" | null;
+const steps: StepDef[] = [
+  { key: "tipo", label: "Tipo", Icon: UserRound },
+  { key: "datos", label: "Datos", Icon: FileText },
+  { key: "condiciones", label: "Condiciones", Icon: Landmark },
+  { key: "assign", label: "Participantes", Icon: Users },
+];
+
 const hoyISO = () => new Date().toISOString().slice(0, 10);
+const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+
+function addMonthsISO(dateISO: string, months: number): string {
+  if (!dateISO) return "";
+  const d = new Date(dateISO + "T00:00:00");
+  const day = d.getDate();
+  d.setMonth(d.getMonth() + months);
+  if (d.getDate() < day) d.setDate(0);
+  return d.toISOString().slice(0, 10);
+}
 
 export default function FormCrearContrato() {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<Step>("create");
+  const [step, setStep] = useState<WizardStep>("tipo");
+  const [tipoSeleccionado, setTipoSeleccionado] = useState<TipoContratoLocal>(null);
   const [createdContractId, setCreatedContractId] = useState<number | null>(null);
-  
+
   const { availableProperties, loadingAvailableProperties } = useGetAvailableProperties();
-
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [formError, setFormError] = useState<string | null>(null);
-
   const { contractTypes, loadingContractTypes } = useGetContractType();
-
   const [cedulaAgente, setCedulaAgente] = useState<string>("");
   const debouncedAgente = useDebounced(cedulaAgente.trim(), 450);
   const isSearching = debouncedAgente.length >= 3;
-
   const {
     agents: agentes = [],
     loadingAgents,
     fetchingAgents,
     errorAgents,
   } = useGetAgentPreview(isSearching ? debouncedAgente : undefined);
-
   const cargandoAgentesUI = loadingAgents || fetchingAgents;
-  const opcionesAgentes = agentes;
+
+  const idsPorNombre = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const t of contractTypes ?? []) {
+      map.set((t.nombre || "").toLowerCase(), t.idTipoContrato);
+    }
+    return map;
+  }, [contractTypes]);
 
   const create = useCreateContract();
+
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const [zodErrors, setZodErrors] = useState<Record<string, string>>({});
 
   const form = useForm({
     defaultValues: {
@@ -67,26 +107,19 @@ export default function FormCrearContrato() {
       deposito: 0 as number,
       porcentajeComision: 0 as number,
       condicionesTexto: "" as string,
+      cantidadPagos: 12 as number,
     },
     onSubmit: async ({ value }) => {
       setFormErrors({});
       setFormError(null);
 
-      const result = createContractSchema.safeParse(value);
-      if (!result.success) {
-        const fieldErrors: Record<string, string> = {};
-        for (const i of result.error.issues) {
-          const k = i.path.join(".");
-          if (!fieldErrors[k]) fieldErrors[k] = i.message;
-        }
-        setFormErrors(fieldErrors);
-        return;
-      }
-
       try {
         const payload: CreateContract = {
           fechaInicio: value.fechaInicio,
-          fechaFin: value.fechaFin,
+          fechaFin:
+            tipoSeleccionado === "alquiler"
+              ? addMonthsISO(value.fechaInicio, Number(value.cantidadPagos || 0))
+              : value.fechaFin,
           fechaFirma: value.fechaFirma,
           fechaPago: value.fechaPago,
           idTipoContrato: Number(value.idTipoContrato),
@@ -96,6 +129,7 @@ export default function FormCrearContrato() {
           deposito: Number(value.deposito),
           porcentajeComision: Number(value.porcentajeComision),
           estado: null,
+          cantidadPagos: tipoSeleccionado === "alquiler" ? Number(value.cantidadPagos) : 0,
           condiciones: value.condicionesTexto
             ? value.condicionesTexto.split("\n").map((t) => t.trim()).filter(Boolean)
             : [],
@@ -113,17 +147,92 @@ export default function FormCrearContrato() {
         setFormErrors(fieldErrors);
         setFormError(formError ?? "Error creando contrato.");
       }
-    }
+    },
   });
 
+  useEffect(() => {
+    if (!tipoSeleccionado) return;
+    const nombre = tipoSeleccionado === "venta" ? "venta" : "alquiler";
+    const id = idsPorNombre.get(nombre);
+    if (id) {
+      form.setFieldValue("idTipoContrato", id);
+    }
+  }, [tipoSeleccionado, idsPorNombre]); // eslint-disable-line
+
+  const fechaFinCalculada = useMemo(() => {
+    if (tipoSeleccionado !== "alquiler") return form.state.values.fechaFin || "";
+    const n = Number(form.state.values.cantidadPagos || 0);
+    return addMonthsISO(form.state.values.fechaInicio, Number.isFinite(n) ? n : 0);
+  }, [tipoSeleccionado, form.state.values.fechaInicio, form.state.values.cantidadPagos, form.state.values.fechaFin]);
+
   const resetAll = () => {
-    setStep("create");
+    setStep("tipo");
+    setTipoSeleccionado(null);
     setCreatedContractId(null);
     setFormErrors({});
     setFormError(null);
+    setZodErrors({});
     setCedulaAgente("");
     form.reset();
   };
+
+  const { canContinueDatos, validationErrors } = useMemo(() => {
+    if (!tipoSeleccionado) return { canContinueDatos: false, validationErrors: {} };
+
+    const values = form.state.values;
+    const schema = tipoSeleccionado === "venta" ? datosVentaSchema : datosAlquilerSchema;
+
+    const result = schema.safeParse(values);
+
+    if (result.success) {
+      return { canContinueDatos: true, validationErrors: {} };
+    }
+
+    const errors: Record<string, string> = {};
+    result.error.issues.forEach((err) => {
+      const path = err.path.join('.');
+      errors[path] = err.message;
+    });
+
+    return { canContinueDatos: false, validationErrors: errors };
+  }, [
+    tipoSeleccionado,
+    form.state.values.fechaFirma,
+    form.state.values.fechaPago,
+    form.state.values.idPropiedad,
+    form.state.values.idAgente,
+    form.state.values.montoTotal,
+    form.state.values.porcentajeComision,
+    form.state.values.fechaInicio,
+    form.state.values.cantidadPagos,
+    form.state.values.deposito,
+  ]);
+
+  const validateField = (fieldName: string, value: any) => {
+    if (!tipoSeleccionado) return;
+
+    const schema = tipoSeleccionado === "venta" ? datosVentaSchema : datosAlquilerSchema;
+    const fieldSchema = schema.shape[fieldName as keyof typeof schema.shape];
+
+    if (!fieldSchema) return;
+
+    const result = fieldSchema.safeParse(value);
+
+    if (result.success) {
+      setZodErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldName];
+        return newErrors;
+      });
+    } else {
+      setZodErrors((prev) => ({
+        ...prev,
+        [fieldName]: result.error[0]?.message || "Error de validación",
+      }));
+    }
+  };
+
+  const isScrollStep = step === "datos";
 
   return (
     <>
@@ -139,248 +248,565 @@ export default function FormCrearContrato() {
         }}
       >
         <DialogPanel
-          className=" max-h-[95vh] rounded-2xl overflow-hidden p-4"
+          className="
+            max-h-[92vh] 
+            w-full rounded-2xl p-0
+            flex flex-col
+          "
         >
-          {step === "create" && (
-            <>
-              <div className="max-h-[85vh] overflow-y-auto pr-3 mt-4
-                  scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-700 scrollbar-track-gray-100">
+          <DialogHeader
+            className="
+              sticky top-0
+              border-b py-2 px-4
+            "
+          >
+            <DialogTitle>
+              Crear contrato {tipoSeleccionado === "venta" ? "de venta" : tipoSeleccionado === "alquiler" ? "de alquiler" : ""}
+            </DialogTitle>
+            <DialogDescription>
+              {step === "tipo" && "Selecciona el tipo de contrato para continuar."}
+              {step === "datos" && "Completa los datos del contrato."}
+              {step === "condiciones" && "Agrega condiciones (una por línea) y envía."}
+            </DialogDescription>
+          </DialogHeader>
 
-              <DialogHeader
-                className="sticky top-0 z-20 bg-background/95 supports-[backdrop-filter]:bg-background/80 backdrop-blur
-             border-b py-2 px-4"
-              >
-                <DialogTitle>Crear contrato</DialogTitle> 
-                <DialogDescription>
-                  Completa los datos y continúa para asignar participantes.
-                </DialogDescription> 
-              </DialogHeader>
+          <div className="px-4 pt-2 pb-3 border-b">
+            <Stepper steps={steps} currentKey={step} />
+          </div>
 
+          <div
+            className={
+              isScrollStep
+                ? "flex-1 overflow-y-auto px-4 pr-6 pt-3 pb-4 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-700 scrollbar-track-gray-100"
+                : "px-4 pr-6 pt-3 pb-4"
+            }
+          >
+            {step === "tipo" && (
+              <div className="space-y-4 py-2 w-full">
+                <Label className="font-semibold">Tipo de contrato</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Button
+                    type="button"
+                    variant={tipoSeleccionado === "venta" ? "default" : "outline"}
+                    onClick={() => setTipoSeleccionado("venta")}
+                  >
+                    Venta
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={tipoSeleccionado === "alquiler" ? "default" : "outline"}
+                    onClick={() => setTipoSeleccionado("alquiler")}
+                  >
+                    Alquiler
+                  </Button>
+                </div>
+
+                {loadingContractTypes && (
+                  <p className="text-xs text-muted-foreground">
+                    Cargando tipos del servidor…
+                  </p>
+                )}
+
+                <DialogFooter className="mt-4">
+                  <DialogClose>
+                    <Button type="button" variant="outline">Cancelar</Button>
+                  </DialogClose>
+                  <Button
+                    type="button"
+                    onClick={() => setStep("datos")}
+                    disabled={!tipoSeleccionado}
+                  >
+                    Continuar
+                  </Button>
+                </DialogFooter>
+              </div>
+            )}
+            {step === "datos" && (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
+                  if (canContinueDatos) {
+                    setStep("condiciones");
+                  } else {
+                    toast.error("Revisa los campos requeridos.");
+                  }
+                }}
+                className="space-y-4 "
+              >
+                {tipoSeleccionado === "venta" && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <form.Field name="fechaFirma">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">Fecha Firma</Label>
+                            <Input
+                              type="date"
+                              value={field.state.value}
+                              onChange={(e) => field.handleChange(e.target.value)}
+                              onBlur={() => validateField("fechaFirma", field.state.value)}
+                            />
+                            {zodErrors.fechaFirma && <p className="text-red-700 text-sm">{zodErrors.fechaFirma}</p>}
+                            {formErrors.fechaFirma && <p className="text-red-700 text-sm">{formErrors.fechaFirma}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+
+                      <form.Field name="fechaPago">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">Fecha Pago</Label>
+                            <Input
+                              type="date"
+                              value={field.state.value}
+                              onChange={(e) => field.handleChange(e.target.value)}
+                              onBlur={() => validateField("fechaPago", field.state.value)}
+                            />
+                            {zodErrors.fechaPago && <p className="text-red-700 text-sm">{zodErrors.fechaPago}</p>}
+                            {formErrors.fechaPago && <p className="text-red-700 text-sm">{formErrors.fechaPago}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+                    </div>
+
+                    <div className="mb-4">
+                      <form.Field name="idPropiedad">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">Propiedad</Label>
+                            <Select
+                              value={field.state.value ? String(field.state.value) : ""}
+                              onValueChange={(v) => {
+                                const numValue = Number(v);
+                                field.handleChange(numValue);
+                                validateField("idPropiedad", numValue);
+                              }}
+                              disabled={loadingAvailableProperties}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder={loadingAvailableProperties ? "Cargando..." : "Selecciona una propiedad"} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {(availableProperties ?? []).map((p: AvailableProperty) => (
+                                  <SelectItem key={p.idPropiedad} value={String(p.idPropiedad)}>
+                                    {p.idPropiedad} - {p.ubicacion}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            {zodErrors.idPropiedad && <p className="text-red-700 text-sm">{zodErrors.idPropiedad}</p>}
+                            {formErrors.idPropiedad && <p className="text-red-700 text-sm">{formErrors.idPropiedad}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+                    </div>
+
+                    <div className="space-y-2 rounded-md border p-3">
+                      <Label className="font-semibold">Asignar agente</Label>
+
+                      <div className="flex items-end gap-2">
+                        <div className="flex-1">
+                          <Label htmlFor="buscarAgente" className="text-sm">Buscar por cédula (mín. 3 dígitos)</Label>
+                          <Input
+                            id="buscarAgente"
+                            placeholder="Ej. 1 2345 6789"
+                            value={cedulaAgente}
+                            onChange={(e) => setCedulaAgente(e.target.value)}
+                          />
+                        </div>
+                        <Button type="button" variant="outline" onClick={() => setCedulaAgente("")}>
+                          Limpiar
+                        </Button>
+                      </div>
+
+                      <form.Field name="idAgente">
+                        {(field) => {
+                          const selectedId = field.state.value ? Number(field.state.value) : undefined;
+                          const selectedExists = selectedId
+                            ? agentes.some((a) => a.identificacion === selectedId)
+                            : false;
+                          const fallbackLabel = selectedId ? String(selectedId) : "";
+
+                          return (
+                            <div>
+                              <Label className="text-sm mb-1">Seleccionar agente</Label>
+                              <Select
+                                value={selectedId ? String(selectedId) : ""}
+                                onValueChange={(v) => {
+                                  const numValue = Number(v);
+                                  field.handleChange(numValue);
+                                  validateField("idAgente", numValue);
+                                }}
+                                disabled={cargandoAgentesUI}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue
+                                    placeholder={
+                                      cargandoAgentesUI
+                                        ? "Cargando agentes…"
+                                        : isSearching
+                                          ? "Selecciona el agente encontrado"
+                                          : "Selecciona un agente"
+                                    }
+                                  />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {!selectedExists && selectedId && (
+                                    <SelectItem value={String(selectedId)}>{fallbackLabel}</SelectItem>
+                                  )}
+                                  {agentes.length > 0 ? (
+                                    agentes.map((a: AgentPreview) => (
+                                      <SelectItem key={a.identificacion} value={String(a.identificacion)}>
+                                        {a.nombreCompleto ?? String(a.identificacion)}
+                                      </SelectItem>
+                                    ))
+                                  ) : (
+                                    <div className="px-3 py-1 text-sm opacity-70">
+                                      {errorAgents ? "Error cargando agentes." : "Sin agentes para mostrar."}
+                                    </div>
+                                  )}
+                                </SelectContent>
+                              </Select>
+                              {zodErrors.idAgente && <p className="text-red-700 text-sm mt-1">{zodErrors.idAgente}</p>}
+                              {formErrors.idAgente && <p className="text-red-700 text-sm mt-1">{formErrors.idAgente}</p>}
+                            </div>
+                          );
+                        }}
+                      </form.Field>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex w-55">
+                        <form.Field name="porcentajeComision">
+                          {(field) => (
+                            <div>
+                              <Label className="font-semibold">% Comisión al agente</Label>
+                              <Input
+                                type="number"
+                                min={0}
+                                max={100}
+                                step="0.01"
+                                value={String(field.state.value ?? "")}
+                                onChange={(e) => {
+                                  const raw = e.currentTarget.valueAsNumber;
+                                  const v = Number.isNaN(raw) ? 0 : clamp(raw, 0, 100);
+                                  field.handleChange(v);
+                                }}
+                                onBlur={() => validateField("porcentajeComision", field.state.value)}
+                                placeholder="Ej. 3.5"
+                              />
+                              {zodErrors.porcentajeComision && <p className="text-red-700 text-sm">{zodErrors.porcentajeComision}</p>}
+                              {formErrors.porcentajeComision && <p className="text-red-700 text-sm">{formErrors.porcentajeComision}</p>}
+                            </div>
+                          )}
+                        </form.Field>
+                      </div>
+
+                      <form.Field name="montoTotal">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">Monto total</Label>
+                            <Input
+                              type="number"
+                              min={0}
+                              step="0.01"
+                              value={String(field.state.value ?? "")}
+                              onChange={(e) => {
+                                const v = e.currentTarget.valueAsNumber;
+                                field.handleChange(Number.isNaN(v) ? 0 : v);
+                              }}
+                              onBlur={() => validateField("montoTotal", field.state.value)}
+                              placeholder="Ej. 250000.00"
+                            />
+                            {zodErrors.montoTotal && <p className="text-red-700 text-sm">{zodErrors.montoTotal}</p>}
+                            {formErrors.montoTotal && <p className="text-red-700 text-sm">{formErrors.montoTotal}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+
+                    </div>
+                  </>
+                )}
+
+                {tipoSeleccionado === "alquiler" && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <form.Field name="fechaInicio">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">Fecha Inicio</Label>
+                            <Input
+                              type="date"
+                              value={field.state.value}
+                              onChange={(e) => field.handleChange(e.target.value)}
+                              onBlur={() => validateField("fechaInicio", field.state.value)}
+                            />
+                            {zodErrors.fechaInicio && <p className="text-red-700 text-sm">{zodErrors.fechaInicio}</p>}
+                            {formErrors.fechaInicio && <p className="text-red-700 text-sm">{formErrors.fechaInicio}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+
+                      <form.Field name="cantidadPagos">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">Cantidad de pagos</Label>
+                            <Input
+                              type="number"
+                              step="1"
+                              value={String(field.state.value ?? 0)}
+                              onChange={(e) => {
+                                const raw = e.currentTarget.valueAsNumber;
+                                field.handleChange(Number.isNaN(raw) ? 0 : Math.max(0, Math.floor(raw)));
+                              }}
+                              onBlur={() => validateField("cantidadPagos", field.state.value)}
+                              placeholder="Ej. 12"
+                            />
+                            {zodErrors.cantidadPagos && <p className="text-red-700 text-sm">{zodErrors.cantidadPagos}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+
+                      <div>
+                        <Label className="font-semibold">Fecha Fin </Label>
+                        <Input type="date" value={fechaFinCalculada} disabled />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <form.Field name="fechaFirma">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">Fecha Firma</Label>
+                            <Input
+                              type="date"
+                              value={field.state.value}
+                              onChange={(e) => field.handleChange(e.target.value)}
+                              onBlur={() => validateField("fechaFirma", field.state.value)}
+                            />
+                            {zodErrors.fechaFirma && <p className="text-red-700 text-sm">{zodErrors.fechaFirma}</p>}
+                            {formErrors.fechaFirma && <p className="text-red-700 text-sm">{formErrors.fechaFirma}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+
+                      <form.Field name="fechaPago">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">Fecha Pago</Label>
+                            <Input
+                              type="date"
+                              value={field.state.value}
+                              onChange={(e) => field.handleChange(e.target.value)}
+                              onBlur={() => validateField("fechaPago", field.state.value)}
+                            />
+                            {zodErrors.fechaPago && <p className="text-red-700 text-sm">{zodErrors.fechaPago}</p>}
+                            {formErrors.fechaPago && <p className="text-red-700 text-sm">{formErrors.fechaPago}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+                    </div>
+
+                    <div >
+                      <form.Field name="idPropiedad">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">Propiedad</Label>
+                            <Select
+                              value={field.state.value ? String(field.state.value) : ""}
+                              onValueChange={(v) => {
+                                const numValue = Number(v);
+                                field.handleChange(numValue);
+                                validateField("idPropiedad", numValue);
+                              }}
+                              disabled={loadingAvailableProperties}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder={loadingAvailableProperties ? "Cargando..." : "Selecciona una propiedad"} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {(availableProperties ?? []).map((p: AvailableProperty) => (
+                                  <SelectItem key={p.idPropiedad} value={String(p.idPropiedad)}>
+                                    {p.idPropiedad} - {p.ubicacion}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            {zodErrors.idPropiedad && <p className="text-red-700 text-sm">{zodErrors.idPropiedad}</p>}
+                            {formErrors.idPropiedad && <p className="text-red-700 text-sm">{formErrors.idPropiedad}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+                    </div>
+
+                    <div className="space-y-2 rounded-md border p-3">
+                      <Label className="font-semibold">Asignar agente</Label>
+
+                      <div className="flex items-end gap-2">
+                        <div className="flex-1">
+                          <Label htmlFor="buscarAgente2" className="text-sm">Buscar por cédula (mín. 3 dígitos)</Label>
+                          <Input
+                            id="buscarAgente2"
+                            placeholder="Ej. 1 2345 6789"
+                            value={cedulaAgente}
+                            onChange={(e) => setCedulaAgente(e.target.value)}
+                          />
+                        </div>
+                        <Button type="button" variant="outline" onClick={() => setCedulaAgente("")}>
+                          Limpiar
+                        </Button>
+                      </div>
+
+                      <form.Field name="idAgente">
+                        {(field) => {
+                          const selectedId = field.state.value ? Number(field.state.value) : undefined;
+                          const selectedExists = selectedId
+                            ? agentes.some((a) => a.identificacion === selectedId)
+                            : false;
+                          const fallbackLabel = selectedId ? String(selectedId) : "";
+
+                          return (
+                            <div>
+                              <Label className="text-sm mb-1">Seleccionar agente</Label>
+                              <Select
+                                value={selectedId ? String(selectedId) : ""}
+                                onValueChange={(v) => {
+                                  const numValue = Number(v);
+                                  field.handleChange(numValue);
+                                  validateField("idAgente", numValue);
+                                }}
+                                disabled={cargandoAgentesUI}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue
+                                    placeholder={
+                                      cargandoAgentesUI
+                                        ? "Cargando agentes…"
+                                        : isSearching
+                                          ? "Selecciona el agente encontrado"
+                                          : "Selecciona un agente"
+                                    }
+                                  />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {!selectedExists && selectedId && (
+                                    <SelectItem value={String(selectedId)}>{fallbackLabel}</SelectItem>
+                                  )}
+                                  {agentes.length > 0 ? (
+                                    agentes.map((a: AgentPreview) => (
+                                      <SelectItem key={a.identificacion} value={String(a.identificacion)}>
+                                        {a.nombreCompleto ?? String(a.identificacion)}
+                                      </SelectItem>
+                                    ))
+                                  ) : (
+                                    <div className="px-3 py-1 text-sm opacity-70">
+                                      {errorAgents ? "Error cargando agentes." : "Sin agentes para mostrar."}
+                                    </div>
+                                  )}
+                                </SelectContent>
+                              </Select>
+                              {formErrors.idAgente && <p className="text-red-700 text-sm mt-1">{formErrors.idAgente}</p>}
+                            </div>
+                          );
+                        }}
+                      </form.Field>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <form.Field name="montoTotal">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">Monto total</Label>
+                            <Input
+                              type="number"
+                              min={0}
+                              step="0.01"
+                              value={String(field.state.value ?? "")}
+                              onChange={(e) => {
+                                const v = e.currentTarget.valueAsNumber;
+                                field.handleChange(Number.isNaN(v) ? 0 : v);
+                              }}
+                              onBlur={() => validateField("montoTotal", field.state.value)}
+                              placeholder="Ej. 250000.00"
+                            />
+                            {zodErrors.montoTotal && <p className="text-red-700 text-sm">{zodErrors.montoTotal}</p>}
+                            {formErrors.montoTotal && <p className="text-red-700 text-sm">{formErrors.montoTotal}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+
+                      <form.Field name="deposito">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">Depósito</Label>
+                            <Input
+                              type="number"
+                              min={0}
+                              step="0.01"
+                              value={String(field.state.value ?? "")}
+                              onChange={(e) => {
+                                const v = e.currentTarget.valueAsNumber;
+                                field.handleChange(Number.isNaN(v) ? 0 : v);
+                              }}
+                              placeholder="Ej. 50000.00"
+                            />
+                            {zodErrors.deposito && <p className="text-red-700 text-sm">{zodErrors.deposito}</p>}
+                            {formErrors.deposito && <p className="text-red-700 text-sm">{formErrors.deposito}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+
+                      <form.Field name="porcentajeComision">
+                        {(field) => (
+                          <div>
+                            <Label className="font-semibold">% Comisión al agente</Label>
+                            <Input
+                              type="number"
+                              min={0}
+                              max={100}
+                              step="0.01"
+                              value={String(field.state.value ?? "")}
+                              onChange={(e) => {
+                                const raw = e.currentTarget.valueAsNumber;
+                                const v = Number.isNaN(raw) ? 0 : clamp(raw, 0, 100);
+                                field.handleChange(v);
+                              }}
+                              onBlur={() => validateField("porcentajeComision", field.state.value)}
+                              placeholder="Ej. 3.5"
+                            />
+                            {zodErrors.porcentajeComision && <p className="text-red-700 text-sm">{zodErrors.porcentajeComision}</p>}
+                            {formErrors.porcentajeComision && <p className="text-red-700 text-sm">{formErrors.porcentajeComision}</p>}
+                          </div>
+                        )}
+                      </form.Field>
+                    </div>
+                  </>
+                )}
+
+                <DialogFooter className="mt-4">
+                  <Button type="button" variant="outline" onClick={() => setStep("tipo")}>Atrás</Button>
+                  <Button type="submit" disabled={!canContinueDatos}>Continuar</Button>
+                </DialogFooter>
+              </form>
+            )}
+
+            {step === "condiciones" && (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (tipoSeleccionado === "alquiler") {
+                    form.setFieldValue("fechaFin", fechaFinCalculada);
+                  }
                   form.handleSubmit();
                 }}
-                className="space-y-4 py-3"
+                className="space-y-4 py-2"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {(["fechaInicio", "fechaFin", "fechaFirma", "fechaPago"] as const).map((name) => (
-                    <form.Field key={name} name={name}>
-                      {(field) => (
-                        <div>
-                          <Label className="font-semibold">{name.replace("fecha", "Fecha ")}</Label>
-                          <Input
-                            type="date"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                          />
-                          {formErrors[name] && <p className="text-red-700 text-sm">{formErrors[name]}</p>}
-                        </div>
-                      )}
-                    </form.Field>
-                  ))}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <form.Field name="idTipoContrato">
-                    {(field) => (
-                      <div>
-                        <Label className="font-semibold">Tipo de contrato</Label>
-                        <Select
-                          value={field.state.value ? String(field.state.value) : ""}
-                          onValueChange={(v) => field.handleChange(Number(v))}
-                          disabled={loadingContractTypes}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder={loadingContractTypes ? "Cargando..." : "Selecciona un tipo"} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {contractTypes.map((t: ContractType) => (
-                              <SelectItem key={t.idTipoContrato} value={String(t.idTipoContrato)}>
-                                {t.nombre}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {formErrors.idTipoContrato && <p className="text-red-700 text-sm">{formErrors.idTipoContrato}</p>}
-                      </div>
-                    )}
-                  </form.Field>
-
-                  
-                  <form.Field name="idPropiedad">
-                    {(field) => (
-                      <div>
-                        <Label className="font-semibold">Propiedad</Label>
-                        <Select
-                          value={field.state.value ? String(field.state.value) : ""}
-                          onValueChange={(v) => field.handleChange(Number(v))}
-                          disabled={loadingAvailableProperties}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder={loadingAvailableProperties ? "Cargando..." : "Selecciona una propiedad"} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {availableProperties.map((p: AvailableProperty) => (
-                              <SelectItem key={p.idPropiedad} value={String(p.idPropiedad)}>
-                                {p.idPropiedad} - {p.ubicacion}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {formErrors.idPropiedad && <p className="text-red-700 text-sm">{formErrors.idPropiedad}</p>}
-                      </div>
-                    )}
-                  </form.Field>
-                </div>
-
-                <div className="space-y-2 rounded-md border p-3">
-                  <Label className="font-semibold">Asignar agente</Label>
-
-                  <div className="flex items-end gap-2">
-                    <div className="flex-1">
-                      <Label htmlFor="buscarAgente" className="text-sm">
-                        Buscar por cédula (mín. 3 dígitos)
-                      </Label>
-                      <Input
-                        id="buscarAgente"
-                        placeholder="Ej. 1 2345 6789"
-                        value={cedulaAgente}
-                        onChange={(e) => setCedulaAgente(e.target.value)}
-                      />
-                    </div>
-                    <Button type="button" variant="outline" onClick={() => setCedulaAgente("")}>
-                      Limpiar
-                    </Button>
-                  </div>
-
-                  <form.Field name="idAgente">
-                    {(field) => {
-                      const selectedId = field.state.value ? Number(field.state.value) : undefined;
-                      const selectedExists = selectedId
-                        ? opcionesAgentes.some((a) => a.identificacion === selectedId)
-                        : false;
-
-                      const fallbackLabel = selectedId ? String(selectedId) : "";
-
-                      return (
-                        <div>
-                          <Label className="text-sm mb-1">Seleccionar agente</Label>
-                          <Select
-                            value={selectedId ? String(selectedId) : ""}
-                            onValueChange={(v) => field.handleChange(Number(v))}
-                            disabled={cargandoAgentesUI}
-                          >
-                            <SelectTrigger>
-                              <SelectValue
-                                placeholder={
-                                  cargandoAgentesUI
-                                    ? "Cargando agentes…"
-                                    : isSearching
-                                      ? "Selecciona el agente encontrado"
-                                      : "Selecciona un agente"
-                                }
-                              />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {!selectedExists && selectedId && (
-                                <SelectItem value={String(selectedId)}>{fallbackLabel}</SelectItem>
-                              )}
-
-                              {opcionesAgentes.length > 0 ? (
-                                opcionesAgentes.map((a: AgentPreview) => (
-                                  <SelectItem key={a.identificacion} value={String(a.identificacion)}>
-                                    {a.nombreCompleto ?? String(a.identificacion)}
-                                  </SelectItem>
-                                ))
-                              ) : (
-                                <div className="px-3 py-1 text-sm opacity-70">
-                                  {errorAgents ? "Error cargando agentes." : "Sin agentes para mostrar."}
-                                </div>
-                              )}
-                            </SelectContent>
-                          </Select>
-
-                          {fetchingAgents && <p className="text-xs opacity-60 mt-1">Actualizando lista…</p>}
-                          {formErrors.idAgente && <p className="text-red-700 text-sm mt-1">{formErrors.idAgente}</p>}
-                        </div>
-                      );
-                    }}
-                  </form.Field>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <form.Field name="montoTotal">
-                    {(field) => (
-                      <div>
-                        <Label className="font-semibold">Monto total</Label>
-                        <Input
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          value={String(field.state.value ?? "")}
-                          onChange={(e) => {
-                            const v = e.currentTarget.valueAsNumber;
-                            field.handleChange(Number.isNaN(v) ? 0 : v);
-                          }}
-                          placeholder="Ej. 250000.00"
-                        />
-                        {formErrors.montoTotal && <p className="text-red-700 text-sm">{formErrors.montoTotal}</p>}
-                      </div>
-                    )}
-                  </form.Field>
-
-                  <form.Field name="deposito">
-                    {(field) => (
-                      <div>
-                        <Label className="font-semibold">Depósito</Label>
-                        <Input
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          value={String(field.state.value ?? "")}
-                          onChange={(e) => {
-                            const v = e.currentTarget.valueAsNumber;
-                            field.handleChange(Number.isNaN(v) ? 0 : v);
-                          }}
-                          placeholder="Ej. 50000.00"
-                        />
-                        {formErrors.deposito && <p className="text-red-700 text-sm">{formErrors.deposito}</p>}
-                      </div>
-                    )}
-                  </form.Field>
-
-                  <form.Field name="porcentajeComision">
-                    {(field) => (
-                      <div>
-                        <Label className="font-semibold">% Comisión</Label>
-                        <Input
-                          type="number"
-                          min={0}
-                          max={100}
-                          step="0.01"
-                          value={String(field.state.value ?? "")}
-                          onChange={(e) => {
-                            const raw = e.currentTarget.valueAsNumber;
-                            const v = Number.isNaN(raw) ? 0 : Math.max(0, Math.min(100, raw));
-                            field.handleChange(v);
-                          }}
-                          placeholder="Ej. 3.5"
-                        />
-                        {formErrors.porcentajeComision && (
-                          <p className="text-red-700 text-sm">{formErrors.porcentajeComision}</p>
-                        )}
-                      </div>
-                    )}
-                  </form.Field>
-                </div>
-
                 <form.Field name="condicionesTexto">
                   {(field) => (
                     <div>
                       <Label className="font-semibold">Condiciones (una por línea)</Label>
                       <Textarea
-                        rows={4}
+                        rows={6}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         placeholder={`Ej.: Pago inicial a 7 días
@@ -392,36 +818,30 @@ Entregar llaves al firmar`}
 
                 {formError && <p className="text-red-700 text-sm text-center">{formError}</p>}
 
-                <DialogFooter>
-                  <Button type="submit" disabled={create.isPending}>
-                    {create.isPending ? "Creando..." : "Crear"}
+                <DialogFooter className="mt-4">
+                  <Button type="button" variant="outline" onClick={() => setStep("datos")}>
+                    Atrás
                   </Button>
-
-                  {/* Botón cierra con animación */}
-                  <DialogClose>
-                    <Button type="button" variant="outline" disabled={create.isPending}>
-                      Cancelar
-                    </Button>
-                  </DialogClose>
+                  <Button type="submit" disabled={create.isPending}>
+                    {create.isPending ? (<><Loader2 className="h-4 w-4 animate-spin mr-2" /> Creando…</>) : "Continuar"}
+                  </Button>
                 </DialogFooter>
-                </form>
-              </div>
-            </>
-          )}
+              </form>
+            )}
 
-          {step === "assign" && createdContractId && (
-            <FormAsignarParticipantes
-              idContrato={createdContractId}
-              onSuccess={() => {
-                setOpen(false);
-                resetAll();
-              }}
-              onCancel={() => {
-                setStep("create");
-                setCreatedContractId(null);
-              }}
-            />
-          )}
+            {step === "assign" && createdContractId && (
+              <FormAsignarParticipantes
+                idContrato={createdContractId}
+                onSuccess={() => {
+                  setOpen(false);
+                  resetAll();
+                }}
+                onCancel={() => {
+                  setOpen(false);
+                }}
+              />
+            )}
+          </div>
         </DialogPanel>
       </Dialog>
     </>

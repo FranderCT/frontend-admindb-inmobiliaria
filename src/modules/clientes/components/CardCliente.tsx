@@ -8,6 +8,7 @@ import DialogDetalleCliente from './DialogDetalleCliente'
 import { useDeleteClient } from '../hooks/clientesHooks'
 import ConfirmDialog from './ConfirmDialog'
 import FormEditCliente from './FormEditCliente'
+import { Can } from '@/modules/seguridad/components/Can'
 
 const CardCliente = ({ client }: ClientCardProps) => {
   const deleteCliente = useDeleteClient()
@@ -69,17 +70,21 @@ const CardCliente = ({ client }: ClientCardProps) => {
         <div className="flex items-center justify-between pt-3 mt-1 border-t">
           <div className="text-sm text-muted-foreground">Acciones</div>
           <div className="flex gap-1">
-            <Button variant="ghost" aria-label="Editar" onClick={onEditClick}>
-              <Edit size={18} />
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-destructive hover:text-destructive"
-              aria-label="Eliminar"
-              onClick={onDeleteClick}
-            >
-              <Trash2 />
-            </Button>
+            <Can resource="clientes" action="update">
+              <Button variant="ghost" aria-label="Editar" onClick={onEditClick}>
+                <Edit size={18} />
+              </Button>
+            </Can>
+            <Can resource="clientes" action="delete">
+              <Button
+                variant="ghost"
+                className="text-destructive hover:text-destructive"
+                aria-label="Eliminar"
+                onClick={onDeleteClick}
+              >
+                <Trash2 />
+              </Button>
+            </Can>
           </div>
         </div>
       </CardContent>

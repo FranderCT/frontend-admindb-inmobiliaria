@@ -8,6 +8,8 @@ import { formatPrice } from '../utils/formatters'
 import FormEditPropiedad from './FormEditPropiedad'
 import { useDeleteProperty } from '../hooks/propiedadesHook'
 import ConfirmDialog from '@/modules/clientes/components/ConfirmDialog'
+import { estadoPropiedadVariant } from '@/utils/statusVariants'
+import { Can } from '@/modules/seguridad/components/Can'
 
 const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: PropiedadCardProps) => {
   const deleteProp = useDeleteProperty()
@@ -39,7 +41,7 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: 
               <CardTitle className="text-lg line-clamp-2">{property.ubicacion}</CardTitle>
               <CardDescription className="font-mono text-xs">{property.idPropiedad}</CardDescription>
             </div>
-            <Badge>{property.estadoPropiedad.nombre}</Badge>
+            <Badge variant={estadoPropiedadVariant[property.estadoPropiedad.nombre]}>{property.estadoPropiedad.nombre}</Badge>
           </div>
         </CardHeader>
 
@@ -69,7 +71,7 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: 
 
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <CircleUser className="h-4 w-4 text-muted-foreground" /> Propietario:
+              <CircleUser className="h-4 w-4 text-muted-foreground" /> Propietario:
             </div>
             <span className="truncate font-semibold">
               {property.cliente.nombre} {property.cliente.apellido1} {property.cliente.apellido2}
@@ -97,25 +99,28 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: 
       </Card>
 
       {/* Modal editar */}
-      <FormEditPropiedad
-        open={openEdit}
-        onOpenChange={setOpenEdit}
-        property={property}
-        estadosPropiedad={estadosPropiedad}
-        tiposInmueble={tiposInmueble}
-      />
-
+      <Can resource="propiedades" action="update">
+        <FormEditPropiedad
+          open={openEdit}
+          onOpenChange={setOpenEdit}
+          property={property}
+          estadosPropiedad={estadosPropiedad}
+          tiposInmueble={tiposInmueble}
+        />
+      </Can>
       {/* Confirm eliminar */}
-      <ConfirmDialog
-        open={openConfirmDelete}
-        onOpenChange={setOpenConfirmDelete}
-        title="Eliminar propiedad"
-        description={`¿Seguro que deseas eliminar la propiedad #${property.idPropiedad} en ${property.ubicacion}? Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
-        cancelText="Cancelar"
-        onConfirm={handleConfirmDelete}
-        loading={deleteProp.isPending as boolean}
-      />
+      <Can resource="propiedades" action="delete">
+        <ConfirmDialog
+          open={openConfirmDelete}
+          onOpenChange={setOpenConfirmDelete}
+          title="Eliminar propiedad"
+          description={`¿Seguro que deseas eliminar la propiedad #${property.idPropiedad} en ${property.ubicacion}? Esta acción no se puede deshacer.`}
+          confirmText="Eliminar"
+          cancelText="Cancelar"
+          onConfirm={handleConfirmDelete}
+          loading={deleteProp.isPending as boolean}
+        />
+      </Can>
     </>
   )
 }

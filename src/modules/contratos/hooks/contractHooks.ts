@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { assignContractParticipants, createContract, getAgentsPreview, getAvailableProperties, getContract, getContractRoleType, getContracts, getContractType, patchUpdateContract } from "../services/contractServices";
-import { AgentPreview, ContractParticipantsPayload, CreateContract, UpdateContract } from "../models/contract";
+import { assignContractParticipants, createContract, getAgentsPreview, getAvailableProperties, getContract, getContractParticipants, getContractPrev, getContractRoleType, getContracts, getContractType, patchUpdateContract, updateContractParticipants } from "../services/contractServices";
+import { AgentPreview, ContractParticipant, ContractParticipantsPayload, CreateContract, UpdateContract } from "../models/contract";
 
 export const useCreateContract = () => {
     const queryClient = useQueryClient();
@@ -14,7 +14,7 @@ export const useCreateContract = () => {
 
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["contracts"],
+                queryKey: ["contracts","contract"],
             });
         },
     });
@@ -57,6 +57,21 @@ export function useGetContract(idContrato: number) {
         loadingContract: isLoading,
         fetchingContract: isFetching,
         errorContract: error,
+    };
+}
+
+export function useGetContractPrev(idContrato?: number, opts?: { enabled?: boolean }) {
+    const { data, isLoading, error, isFetching } = useQuery({
+        queryKey: ["contract", idContrato],
+        queryFn: () => getContractPrev(idContrato),
+        ...opts,
+    });
+
+    return {
+        contrato: data,
+        loadingContrato: isLoading,
+        fetchingContrato: isFetching,
+        errorContrato: error,
     };
 }
 
@@ -118,7 +133,38 @@ export function useGetAvailableProperties() {
         errorAvailableProperties: error,
     };
 }
+export function useGetContractParticipants(idContrato: number) {
+  const { data, isLoading, isFetching, isError, error } = useQuery<ContractParticipant[], Error>({
+    queryKey: ['contrato', idContrato, 'participantes'],
+    queryFn: () => getContractParticipants(idContrato),
+    enabled: !!idContrato,
+    staleTime: 30_000,
+  })
 
+  const participantes = data ?? []
+  const participantesCount = participantes.length
+  const tieneParticipantes = participantesCount > 0
+
+  return {
+    participantes,
+    participantesCount,
+    tieneParticipantes,
+    loading: isLoading,
+    fetching: isFetching,
+    isError,
+    error,
+  }
+}
+
+export function useUpdateContractParticipant(idContrato: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: updateContractParticipants,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['contrato', idContrato, 'participantes'] })
+    },
+  })
+}
 export const useUpdateContract = () => {
   const queryClient = useQueryClient();
   return useMutation({

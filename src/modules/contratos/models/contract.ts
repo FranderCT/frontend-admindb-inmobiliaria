@@ -9,6 +9,7 @@ export interface CreateContract {
   idAgente: number;
   montoTotal: number;
   deposito: number;
+  cantidadPagos?: number;
   porcentajeComision: number;
   estado: null;
   condiciones: string[];
@@ -27,6 +28,7 @@ export interface Contract {
   idAgente: number,
   NombreAgente: string,
   ApellidoAgente: string,
+  estado: string,
   condiciones: [
     {
       idCondicion: number,
@@ -52,6 +54,13 @@ export interface ContractParticipants {
   apellido2?: string;
   idRol: number;
   rol: string;
+}
+export interface ContractParticipant  {
+  idClienteContrato: number
+  idContrato: number
+  identificacion: number
+  nombreCliente: string
+  rol: string 
 }
 
 export interface ContractDetails {
