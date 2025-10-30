@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2 } from 'lucide-react'
 import { useGetContractRoleType, useUpdateContractParticipant } from '../hooks/contractHooks'
 import { ParticipanteMin } from '../types/contractTypes'
-
+// out of use
 function FormElegirYEditarParticipante({
   idContrato,
   participantes,
