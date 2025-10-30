@@ -4,7 +4,8 @@ export interface Agent {
   apellido1: string;
   apellido2?: string;
   telefono: string;
-  estado: boolean; 
+  estado: boolean;
+  comisionAcumulada?: number 
 }
 
 export interface CreateAgent {

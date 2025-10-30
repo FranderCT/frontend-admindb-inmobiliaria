@@ -2,14 +2,13 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Edit, Trash2, IdCard, Phone } from 'lucide-react'
+import { Edit, Trash2, IdCard, Phone } from 'lucide-react' 
 import ConfirmDialog from './ConfirmDialog'
 import { AgentCardProps } from '../types/agentTypes'
 import { useDeleteAgent } from '../hooks/agentesHooks'
 import DialogDetalleAgente from './DialogDetalleAgente'
 import FormEditAgente from './FormEditAgente'
 import { Can } from '@/modules/seguridad/components/Can'
-
 
 const CardAgente = ({ agent }: AgentCardProps) => {
   const deleteAgente = useDeleteAgent()
@@ -66,6 +65,22 @@ const CardAgente = ({ agent }: AgentCardProps) => {
             <span>Contacto:</span>
           </div>
           <span className="font-medium">{agent.telefono}</span>
+        </div>
+
+        {/* Comisión acumulada con símbolo de colón */}
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="inline-flex items-center justify-center w-5">
+              ₡
+            </span>
+            <span>Comisión acumulada:</span>
+          </div>
+          <span className="font-medium">
+            ₡{agent.comisionAcumulada?.toLocaleString('es-CR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }) ?? '0.00'}
+          </span>
         </div>
 
         <div className="flex items-center justify-between pt-3 mt-1 border-t">
