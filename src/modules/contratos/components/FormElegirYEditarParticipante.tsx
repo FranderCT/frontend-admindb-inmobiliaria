@@ -73,7 +73,7 @@ function FormElegirYEditarParticipante({
             <SelectContent>
               {participantes.map(p => (
                 <SelectItem key={p.idClienteContrato} value={String(p.idClienteContrato)}>
-                  {p.nombreCliente} — {p.identificacion} ({p.rol})
+                  {p.nombreCliente} ({p.rol})
                 </SelectItem>
               ))}
             </SelectContent>
