@@ -36,7 +36,6 @@ import {
 } from "@/components/animate-ui/components/headless/dialog";
 import Stepper, { StepDef } from "@/modules/app/components/Stepper";
 import { datosVentaSchema, datosAlquilerSchema } from "../schema/contractValidators";
-import { set } from "zod";
 
 
 type WizardStep = "tipo" | "datos" | "condiciones" | "assign";
@@ -94,15 +93,23 @@ export default function FormCrearContrato() {
 
   const [zodErrors, setZodErrors] = useState<Record<string, string>>({});
 
+  const pruneUndefined = <T extends Record<string, any>>(obj: T): T => {
+    const out: Record<string, any> = {};
+    for (const k in obj) {
+      if (obj[k] !== undefined) out[k] = obj[k];
+    }
+    return out as T;
+  };
+
   const form = useForm({
     defaultValues: {
       fechaInicio: hoyISO(),
       fechaFin: hoyISO(),
       fechaFirma: hoyISO(),
       fechaPago: hoyISO(),
-      idTipoContrato: undefined as number | undefined,
-      idPropiedad: undefined as number | undefined,
-      idAgente: undefined as number | undefined,
+      idTipoContrato: 0 as number,
+      idPropiedad: 0 as number,
+      idAgente: 0 as number,
       montoTotal: 0 as number,
       deposito: 0 as number,
       porcentajeComision: 0 as number,
@@ -114,14 +121,11 @@ export default function FormCrearContrato() {
       setFormError(null);
 
       try {
-        const payload: CreateContract = {
-          fechaInicio: value.fechaInicio,
-          fechaFin:
-            tipoSeleccionado === "alquiler"
-              ? addMonthsISO(value.fechaInicio, Number(value.cantidadPagos || 0))
-              : value.fechaFin,
-          fechaFirma: value.fechaFirma,
-          fechaPago: value.fechaPago,
+        const isVenta = tipoSeleccionado === "venta";
+        const isAlquiler = tipoSeleccionado === "alquiler";
+
+        // Construimos el payload base
+        const base: CreateContract = {
           idTipoContrato: Number(value.idTipoContrato),
           idPropiedad: Number(value.idPropiedad),
           idAgente: Number(value.idAgente),
@@ -129,11 +133,39 @@ export default function FormCrearContrato() {
           deposito: Number(value.deposito),
           porcentajeComision: Number(value.porcentajeComision),
           estado: null,
-          cantidadPagos: tipoSeleccionado === "alquiler" ? Number(value.cantidadPagos) : 0,
           condiciones: value.condicionesTexto
             ? value.condicionesTexto.split("\n").map((t) => t.trim()).filter(Boolean)
             : [],
         };
+
+        // Campos por tipo
+        const payload: CreateContract = pruneUndefined({
+          ...base,
+
+          // Fecha de firma la usas en ambos flujos
+          fechaFirma: value.fechaFirma || undefined,
+
+          // Solo ALQUILER: enviar inicio/fin/pago y cantidadPagos
+          ...(isAlquiler && {
+            fechaInicio: value.fechaInicio || undefined,
+            fechaFin: addMonthsISO(value.fechaInicio, Number(value.cantidadPagos || 0)) || undefined,
+            fechaPago: value.fechaPago || undefined,
+            cantidadPagos: Number(value.cantidadPagos || 0),
+          }),
+
+          // Solo VENTA: NO enviar fechaInicio ni fechaFin (ni fechaPago)
+          ...(isVenta && {
+            fechaInicio: undefined,
+            fechaFin: undefined,
+            fechaPago: undefined,
+            cantidadPagos: undefined,
+          }),
+        });
+
+        // Validaciones básicas
+        if (!payload.idTipoContrato) return toast.error("Selecciona el tipo de contrato.");
+        if (!payload.idPropiedad) return toast.error("Selecciona una propiedad.");
+        if (!payload.idAgente) return toast.error("Selecciona un agente.");
 
         const creado = await create.mutateAsync({ contract: payload });
         const id = Number(creado?.idContrato);
@@ -149,6 +181,7 @@ export default function FormCrearContrato() {
       }
     },
   });
+
 
   useEffect(() => {
     if (!tipoSeleccionado) return;
@@ -351,25 +384,6 @@ export default function FormCrearContrato() {
                           </div>
                         )}
                       </form.Field>
-
-                      <form.Field name="fechaPago">
-                        {(field) => (
-                          <div>
-                            <Label className="font-semibold">Fecha Pago</Label>
-                            <Input
-                              type="date"
-                              value={field.state.value}
-                              onChange={(e) => field.handleChange(e.target.value)}
-                              onBlur={() => validateField("fechaPago", field.state.value)}
-                            />
-                            {zodErrors.fechaPago && <p className="text-red-700 text-sm">{zodErrors.fechaPago}</p>}
-                            {formErrors.fechaPago && <p className="text-red-700 text-sm">{formErrors.fechaPago}</p>}
-                          </div>
-                        )}
-                      </form.Field>
-                    </div>
-
-                    <div className="mb-4">
                       <form.Field name="idPropiedad">
                         {(field) => (
                           <div>
@@ -387,11 +401,17 @@ export default function FormCrearContrato() {
                                 <SelectValue placeholder={loadingAvailableProperties ? "Cargando..." : "Selecciona una propiedad"} />
                               </SelectTrigger>
                               <SelectContent>
-                                {(availableProperties ?? []).map((p: AvailableProperty) => (
-                                  <SelectItem key={p.idPropiedad} value={String(p.idPropiedad)}>
-                                    {p.idPropiedad} - {p.ubicacion}
-                                  </SelectItem>
-                                ))}
+                                {(availableProperties ?? []).length > 0 ? (
+                                  (availableProperties ?? []).map((p: AvailableProperty) => (
+                                    <SelectItem key={p.idPropiedad} value={String(p.idPropiedad)}>
+                                      {p.idPropiedad} - {p.ubicacion}
+                                    </SelectItem>
+                                  ))
+                                ) : (
+                                  <div className="px-3 py-1 text-sm opacity-70">
+                                    {loadingAvailableProperties ? "Cargando propiedades..." : "No hay propiedades disponibles."}
+                                  </div>
+                                )}
                               </SelectContent>
                             </Select>
                             {zodErrors.idPropiedad && <p className="text-red-700 text-sm">{zodErrors.idPropiedad}</p>}
@@ -625,11 +645,17 @@ export default function FormCrearContrato() {
                                 <SelectValue placeholder={loadingAvailableProperties ? "Cargando..." : "Selecciona una propiedad"} />
                               </SelectTrigger>
                               <SelectContent>
-                                {(availableProperties ?? []).map((p: AvailableProperty) => (
-                                  <SelectItem key={p.idPropiedad} value={String(p.idPropiedad)}>
-                                    {p.idPropiedad} - {p.ubicacion}
-                                  </SelectItem>
-                                ))}
+                                {(availableProperties ?? []).length > 0 ? (
+                                  (availableProperties ?? []).map((p: AvailableProperty) => (
+                                    <SelectItem key={p.idPropiedad} value={String(p.idPropiedad)}>
+                                      {p.idPropiedad} - {p.ubicacion}
+                                    </SelectItem>
+                                  ))
+                                ) : (
+                                  <div className="px-3 py-1 text-sm opacity-70">
+                                    {loadingAvailableProperties ? "Cargando propiedades..." : "No hay propiedades disponibles."}
+                                  </div>
+                                )}
                               </SelectContent>
                             </Select>
                             {zodErrors.idPropiedad && <p className="text-red-700 text-sm">{zodErrors.idPropiedad}</p>}

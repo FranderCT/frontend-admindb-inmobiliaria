@@ -17,7 +17,6 @@ export const zPercent = z.number("Ingresa un porcentaje")
 
 export const datosVentaSchema = z.object({
   fechaFirma: zDate,
-  fechaPago: zDate,
   idPropiedad: zIntId,
   idAgente: zIntId,
   montoTotal: zMoneyGE1,
@@ -25,7 +24,6 @@ export const datosVentaSchema = z.object({
   fechaInicio: z.string().optional(),
   fechaFin: z.string().optional(),
   deposito: zMoneyGE0.optional(),
-  cantidadPagos: z.number().optional(),
 });
 
 export const datosAlquilerSchema = z.object({

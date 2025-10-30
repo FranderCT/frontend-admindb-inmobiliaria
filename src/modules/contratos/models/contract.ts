@@ -1,9 +1,9 @@
 export interface CreateContract {
   idContrato?: number;
-  fechaInicio: string;
-  fechaFin: string;
-  fechaFirma: string;
-  fechaPago: string;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+  fechaFirma?: string | null;
+  fechaPago?: string | null;
   idTipoContrato: number;
   idPropiedad: number;
   idAgente: number;
@@ -55,12 +55,12 @@ export interface ContractParticipants {
   idRol: number;
   rol: string;
 }
-export interface ContractParticipant  {
+export interface ContractParticipant {
   idClienteContrato: number
   idContrato: number
   identificacion: number
   nombreCliente: string
-  rol: string 
+  rol: string
 }
 
 export interface ContractDetails {

@@ -21,9 +21,6 @@ function RouteComponent() {
     [contracts]
   );
 
-  if (loadingContracts) return <div>Loading...</div>;
-  if (errorContracts) return <div>Error loading contracts</div>;
-
   return (
     <section className="m-4">
       <header className="flex items-center justify-between mb-4 ml-16">
@@ -37,12 +34,19 @@ function RouteComponent() {
       </nav>
 
       <main className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {list.length === 0 ? (
-          <div className="ml-16 opacity-70">No hay contratos aún.</div>
+        {loadingContracts ? (
+          <div>Cargando contratos...</div>
         ) : (
-          list.map((contract) => (
-            <CardPreviewContrato key={contract.idContrato} contract={contract} />
-          ))
+          <>
+              {errorContracts && (<div>Error al cargar los contratos.</div>)}
+            {list.length === 0 ? (
+              <div className="ml-16 opacity-70">No hay contratos aún.</div>
+            ) : (
+              list.map((contract) => (
+                <CardPreviewContrato key={contract.idContrato} contract={contract} />
+              ))
+            )}
+          </>
         )}
       </main>
     </section>
