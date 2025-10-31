@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Edit, CalendarDays, FileText, BriefcaseBusiness, LandPlot, Signature, MapPin } from 'lucide-react'
 import type { CardContractProps } from '../types/contractTypes'
 import DialogDetalleContrato from './DialogDetalleContrato'

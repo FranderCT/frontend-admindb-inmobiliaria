@@ -15,7 +15,7 @@ export const zPercent = z.number("Ingresa un porcentaje")
   .max(100, "Debe ser <= 100");
 
 export const datosVentaSchema = z.object({
-  fechaFirma: z.date(),
+  fechaFirma: z.string(),
   idPropiedad: zIntId,
   idAgente: zIntId,
   montoTotal: zMoneyGE1,
