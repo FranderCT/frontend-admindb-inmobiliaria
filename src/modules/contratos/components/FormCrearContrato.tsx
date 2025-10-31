@@ -35,7 +35,8 @@ import {
   DialogClose,
 } from "@/components/animate-ui/components/headless/dialog";
 import Stepper, { StepDef } from "@/modules/app/components/Stepper";
-import { datosVentaSchema, datosAlquilerSchema } from "../schema/contractValidators";
+import { datosVentaSchema, datosAlquilerSchema, mapIssuesByField, prettyIssue } from "../schema/contractValidators";
+import { addMonthsISO } from "../utils/date";
 
 
 type WizardStep = "tipo" | "datos" | "condiciones" | "assign";
@@ -50,14 +51,6 @@ const steps: StepDef[] = [
 const hoyISO = () => new Date().toISOString().slice(0, 10);
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
-function addMonthsISO(dateISO: string, months: number): string {
-  if (!dateISO) return "";
-  const d = new Date(dateISO + "T00:00:00");
-  const day = d.getDate();
-  d.setMonth(d.getMonth() + months);
-  if (d.getDate() < day) d.setDate(0);
-  return d.toISOString().slice(0, 10);
-}
 
 export default function FormCrearContrato() {
   const [open, setOpen] = useState(false);
@@ -124,7 +117,6 @@ export default function FormCrearContrato() {
         const isVenta = tipoSeleccionado === "venta";
         const isAlquiler = tipoSeleccionado === "alquiler";
 
-        // Construimos el payload base
         const base: CreateContract = {
           idTipoContrato: Number(value.idTipoContrato),
           idPropiedad: Number(value.idPropiedad),
@@ -138,14 +130,11 @@ export default function FormCrearContrato() {
             : [],
         };
 
-        // Campos por tipo
         const payload: CreateContract = pruneUndefined({
           ...base,
 
-          // Fecha de firma la usas en ambos flujos
           fechaFirma: value.fechaFirma || undefined,
 
-          // Solo ALQUILER: enviar inicio/fin/pago y cantidadPagos
           ...(isAlquiler && {
             fechaInicio: value.fechaInicio || undefined,
             fechaFin: addMonthsISO(value.fechaInicio, Number(value.cantidadPagos || 0)) || undefined,
@@ -153,7 +142,6 @@ export default function FormCrearContrato() {
             cantidadPagos: Number(value.cantidadPagos || 0),
           }),
 
-          // Solo VENTA: NO enviar fechaInicio ni fechaFin (ni fechaPago)
           ...(isVenta && {
             fechaInicio: undefined,
             fechaFin: undefined,
@@ -162,7 +150,6 @@ export default function FormCrearContrato() {
           }),
         });
 
-        // Validaciones básicas
         if (!payload.idTipoContrato) return toast.error("Selecciona el tipo de contrato.");
         if (!payload.idPropiedad) return toast.error("Selecciona una propiedad.");
         if (!payload.idAgente) return toast.error("Selecciona un agente.");
@@ -212,22 +199,11 @@ export default function FormCrearContrato() {
   const { canContinueDatos, validationErrors } = useMemo(() => {
     if (!tipoSeleccionado) return { canContinueDatos: false, validationErrors: {} };
 
-    const values = form.state.values;
     const schema = tipoSeleccionado === "venta" ? datosVentaSchema : datosAlquilerSchema;
+    const result = schema.safeParse(form.state.values);
 
-    const result = schema.safeParse(values);
-
-    if (result.success) {
-      return { canContinueDatos: true, validationErrors: {} };
-    }
-
-    const errors: Record<string, string> = {};
-    result.error.issues.forEach((err) => {
-      const path = err.path.join('.');
-      errors[path] = err.message;
-    });
-
-    return { canContinueDatos: false, validationErrors: errors };
+    if (result.success) return { canContinueDatos: true, validationErrors: {} };
+    return { canContinueDatos: false, validationErrors: mapIssuesByField(result.error.issues) };
   }, [
     tipoSeleccionado,
     form.state.values.fechaFirma,
@@ -241,29 +217,30 @@ export default function FormCrearContrato() {
     form.state.values.deposito,
   ]);
 
+
   const validateField = (fieldName: string, value: any) => {
     if (!tipoSeleccionado) return;
 
     const schema = tipoSeleccionado === "venta" ? datosVentaSchema : datosAlquilerSchema;
-    const fieldSchema = schema.shape[fieldName as keyof typeof schema.shape];
-
+    const fieldSchema = (schema as any).shape?.[fieldName];
     if (!fieldSchema) return;
 
-    const result = fieldSchema.safeParse(value);
-
+    const result = fieldSchema.safeParse(value); // con coerce ya transforma string→number
     if (result.success) {
       setZodErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[fieldName];
-        return newErrors;
+        const next = { ...prev };
+        delete next[fieldName];
+        return next;
       });
     } else {
+      const first = result.error.issues[0];
       setZodErrors((prev) => ({
         ...prev,
-        [fieldName]: result.error[0]?.message || "Error de validación",
+        [fieldName]: prettyIssue(first, fieldName),
       }));
     }
   };
+
 
   const isScrollStep = step === "datos";
 
@@ -372,7 +349,7 @@ export default function FormCrearContrato() {
                       <form.Field name="fechaFirma">
                         {(field) => (
                           <div>
-                            <Label className="font-semibold">Fecha Firma</Label>
+                            <Label className="font-semibold">Fecha de firma</Label>
                             <Input
                               type="date"
                               value={field.state.value}
@@ -597,7 +574,7 @@ export default function FormCrearContrato() {
                       <form.Field name="fechaFirma">
                         {(field) => (
                           <div>
-                            <Label className="font-semibold">Fecha Firma</Label>
+                            <Label className="font-semibold">Fecha de firma</Label>
                             <Input
                               type="date"
                               value={field.state.value}
@@ -613,7 +590,7 @@ export default function FormCrearContrato() {
                       <form.Field name="fechaPago">
                         {(field) => (
                           <div>
-                            <Label className="font-semibold">Fecha Pago</Label>
+                            <Label className="font-semibold">Fecha a pagar</Label>
                             <Input
                               type="date"
                               value={field.state.value}

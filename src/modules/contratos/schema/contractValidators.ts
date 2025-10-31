@@ -1,7 +1,6 @@
 import { requiredInt } from "@/utils/validators";
-import { z } from "zod";
+import { z, ZodIssue, ZodIssueCode } from "zod";
 
-export const zDate = z.string().min(1, "Fecha obligatoria");
 export const zIntId = z.number("Selecciona un valor" )
   .int("Debe ser entero")
   .positive("Debe ser mayor a 0");
@@ -16,23 +15,23 @@ export const zPercent = z.number("Ingresa un porcentaje")
   .max(100, "Debe ser <= 100");
 
 export const datosVentaSchema = z.object({
-  fechaFirma: zDate,
+  fechaFirma: z.date(),
   idPropiedad: zIntId,
   idAgente: zIntId,
   montoTotal: zMoneyGE1,
   porcentajeComision: zPercent,
-  fechaInicio: z.string().optional(),
-  fechaFin: z.string().optional(),
+  fechaInicio: z.string(),
+  fechaFin: z.string(),
   deposito: zMoneyGE0.optional(),
 });
 
 export const datosAlquilerSchema = z.object({
-  fechaInicio: zDate,
+  fechaInicio: z.string(),
   cantidadPagos: z.number("Cantidad de pagos obligatoria")
     .int("Debe ser entero")
     .min(1, "Debe ser al menos 1"),
-  fechaFirma: zDate,
-  fechaPago: zDate,
+  fechaFirma: z.string(),
+  fechaPago: z.string(),
   idPropiedad: zIntId,
   idAgente: zIntId,
   montoTotal: zMoneyGE1,
@@ -46,8 +45,8 @@ export type DatosAlquiler = z.infer<typeof datosAlquilerSchema>;
 
 
 const baseSubmit = z.object({
-  fechaFirma: zDate,
-  fechaPago: zDate,
+  fechaFirma: z.string(),
+  fechaPago: z.string(),
   idTipoContrato: zIntId,
   idPropiedad: zIntId,
   idAgente: zIntId,
@@ -57,14 +56,14 @@ const baseSubmit = z.object({
 });
 
 export const submitVentaSchema = baseSubmit.extend({
-  fechaInicio: zDate.optional(),
-  fechaFin: zDate.optional(),
+  fechaInicio: z.string(),
+  fechaFin: z.string(),
   deposito: zMoneyGE0.optional(),
 });
 
 export const submitAlquilerSchema = baseSubmit.extend({
-  fechaInicio: zDate,
-  fechaFin: zDate,
+  fechaInicio: z.string(),
+  fechaFin: z.string(),
   deposito: zMoneyGE0,
   cantidadPagos: z.number().int().min(1),
 });
@@ -84,3 +83,46 @@ export const assignParticipantsSchema = z.object({
 });
 
 export type AssignParticipantsInput = z.infer<typeof assignParticipantsSchema>;
+
+const FIELD_LABELS: Record<string, string> = {
+  fechaInicio: "Fecha de inicio",
+  fechaFin: "Fecha de fin",
+  fechaFirma: "Fecha de firma",
+  fechaPago: "Fecha de pago",
+  idTipoContrato: "Tipo de contrato",
+  idPropiedad: "Propiedad",
+  idAgente: "Agente",
+  montoTotal: "Monto total",
+  deposito: "Depósito",
+  porcentajeComision: "% de comisión",
+  condicionesTexto: "Condiciones",
+  cantidadPagos: "Cantidad de pagos",
+};
+
+const labelFor = (k: string) => FIELD_LABELS[k] ?? k;
+
+export function prettyIssue(issue: ZodIssue, fieldName?: string) {
+  if (issue.message) return issue.message;
+
+  const label = labelFor(fieldName ?? issue.path.join("."));
+  switch (issue.code) {
+    case ZodIssueCode.invalid_type:
+      return `“${label}” no es válido.`;
+    case ZodIssueCode.too_small:
+      return `“${label}” es demasiado pequeño.`;
+    case ZodIssueCode.too_big:
+      return `“${label}” es demasiado grande.`;
+    default:
+      return `“${label}” no es válido.`;
+  }
+}
+
+export function mapIssuesByField(issues: ZodIssue[]): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const issue of issues) {
+    const path = issue.path.join(".");
+    const msg = prettyIssue(issue, path);
+    if (!out[path]) out[path] = msg; // primera por campo
+  }
+  return out;
+}
