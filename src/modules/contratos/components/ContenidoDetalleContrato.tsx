@@ -196,7 +196,10 @@ export default function ContenidoDetalleContrato({ contractID }: ContractDetailP
             )}
 
             {detail.tipoContrato === 'Alquiler' && (
-              <div></div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Cantidad de pagos a realizar</span>
+                <span className="font-medium">{detail.cantidadPagos}</span>
+              </div>
             )}
 
             {detail.montoTotal && (

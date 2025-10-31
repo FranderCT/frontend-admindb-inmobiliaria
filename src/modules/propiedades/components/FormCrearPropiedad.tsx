@@ -249,7 +249,7 @@ const FormCrearPropiedad = () => {
                             <div className="flex items-end gap-2">
                                 <div className="flex-1">
                                     <Label htmlFor="buscarCedula" className="text-sm">
-                                        Buscar por cédula (mín. 3 dígitos)
+                                        Buscar por cédula
                                     </Label>
                                     <Input
                                         id="buscarCedula"
@@ -270,7 +270,7 @@ const FormCrearPropiedad = () => {
                             <form.Field name="identificacion">
                                 {(field) => (
                                     <div>
-                                        <Label className="text-sm mb-1">Seleccionar cliente</Label>
+                                        <Label className="text-sm mb-1">Seleccionar propietario</Label>
                                         <Select
                                             value={field.state.value ? String(field.state.value) : ""}
                                             onValueChange={(v) => field.handleChange(Number(v))}

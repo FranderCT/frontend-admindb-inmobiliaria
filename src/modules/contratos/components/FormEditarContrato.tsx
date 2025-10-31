@@ -16,6 +16,7 @@ import {
 } from "../hooks/contractHooks";
 import type { AgentPreview, UpdateContract } from "../models/contract";
 import { EditContractProps } from "../types/contractTypes";
+import { addMonthsISO } from "../utils/date";
 
 const toTextBlock = (arr?: { textoCondicion: string }[] | string[]) =>
   Array.isArray(arr)
@@ -33,12 +34,10 @@ const toDateInput = (v?: string | null): string => {
 };
 
 export default function FormEditarContrato({ initialIdContrato, onSuccess }: EditContractProps) {
-  // Hooks SIEMPRE en el tope
   const { contract: defaultValuesContrato, loadingContract } = useGetContract(initialIdContrato);
   const update = useUpdateContract();
   const { availableProperties = [], loadingAvailableProperties } = useGetAvailableProperties();
 
-  // Agentes
   const [cedulaAgente, setCedulaAgente] = useState("");
   const debouncedAgente = useDebounced(cedulaAgente.trim(), 450);
   const isSearching = debouncedAgente.length >= 3;
@@ -48,30 +47,27 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
   const opcionesAgentes = agents as AgentPreview[];
   const cargandoAgentesUI = loadingAgents || fetchingAgents;
 
-  // Flag de carga y contrato seguro (puede estar undefined al primer render)
   const isLoading = loadingContract || !defaultValuesContrato;
   const contrato = defaultValuesContrato ?? ({} as any);
 
-  // Defaults SIEMPRE definidos (vacíos si no hay contrato aún)
-  const defaults = useMemo(
-    () => ({
-      fechaInicio: toDateInput(contrato.fechaInicio),
-      fechaFin: toDateInput(contrato.fechaFin),
-      fechaFirma: toDateInput(contrato.fechaFirma),
-      fechaPago: toDateInput(contrato.fechaPago),
-      idPropiedad: contrato.idPropiedad ?? 0,
-      idAgente: contrato.idAgente ?? 0,
-      montoTotal: contrato.montoTotal ?? 0,
-      deposito: contrato.deposito ?? 0,
-      porcentajeComision: contrato.porcentajeComision ?? 0,
-      estado: contrato.estado ?? "",
-      condicionesTexto: toTextBlock(contrato.condiciones),
-    }),
-    // OJO: depende del objeto contrato (que cambia cuando llega el GET)
-    [contrato]
-  );
+  const defaults = useMemo(() => {
+    const c = defaultValuesContrato ?? ({} as any);
+    return {
+      fechaInicio: toDateInput(c?.fechaInicio),
+      fechaFin: toDateInput(c?.fechaFin),
+      fechaFirma: toDateInput(c?.fechaFirma),
+      fechaPago: toDateInput(c?.fechaPago),
+      idPropiedad: Number(c?.idPropiedad ?? c?.propiedad?.idPropiedad ?? 0),
+      idAgente: Number(c?.idAgente ?? c?.agente?.identificacion ?? 0),
+      montoTotal: Number(c?.montoTotal ?? 0),
+      deposito: Number(c?.deposito ?? 0),
+      porcentajeComision: Number(c?.porcentajeComision ?? 0),
+      cantidadPagos: Number(c?.cantidadPagos ?? 0),
+      estado: c?.estado ?? "",
+      condicionesTexto: toTextBlock(c?.condiciones),
+    };
+  }, [defaultValuesContrato]);
 
-  // Form SIEMPRE se crea una vez con defaults (aunque sean vacíos)
   const form = useForm({
     defaultValues: defaults,
     onSubmit: async ({ value }) => {
@@ -83,7 +79,19 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
       if (!value.idPropiedad) return toast.error("Falta el id de la propiedad.");
       if (!value.idAgente) return toast.error("Selecciona un agente.");
 
-      const patch = diffPayload(defaults, value);
+      const pagosNum = Number(value.cantidadPagos ?? 0);
+      const fechaFinFinal = isAlquiler
+        ? addMonthsISO(value.fechaInicio, Number.isFinite(pagosNum) ? pagosNum : 0)
+        : value.fechaFin;
+
+      const valueWithDerived = { ...value, fechaFin: fechaFinFinal };
+
+      const patch = diffPayload(defaults, valueWithDerived);
+
+      if (Object.prototype.hasOwnProperty.call(patch, "cantidadPagos")) {
+        (patch as any).fechaFin = fechaFinFinal;
+      }
+
       if (Object.keys(patch).length === 0) {
         toast.message("No hay cambios para guardar.");
         return;
@@ -100,7 +108,7 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
     },
   });
 
-  // Cuando LLEGUE el contrato, reseteamos el form con los defaults correctos
+
   useEffect(() => {
     if (!isLoading) {
       form.reset(defaults);
@@ -108,29 +116,32 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, defaults]);
 
-  // Visibilidad de campos de fecha SIN romper reglas de hooks
-  const isVenta = contrato?.tipoContrato === "Venta";
-  const isAlquiler = contrato?.tipoContrato === "Alquiler";
+  const tipo = contrato?.tipoContrato ?? contrato?.TipoContrato;
+  const isVenta = tipo === "Venta";
+  const isAlquiler = tipo === "Alquiler";
 
-  // Propiedad (solo lectura) con preferencia por el objeto anidado del GET
   const propiedadTexto = contrato?.propiedad
-    ? `${contrato.propiedad.idPropiedad} - ${contrato.propiedad.ubicacion}`
+    ? `${contrato?.propiedad?.idPropiedad ?? ""} - ${contrato?.propiedad?.ubicacion ?? ""}`
     : (() => {
-      const p = availableProperties.find((x) => x.idPropiedad === contrato.idPropiedad);
+      const idProp = contrato?.idPropiedad;
+      const p = availableProperties?.find?.((x) => x.idPropiedad === idProp);
       return p
         ? `${p.idPropiedad} - ${p.ubicacion}`
-        : contrato.idPropiedad
-          ? String(contrato.idPropiedad) + (loadingAvailableProperties ? " (cargando…)" : "")
+        : idProp
+          ? String(idProp) + (loadingAvailableProperties ? " (cargando…)" : "")
           : "";
     })();
-
-  // Fallback para agente seleccionado si no aparece en el listado actual
+    
   const selectedAgenteId = form.state.values.idAgente;
   const selectedExists = opcionesAgentes.some((a) => a.identificacion === Number(selectedAgenteId));
   const fallbackAgenteLabel = selectedAgenteId ? String(selectedAgenteId) : "";
 
-  // Si quieres, muestra un overlay visual de carga (pero SIN cortar hooks):
-  // Podrías deshabilitar inputs cuando isLoading sea true.
+  const fechaFinCalculada = useMemo(() => {
+    if (isVenta) return form.state.values.fechaFin || "";
+    const n = Number(form.state.values.cantidadPagos || 0);
+    return addMonthsISO(form.state.values.fechaInicio, Number.isFinite(n) ? n : 0);
+  }, [ form.state.values.fechaInicio, form.state.values.cantidadPagos, form.state.values.fechaFin]);
+
   return (
     <form
       onSubmit={(e) => {
@@ -139,7 +150,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
       }}
       className="space-y-4"
     >
-      {/* Propiedad (solo lectura) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label className="font-semibold">Propiedad</Label>
@@ -148,7 +158,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
         </div>
       </div>
 
-      {/* Fechas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {isVenta && (
           <form.Field name="fechaFirma">
@@ -182,24 +191,34 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
               )}
             </form.Field>
 
-            <form.Field name="fechaFin">
+            <form.Field name="cantidadPagos">
               {(field) => (
                 <div>
-                  <Label className="font-semibold">Fecha fin</Label>
+                  <Label className="font-semibold">Cantidad de pagos</Label>
                   <Input
-                    type="date"
-                    value={field.state.value ?? ""}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    disabled={isLoading}
+                    type="number"
+                    step="1"
+                    value={String(field.state.value ?? 0)}
+                    onChange={(e) => {
+                      const raw = e.currentTarget.valueAsNumber;
+                      field.handleChange(Number.isNaN(raw) ? 0 : Math.max(0, Math.floor(raw)));
+                    }}
+                    placeholder="Ej. 12"
                   />
                 </div>
               )}
             </form.Field>
 
+            <div>
+              <Label className="font-semibold">Fecha Fin</Label>
+              <Input type="date" value={fechaFinCalculada} disabled />
+              <input type="hidden" name="fechaFin" value={fechaFinCalculada} />
+            </div>
+
             <form.Field name="fechaPago">
               {(field) => (
                 <div>
-                  <Label className="font-semibold">Fecha pago</Label>
+                  <Label className="font-semibold">Fecha a pagar</Label>
                   <Input
                     type="date"
                     value={field.state.value ?? ""}
@@ -213,7 +232,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
         )}
       </div>
 
-      {/* Agente */}
       <div className="space-y-2 rounded-md border p-3">
         <Label className="font-semibold">Agente</Label>
 
@@ -272,7 +290,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
         </form.Field>
       </div>
 
-      {/* Montos / Comisión */}
       <div className={`grid grid-cols-1 ${isAlquiler ? "md:grid-cols-3" : "md:grid-cols-2"} gap-4`}>
         <form.Field name="montoTotal">
           {(field) => (
@@ -341,7 +358,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
         </form.Field>
       </div>
 
-      {/* Condiciones */}
       <form.Field name="condicionesTexto">
         {(field) => (
           <div>
@@ -366,7 +382,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
   );
 }
 
-// ---- fuera del componente ----
 function diffPayload(orig: any, curr: any): Partial<UpdateContract> {
   const out: Partial<UpdateContract> = {};
   const pushIfChanged = (k: string, map?: (v: any) => any) => {
@@ -383,6 +398,7 @@ function diffPayload(orig: any, curr: any): Partial<UpdateContract> {
   pushIfChanged("idPropiedad", Number);
   pushIfChanged("idAgente", Number);
   pushIfChanged("montoTotal", Number);
+  pushIfChanged("cantidadPagos", Number);
   pushIfChanged("deposito", Number);
   pushIfChanged("porcentajeComision", Number);
   pushIfChanged("estado", (v) => (v === "" ? null : v));

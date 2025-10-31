@@ -67,6 +67,7 @@ export interface ContractDetails {
   idContrato: number,
   fechaInicio: string,
   fechaFin: string,
+  cantidadPagos: number,
   fechaFirma: string,
   fechaPago: string,
   tipoContrato: string,
@@ -116,6 +117,7 @@ export interface AvailableProperty {
 
 export interface UpdateContract {
   idContrato: number;
+  cantidadPagos?: number;
   fechaInicio?: string;
   fechaFin?: string;
   fechaFirma?: string;
