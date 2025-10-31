@@ -33,12 +33,10 @@ const toDateInput = (v?: string | null): string => {
 };
 
 export default function FormEditarContrato({ initialIdContrato, onSuccess }: EditContractProps) {
-  // Hooks SIEMPRE en el tope
   const { contract: defaultValuesContrato, loadingContract } = useGetContract(initialIdContrato);
   const update = useUpdateContract();
   const { availableProperties = [], loadingAvailableProperties } = useGetAvailableProperties();
 
-  // Agentes
   const [cedulaAgente, setCedulaAgente] = useState("");
   const debouncedAgente = useDebounced(cedulaAgente.trim(), 450);
   const isSearching = debouncedAgente.length >= 3;
@@ -48,30 +46,26 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
   const opcionesAgentes = agents as AgentPreview[];
   const cargandoAgentesUI = loadingAgents || fetchingAgents;
 
-  // Flag de carga y contrato seguro (puede estar undefined al primer render)
   const isLoading = loadingContract || !defaultValuesContrato;
   const contrato = defaultValuesContrato ?? ({} as any);
 
-  // Defaults SIEMPRE definidos (vacíos si no hay contrato aún)
   const defaults = useMemo(
     () => ({
       fechaInicio: toDateInput(contrato.fechaInicio),
       fechaFin: toDateInput(contrato.fechaFin),
       fechaFirma: toDateInput(contrato.fechaFirma),
       fechaPago: toDateInput(contrato.fechaPago),
-      idPropiedad: contrato.idPropiedad ?? 0,
-      idAgente: contrato.idAgente ?? 0,
-      montoTotal: contrato.montoTotal ?? 0,
-      deposito: contrato.deposito ?? 0,
-      porcentajeComision: contrato.porcentajeComision ?? 0,
-      estado: contrato.estado ?? "",
-      condicionesTexto: toTextBlock(contrato.condiciones),
+      idPropiedad: defaultValuesContrato.idPropiedad ?? 0,
+      idAgente: defaultValuesContrato.idAgente ?? 0,
+      montoTotal: defaultValuesContrato.montoTotal,
+      deposito: defaultValuesContrato.deposito ?? 0,
+      porcentajeComision: defaultValuesContrato.porcentajeComision ?? 0,
+      estado: defaultValuesContrato.estado ?? "",
+      condicionesTexto: toTextBlock(defaultValuesContrato.condiciones),
     }),
-    // OJO: depende del objeto contrato (que cambia cuando llega el GET)
     [contrato]
   );
 
-  // Form SIEMPRE se crea una vez con defaults (aunque sean vacíos)
   const form = useForm({
     defaultValues: defaults,
     onSubmit: async ({ value }) => {
@@ -100,7 +94,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
     },
   });
 
-  // Cuando LLEGUE el contrato, reseteamos el form con los defaults correctos
   useEffect(() => {
     if (!isLoading) {
       form.reset(defaults);
@@ -108,11 +101,9 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, defaults]);
 
-  // Visibilidad de campos de fecha SIN romper reglas de hooks
   const isVenta = contrato?.tipoContrato === "Venta";
   const isAlquiler = contrato?.tipoContrato === "Alquiler";
 
-  // Propiedad (solo lectura) con preferencia por el objeto anidado del GET
   const propiedadTexto = contrato?.propiedad
     ? `${contrato.propiedad.idPropiedad} - ${contrato.propiedad.ubicacion}`
     : (() => {
@@ -124,13 +115,10 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
           : "";
     })();
 
-  // Fallback para agente seleccionado si no aparece en el listado actual
   const selectedAgenteId = form.state.values.idAgente;
   const selectedExists = opcionesAgentes.some((a) => a.identificacion === Number(selectedAgenteId));
   const fallbackAgenteLabel = selectedAgenteId ? String(selectedAgenteId) : "";
 
-  // Si quieres, muestra un overlay visual de carga (pero SIN cortar hooks):
-  // Podrías deshabilitar inputs cuando isLoading sea true.
   return (
     <form
       onSubmit={(e) => {
@@ -139,7 +127,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
       }}
       className="space-y-4"
     >
-      {/* Propiedad (solo lectura) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label className="font-semibold">Propiedad</Label>
@@ -148,7 +135,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
         </div>
       </div>
 
-      {/* Fechas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {isVenta && (
           <form.Field name="fechaFirma">
@@ -213,7 +199,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
         )}
       </div>
 
-      {/* Agente */}
       <div className="space-y-2 rounded-md border p-3">
         <Label className="font-semibold">Agente</Label>
 
@@ -272,7 +257,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
         </form.Field>
       </div>
 
-      {/* Montos / Comisión */}
       <div className={`grid grid-cols-1 ${isAlquiler ? "md:grid-cols-3" : "md:grid-cols-2"} gap-4`}>
         <form.Field name="montoTotal">
           {(field) => (
@@ -341,7 +325,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
         </form.Field>
       </div>
 
-      {/* Condiciones */}
       <form.Field name="condicionesTexto">
         {(field) => (
           <div>
@@ -366,7 +349,6 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
   );
 }
 
-// ---- fuera del componente ----
 function diffPayload(orig: any, curr: any): Partial<UpdateContract> {
   const out: Partial<UpdateContract> = {};
   const pushIfChanged = (k: string, map?: (v: any) => any) => {
