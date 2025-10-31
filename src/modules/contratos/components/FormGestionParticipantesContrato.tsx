@@ -3,6 +3,7 @@ import FormAsignarParticipantes from './FormAsignarParticipantes'
 import { useGetContractParticipants } from '../hooks/contractHooks'
 import { FormGestionParticipantesContratoProps } from '../types/contractTypes'
 import FormElegirYEditarParticipante from './FormElegirYEditarParticipante'
+import { CardDescription } from '@/components/ui/card'
 
 
 export default function FormGestionParticipantesContrato({ idContrato, onSuccess, onCancel }: FormGestionParticipantesContratoProps) {
@@ -31,5 +32,8 @@ export default function FormGestionParticipantesContrato({ idContrato, onSuccess
     return <div className="text-sm text-red-600">Error: {error?.message ?? 'No se pudieron cargar los participantes.'}</div>
   }
 
-  return <FormElegirYEditarParticipante idContrato={idContrato} participantes={participantes} onSuccess={onSuccess}  />
+  return <CardDescription>
+    No puedes cambiar los participantes asignados a un contrato. 
+    Si necesitas modificar los participantes, por favor anula el contrato y crea uno nuevo con los participantes correctos.
+  </CardDescription>
 }

@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2 } from 'lucide-react'
 import { useGetContractRoleType, useUpdateContractParticipant } from '../hooks/contractHooks'
 import { ParticipanteMin } from '../types/contractTypes'
-
+// out of use
 function FormElegirYEditarParticipante({
   idContrato,
   participantes,
@@ -73,7 +73,7 @@ function FormElegirYEditarParticipante({
             <SelectContent>
               {participantes.map(p => (
                 <SelectItem key={p.idClienteContrato} value={String(p.idClienteContrato)}>
-                  {p.nombreCliente} — {p.identificacion} ({p.rol})
+                  {p.nombreCliente} ({p.rol})
                 </SelectItem>
               ))}
             </SelectContent>

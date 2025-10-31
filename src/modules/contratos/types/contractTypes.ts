@@ -28,21 +28,8 @@ export type DialogContractDetailProps = {
   onOpenChange?: (v: boolean) => void
 }
 export type EditContractProps = {
-  initial: {
-    idContrato: number;
-    fechaInicio?: string;
-    fechaFin?: string;
-    fechaFirma?: string;
-    fechaPago?: string;
-    idTipoContrato?: number;
-    idPropiedad?: number;
-    idAgente?: number;
-    montoTotal?: number;
-    deposito?: number;
-    porcentajeComision?: number;
-    estado?: string | null;
-    condiciones?: string[];
-  };
+  initialIdContrato: number;
+
   onSuccess?: () => void; 
 };
 

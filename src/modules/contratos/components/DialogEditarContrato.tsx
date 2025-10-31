@@ -33,7 +33,7 @@ export default function DialogEditarContrato({ open, onOpenChange, initial }: Fo
             <TabsPanel value="editar" className="flex flex-col gap-6 mb-6">
               <div className="max-h-[80vh] overflow-y-auto p-4 pr-6 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-700 scrollbar-track-gray-100 mb-4">
                 <FormEditarContrato
-                  initial={initial}
+                  initialIdContrato={initial.idContrato}
                   onSuccess={() => onOpenChange(false)}
                 />
               </div>

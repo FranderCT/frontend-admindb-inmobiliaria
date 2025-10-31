@@ -25,9 +25,9 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <CardTitle className="text-base font-semibold">{contract.idContrato}</CardTitle>
-            <CardDescription className="text-sm flex items-center gap-1">
+            <CardTitle className="text-sm flex items-center gap-1">
               <FileText size={15} /> {contract.TipoContrato}
-            </CardDescription>
+            </CardTitle>
           </div>
           <Badge variant={estadoContratoVariant[contract.estado]}>{contract.estado}</Badge>
         </div>
@@ -48,7 +48,8 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
           <span className="font-medium">{contract.Propiedad}</span>
         </div>
 
-        <div className="flex items-center justify-between text-sm">
+        {contract.TipoContrato.toLowerCase() === 'alquiler' && (
+          <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <CalendarDays size={16} />
             Período:
@@ -57,6 +58,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
             {formatDate(contract.fechaInicio)} — {formatDate(contract.fechaFin)}
           </span>
         </div>
+      )}
 
         <div className="flex items-center justify-between text-sm">
           <div className="text-muted-foreground flex gap-2 items-center">
@@ -74,7 +76,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
 
         <div className="flex items-center justify-between text-sm">
           <div className="text-muted-foreground flex gap-2 items-center">
-            <CalendarDays className="h-4 w-4" /> Fecha de pago:
+            <CalendarDays className="h-4 w-4" /> {contract.TipoContrato.toLowerCase() === 'alquiler' ? 'Fecha a pagar' : 'Fecha de pago'}:
           </div>
           <b className="text-foreground">{formatDate(contract.fechaPago)}</b>
         </div>
