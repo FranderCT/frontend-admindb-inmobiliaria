@@ -6,6 +6,7 @@ export interface InvoiceItem {
   id: number;
   tipo: "Venta" | "Alquiler";
   propiedadId: number;
+  ubicacion: string;
   periodo: { inicio: string; fin: string };
   agente: string;
   comisionPct: number;
