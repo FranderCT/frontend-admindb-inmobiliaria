@@ -15,6 +15,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
   const [openDetalle, setOpenDetalle] = useState(false)
   const [openEdit, setOpenEdit] = useState(false)
 
+  const isDisabled = contract.estado?.toLowerCase() === 'finalizado'
   const Trigger = (
     <Card
       className="hover:shadow-md transition-shadow hover:cursor-pointer"
@@ -83,20 +84,34 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
 
         <div className="flex items-center justify-between pt-3 mt-1 border-t">
           <div className="text-sm text-muted-foreground">Acciones</div>
-          <div className="flex gap-1"><Can resource="contratos" action="update">
-            <Button
-              variant="ghost"
-              aria-label="Editar"
-              onClick={(e) => {
-                e.stopPropagation()
-                e.preventDefault()
-                setOpenEdit(true)
-              }}
-              disabled={contract.estado.toLowerCase() === "finalizado"}
-            >
-              <Edit size={18} />
-            </Button>
-          </Can>
+          <div
+            role="group"
+            aria-disabled={isDisabled}
+            title={isDisabled ? 'Contrato finalizado: no se puede editar' : undefined}
+            onClick={(e) => {
+              if (isDisabled) e.stopPropagation()
+            }}
+            className={`flex gap-1 ${isDisabled ? 'cursor-not-allowed' : ''}`}
+          >
+            <Can resource="contratos" action="update">
+              <Button
+                variant="ghost"
+                aria-label="Editar"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  e.preventDefault()
+                  if (!isDisabled) setOpenEdit(true)
+                }}
+                onMouseDown={(e) => {
+                  if (isDisabled) e.preventDefault()
+                }}
+                className="disabled:cursor-not-allowed"
+                disabled={isDisabled}
+                tabIndex={isDisabled ? -1 : 0}
+              >
+                <Edit size={18} />
+              </Button>
+            </Can>
           </div>
         </div>
       </CardContent>

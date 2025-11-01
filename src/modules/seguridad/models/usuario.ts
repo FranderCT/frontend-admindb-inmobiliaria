@@ -13,7 +13,7 @@ export interface Login {
 }
 
 export interface LoginResponse {
-    access_token: string;
+    token: string;
 }
 export interface rolUsuario{
     idRolUsuario: number;
