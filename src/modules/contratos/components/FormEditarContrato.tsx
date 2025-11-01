@@ -228,6 +228,7 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
                 </div>
               )}
             </form.Field>
+
             <form.Field name="fechaPago">
               {(field) => (
                 <div>
