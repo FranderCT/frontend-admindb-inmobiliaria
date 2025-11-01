@@ -1,16 +1,16 @@
 import {
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogFooter,
-    AlertDialogCancel,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogFooter,
+  AlertDialogCancel,
 } from '@/components/animate-ui/components/radix/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { useGetHistorialAgente } from '../hooks/agentesHooks'
 
 function ContenidoHistorial({
   agenteNombre,
-  telefono,
-  identificacion,
+  telefono,         // se mantiene por compatibilidad, no se muestra
+  identificacion,   // se mantiene por compatibilidad, no se muestra
 }: {
   agenteNombre: string
   telefono: string
@@ -20,18 +20,20 @@ function ContenidoHistorial({
     loadingAgente,
     fetchingAgente,
     errorAgente,
+    contratos,
   } = useGetHistorialAgente(identificacion)
 
   return (
     <>
       <AlertDialogHeader className="mb-2 pr-10">
-        <AlertDialogTitle className="text-lg">Historial del agente</AlertDialogTitle>
+        <AlertDialogTitle className="text-lg">
+          Contratos en los que ha Participado un Agente
+        </AlertDialogTitle>
       </AlertDialogHeader>
 
       <div className="space-y-1 text-sm">
         <h3 className="font-semibold">{agenteNombre}</h3>
-        <p className="text-muted-foreground">{identificacion}</p>
-        <p className="text-muted-foreground">{telefono}</p>
+        {/* Líneas removidas: identificación y teléfono */}
       </div>
 
       <div className="mt-4 space-y-2">
@@ -51,7 +53,36 @@ function ContenidoHistorial({
 
         {!loadingAgente && !fetchingAgente && !errorAgente && (
           <>
-            
+            {(!contratos || contratos.length === 0) ? (
+              <p className="text-sm text-muted-foreground">
+                Sin contratos para este agente.
+              </p>
+            ) : (
+              <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                {contratos.map((c: any) => (
+                  <div key={c.idContrato} className="rounded border p-3 text-sm space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">
+                        {c.tipoContrato} · #{c.idContrato}
+                      </span>
+                      <span className="text-muted-foreground">{c.estado}</span>
+                    </div>
+
+                    <div className="text-muted-foreground text-xs">
+                      {c.propiedadUbicacion}
+                      {c.fechaFirma
+                        ? ` · ${new Date(c.fechaFirma).toLocaleDateString()}`
+                        : ''}
+                    </div>
+
+                    <div className="text-xs">
+                      Monto total: ₡{Number(c.montoTotal ?? 0).toLocaleString()} · Depósito: ₡
+                      {Number(c.deposito ?? 0).toLocaleString()} · Comisión: {c.porcentajeComision}%
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>

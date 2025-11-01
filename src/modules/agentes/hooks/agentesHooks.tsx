@@ -13,6 +13,7 @@ import {
   getAgents,
   updateAgent,
   activateAgent,
+  getAgentContracts,
 } from "../services/agentesServices";
 
 function useQueryAgent() {
@@ -99,12 +100,13 @@ export function useGetAgent(
 
 export function useGetHistorialAgente(identificacion: string) {
   const { data, isLoading, error, isPlaceholderData, isFetching } = useQuery({
-    queryKey: ["agent", identificacion],
-    queryFn: () => getAgent(identificacion),
+    queryKey: ["agent-contracts", identificacion],
+    queryFn: () => getAgentContracts(identificacion),
+    enabled: Boolean(identificacion),
   });
 
   return {
-    agente: data,
+    contratos: data ?? [],
     loadingAgente: isLoading,
     fetchingAgente: isFetching,
     errorAgente: error,
