@@ -122,7 +122,7 @@ export function mapIssuesByField(issues: ZodIssue[]): Record<string, string> {
   for (const issue of issues) {
     const path = issue.path.join(".");
     const msg = prettyIssue(issue, path);
-    if (!out[path]) out[path] = msg; // primera por campo
+    if (!out[path]) out[path] = msg; 
   }
   return out;
 }

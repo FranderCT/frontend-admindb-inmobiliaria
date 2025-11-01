@@ -215,6 +215,20 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
               <input type="hidden" name="fechaFin" value={fechaFinCalculada} />
             </div>
 
+            <form.Field name="fechaFirma">
+              {(field) => (
+                <div>
+                  <Label className="font-semibold">Fecha de firma</Label>
+                  <Input
+                    type="date"
+                    value={field.state.value ?? ""}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    disabled={isLoading}
+                  />
+                </div>
+              )}
+            </form.Field>
+
             <form.Field name="fechaPago">
               {(field) => (
                 <div>
