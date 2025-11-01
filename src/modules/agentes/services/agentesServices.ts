@@ -115,3 +115,28 @@ export const updateAgent = async (
   return data;
 };
 
+
+export type AgentContract = {
+  idContrato: number;
+  tipoContrato: string;
+  idPropiedad: number;
+  propiedadUbicacion: string;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+  fechaFirma?: string | null;
+  montoTotal: number;
+  deposito: number;
+  porcentajeComision: number;
+  estado: string;
+};
+
+export const getAgentContracts = async (
+  identificacion: string | number
+): Promise<AgentContract[]> => {
+  const id = encodeURIComponent(String(identificacion).trim());
+  const { data } = await altosDelValleAPI.get<AgentContract[]>(
+    `/agente/contratos/${id}`
+  );
+  return data;
+};
+
