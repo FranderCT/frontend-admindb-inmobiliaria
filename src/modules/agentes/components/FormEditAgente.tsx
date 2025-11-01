@@ -103,7 +103,7 @@ const FormEditAgente = ({
     <Dialog open={open} onClose={onOpenChange}>
       <DialogPanel from={from} showCloseButton={showCloseButton} className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Editar cliente</DialogTitle>
+          <DialogTitle>Editar agente</DialogTitle>
           <DialogDescription>Actualiza la información y guarda los cambios.</DialogDescription>
         </DialogHeader>
 

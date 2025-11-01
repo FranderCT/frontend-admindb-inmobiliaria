@@ -1,4 +1,4 @@
-import { Plus, Pencil, FileText, CreditCard, User, Percent, Calendar, X } from "lucide-react";
+import { Plus, Pencil, FileText, CreditCard, User, Percent, Calendar, X, Building2 } from "lucide-react";
 import { InvoiceStatus } from "../types/facturasType";
 import { useInvoices } from "../hooks/facturasHooks";
 import { deriveClienteInfo, formatDate, formatMoney } from "../models/facturas";
@@ -102,6 +102,13 @@ export default function FacturacionPage() {
                   </li>
 
                   <li className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4" />
+                    <span>
+                      <span className="text-gray-500">Ubicación de la propiedad:</span> {f.ubicacion}
+                    </span>
+                </li>
+
+                  <li className="flex items-center gap-2">
                     <User className="w-4 h-4" />
                     <span><span className="text-gray-500">Agente:</span> {f.agente}</span>
                   </li>
@@ -144,9 +151,6 @@ export default function FacturacionPage() {
                         Marcar pagada
                       </button>
                     )}
-                    <button className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-gray-50">
-                      <Pencil className="w-4 h-4" /> Editar
-                    </button>
                   </div>
                 </div>
               </article>

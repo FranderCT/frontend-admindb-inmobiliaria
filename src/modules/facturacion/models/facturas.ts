@@ -10,6 +10,7 @@ export function mapFacturaApiToInvoice(api: any): InvoiceItem {
     id: api.idFactura,
     tipo: api.tipoContrato,
     propiedadId: api.idPropiedad,
+    ubicacion: api.ubicacion ?? "",
     periodo: { inicio: api.fechaEmision ?? null, fin: api.fechaEmision ?? null },
     agente: api.nombreAgente ?? "",
     comisionPct: Number(api.porcentajeComision ?? 0),
