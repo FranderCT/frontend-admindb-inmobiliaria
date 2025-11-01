@@ -28,9 +28,9 @@ export const useLogin = () => {
     mutationFn: ({ user }: { user: Login }) => loginUser(user),
 
     onSuccess: (data: LoginResponse) => {
-      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("token", data.token);
 
-      altosDelValleAPI.defaults.headers.common["Authorization"] = `Bearer ${data.access_token}`;
+      altosDelValleAPI.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
 
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },
