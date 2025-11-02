@@ -93,12 +93,13 @@ export default function FacturacionPage() {
                 <ul className="space-y-2 text-sm text-gray-700">
                   <li className="flex items-center gap-2">
                     <FileText className="w-4 h-4" />
+                    Tipo de contrato:
                     <span>{f.tipo}</span>
                   </li>
 
                   <li className="flex items-center gap-2">
                     <CreditCard className="w-4 h-4" />
-                    <span><span className="text-gray-500">Propiedad:</span> {f.propiedadId}</span>
+                    <span><span className="text-gray-500">ID Propiedad:</span> {f.propiedadId}</span>
                   </li>
 
                   <li className="flex items-center gap-2">
@@ -115,7 +116,7 @@ export default function FacturacionPage() {
 
                   <li className="flex items-center gap-2">
                     <Percent className="w-4 h-4" />
-                    <span><span className="text-gray-500"> Comisión:</span> {f.comisionPct}%</span>
+                    <span><span className="text-gray-500"> Comisión del Agente:</span> {f.comisionPct}%</span>
                   </li>
 
                   <li className="flex items-center gap-2">
@@ -138,6 +139,13 @@ export default function FacturacionPage() {
                     {/* ↓ Único cambio visual: mostramos el texto igual que back */}
                     <span><span className="text-gray-500">Cliente:</span> {cliente.text}</span>
                   </li>
+
+                  <li className="flex items-center gap-2">
+                    <Percent className="w-4 h-4" />
+                    <span><span className="text-gray-500"> IVA:</span> {f.porcentajeIva}%</span>
+                  </li>
+
+                  
                 </ul>
 
                 <div className="mt-4 flex items-center justify-between">

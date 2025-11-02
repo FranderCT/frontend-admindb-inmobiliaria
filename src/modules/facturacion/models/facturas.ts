@@ -19,12 +19,11 @@ export function mapFacturaApiToInvoice(api: any): InvoiceItem {
     contratoId: api.idContrato,
     montoTotal: Number(api.montoPagado ?? 0),
     estado,
-
-    
     clientes: api.clientes ?? api.cliente ?? api.clientePrincipal ?? "",
     clienteId: parsed?.id ?? undefined,
     clienteNombre: parsed?.name ?? undefined,
     rolCliente: parsed?.rol ?? undefined,
+    porcentajeIva: Number(api.porcentajeIva ?? 0),
   };
 }
 

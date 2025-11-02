@@ -15,6 +15,7 @@ export interface InvoiceItem {
   contratoId: number;
   montoTotal: number;
   estado: InvoiceStatus;
+  porcentajeIva: number;
 
   // String original que puede venir de la API
   clientes: string;
