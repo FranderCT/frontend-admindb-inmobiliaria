@@ -117,10 +117,10 @@ export function useGetContractType() {
 
 export function useGetAgentPreview(identificacion?: string) {
   const ced = identificacion?.trim() ?? "";
-  const key = ["agent-preview", ced.length >= 3 ? ced : "list"];
 
   const { data, isLoading, isFetching, error } = useQuery({
-    queryKey: key,
+
+      queryKey: ["agent-preview", "contratos", ced],
     queryFn: () => getAgentsPreview(ced.length >= 3 ? ced : undefined),
     staleTime: 60_000,
   });

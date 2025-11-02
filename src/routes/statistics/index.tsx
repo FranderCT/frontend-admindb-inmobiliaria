@@ -23,7 +23,7 @@ export const Route = createFileRoute('/statistics/')({
 function RouteComponent() {
 
   return (
-    <div className="ml-16 mt-10">
+    <div className="ml-5 mt-15">
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="w-full flex flex-wrap gap-2">
           <TabsTab value="general">General</TabsTab>

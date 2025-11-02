@@ -11,6 +11,7 @@ import { ContratosFiltersProvider } from "@/modules/contratos/context/contractCo
 import { useContratosPaginatedFromContext } from "@/modules/contratos/hooks/useContractFilters";
 import FormCrearContrato from "@/modules/contratos/components/FormCrearContrato";
 import CardPreviewContrato from "@/modules/contratos/components/CardPreviewContrato";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/contratos/")({
   beforeLoad: ({ location }) => {
@@ -51,7 +52,11 @@ function RouteComponent() {
       </nav>
 
       {(isLoading || (isFetching && !data)) && (
-        <div className="ml-16">Cargando contratos...</div>
+        <div className="ml-16 flex flex-col gap-2">
+          <Skeleton className="h-3 w-3/5 rounded-lg" />
+          <Skeleton className="h-3 w-3/5 rounded-lg" />
+          <Skeleton className="h-3 w-3/5 rounded-lg" />
+        </div>
       )}
       {error && <div className="ml-16 text-destructive">Error cargando contratos.</div>}
 

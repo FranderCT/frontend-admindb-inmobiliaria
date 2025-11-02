@@ -5,9 +5,8 @@ import { useGetDashboardReport } from '@/modules/estadisticas/hooks/statsHooks'
 import { getUserInfoFromToken, protectRoute } from '@/modules/seguridad/utils/authGuard'
 import { createFileRoute } from '@tanstack/react-router'
 import { BarChart3, Building2, FileText, Receipt, Users, LandPlot, ReceiptText, Scroll } from 'lucide-react'
-
+import { Skeleton } from '@/components/ui/skeleton';
 import { fmtCRC } from "@/utils/moneyFormatter";
-import Skeleton from 'node_modules/@mui/material/esm/Skeleton/Skeleton'
 
 export const Route = createFileRoute('/')({
   component: RouteComponent,
