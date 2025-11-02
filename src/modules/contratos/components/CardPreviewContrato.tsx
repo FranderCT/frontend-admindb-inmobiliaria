@@ -5,7 +5,6 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Edit, CalendarDays, FileText, BriefcaseBusiness, LandPlot, Signature, MapPin } from 'lucide-react'
 import type { CardContractProps } from '../types/contractTypes'
 import DialogDetalleContrato from './DialogDetalleContrato'
-// import { getEstado } from '@/utils/contractStatus'
 import { formatDate } from '@/utils/dates'
 import DialogEditarContrato from './DialogEditarContrato'
 import { estadoContratoVariant } from '@/utils/statusVariants'
@@ -49,7 +48,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
           <span className="font-medium">{contract.Propiedad}</span>
         </div>
 
-        {contract.TipoContrato.toLowerCase() === 'alquiler' && (
+        {contract.TipoContrato=== 'Alquiler' && (
           <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <CalendarDays size={16} />
@@ -77,7 +76,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
 
         <div className="flex items-center justify-between text-sm">
           <div className="text-muted-foreground flex gap-2 items-center">
-            <CalendarDays className="h-4 w-4" /> {contract.TipoContrato.toLowerCase() === 'alquiler' ? 'Fecha a pagar' : 'Fecha de pago'}:
+            <CalendarDays className="h-4 w-4" /> {contract.TipoContrato === 'Alquiler' ? 'Fecha a pagar' : 'Fecha de pago'}:
           </div>
           <b className="text-foreground">{formatDate(contract.fechaPago)}</b>
         </div>

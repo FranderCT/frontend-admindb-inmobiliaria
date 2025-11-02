@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { assignContractParticipants, createContract, getAgentsPreview, getAvailableProperties, getContract, getContractParticipants, getContractPrev, getContractRoleType, getContracts, getContractType, patchUpdateContract, updateContractParticipants } from "../services/contractServices";
-import { AgentPreview, ContractParticipant, ContractParticipantsPayload, CreateContract, UpdateContract } from "../models/contract";
+import { AgentPreview, ContractParticipant, ContractParticipantsPayload, ContractsPaginateParams, ContractsPaginateResponse, CreateContract, UpdateContract } from "../models/contract";
 
 export const useCreateContract = () => {
     const queryClient = useQueryClient();
@@ -32,19 +32,31 @@ export const useAssignContractParticipants = () => {
     });
 };
 
-export function useGetContracts() {
-    const { data, isLoading, error, isFetching } = useQuery({
-        queryKey: ["contracts"],
-        queryFn: () => getContracts(),
-    });
-
-    return {
-        contracts: data,
-        loadingContracts: isLoading,
-        fetchingContracts: isFetching,
-        errorContracts: error,
+export function useGetContracts(params: ContractsPaginateParams) {
+    const normalized: ContractsPaginateParams = {
+        page: params.page ?? 1,
+        limit: params.limit ?? 10,
+        sortCol: params.sortCol ?? "fechaInicio",
+        sortDir: params.sortDir ?? "ASC",
+        q: params.q ?? "",
+        estado:
+            typeof params.estado === "string"
+                ? (Number(params.estado) as 0 | 1)
+                : params.estado,
+        tipoContratoId:
+            params.tipoContratoId != null ? Number(params.tipoContratoId) : undefined,
+        agenteId: params.agenteId != null ? Number(params.agenteId) : undefined,
+        propiedadId:
+            params.propiedadId != null ? Number(params.propiedadId) : undefined,
     };
+
+    return useQuery<ContractsPaginateResponse>({
+        queryKey: ["contracts", "paginate", normalized],
+        queryFn: () => getContracts(normalized),
+        staleTime: 60_000,
+    });
 }
+
 
 export function useGetContract(idContrato: number) {
     const { data, isLoading, error, isFetching } = useQuery({

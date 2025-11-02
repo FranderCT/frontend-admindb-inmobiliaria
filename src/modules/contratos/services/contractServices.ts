@@ -1,5 +1,5 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { AgentPreview, AvailableProperty, Contract, ContractDetails, ContractParticipant, ContractParticipantsPayload, ContractType, CreateContract, RoleType, UpdateContract } from "../models/contract";
+import { AgentPreview, AvailableProperty, Contract, ContractDetails, ContractParticipant, ContractParticipantsPayload, ContractsPaginateParams, ContractsPaginateResponse, ContractType, CreateContract, RoleType, UpdateContract } from "../models/contract";
 import { normalize, RawAgent } from "../types/contractTypes";
 
 export const createContract = async (contract: CreateContract): Promise<CreateContract> => {
@@ -14,9 +14,28 @@ export async function assignContractParticipants(payload: ContractParticipantsPa
   const { data } = await altosDelValleAPI.post("/cliente-contrato/varios-clientes", payload);
   return data;
 }
-export const getContracts = async (): Promise<Contract[]> => {
-  const response = await altosDelValleAPI.get<Contract[]>(`/contrato/vista-previa`);
-  return response.data;
+
+export const getContracts = async (
+  p: ContractsPaginateParams
+): Promise<ContractsPaginateResponse> => {
+  const params: Record<string, unknown> = {
+    pagina: p.page ?? 1,
+    cantidadPorPagina: p.limit ?? 10,
+    ordenarPor: p.sortCol ?? "fechaInicio",
+    direccionOrden: p.sortDir ?? "ASC",
+  };
+
+  if (p.q) params.q = p.q;
+  if (typeof p.estado === "number") params.estado = p.estado;
+  if (p.tipoContratoId != null) params.idTipoContrato = Number(p.tipoContratoId);
+  if (p.agenteId != null) params.idAgente = Number(p.agenteId);
+  if (p.propiedadId != null) params.idPropiedad = Number(p.propiedadId);
+
+  const { data } = await altosDelValleAPI.get<ContractsPaginateResponse>(
+    "/contrato/vista-previa",
+    { params }
+  );
+  return data;
 };
 
 export const getContract = async (idContrato: number): Promise<ContractDetails> => {

@@ -1,14 +1,19 @@
+import StatisticsCard from '@/components/StatisticsCard'
 import TileCard from '@/components/TileCard'
 import { cn } from '@/lib/utils'
+import { useGetDashboardReport } from '@/modules/estadisticas/hooks/statsHooks'
 import { getUserInfoFromToken, protectRoute } from '@/modules/seguridad/utils/authGuard'
 import { createFileRoute } from '@tanstack/react-router'
-import { BarChart3, Building2, FileText, Receipt, Users } from 'lucide-react'
+import { BarChart3, Building2, FileText, Receipt, Users, LandPlot, ReceiptText, Scroll } from 'lucide-react'
+
+import { fmtCRC } from "@/utils/moneyFormatter";
+import Skeleton from 'node_modules/@mui/material/esm/Skeleton/Skeleton'
 
 export const Route = createFileRoute('/')({
-  component: RouteComponent,  
+  component: RouteComponent,
   beforeLoad: ({ location }) => {
-      protectRoute(location.pathname, ['AGENTE', 'ADMINISTRADOR', 'LECTOR'])
-    },
+    protectRoute(location.pathname, ['AGENTE', 'ADMINISTRADOR', 'LECTOR'])
+  },
 })
 
 const tiles = [
@@ -45,7 +50,8 @@ const tiles = [
 ];
 function RouteComponent() {
   const userInfo = getUserInfoFromToken();
-  
+  const { dashboardReport, loadingDashboardReport, errorDashboardReport } = useGetDashboardReport();
+
   return <div className="m-4">
     <main className={cn("flex-1 transition-all duration-300 pt-16 lg:pt-6")}>
       <div className="p-6 lg:p-8">
@@ -53,6 +59,48 @@ function RouteComponent() {
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">Hola, {userInfo?.name}</h1>
             <p className="text-muted-foreground">Bienvenido al sistema de gestión de la Inmobiliaria Altos del Valle</p>
+          </div>
+          <div className="flex flex-wrap gap-6">
+            {loadingDashboardReport && <div className="max-w-[300px] w-full flex items-center gap-3">
+              <div>
+                <Skeleton className="flex rounded-full w-12 h-12" />
+              </div>
+              <div className="w-full flex flex-col gap-2">
+                <Skeleton className="h-3 w-3/5 rounded-lg" />
+                <Skeleton className="h-3 w-4/5 rounded-lg" />
+              </div>
+            </div>}
+            {errorDashboardReport && <div className="text-destructive">Error cargando datos del dashboard.</div>}
+            {dashboardReport && dashboardReport.length > 0 && (
+              <>
+                <StatisticsCard
+                  icon={<LandPlot className="h-5 w-5 text-green-600" />}
+                  title="Total de propiedades registradas"
+                  value={dashboardReport[0]?.TotalPropiedades || 0}
+                />
+
+                <StatisticsCard
+                  icon={<Scroll className="h-5 w-5 text-orange-600" />}
+                  title="Total de contratos en el sistema"
+                  value={dashboardReport[0]?.TotalContratos || 0}
+                />
+                <StatisticsCard
+                  icon={<Users className="h-5 w-5 text-blue-600" />}
+                  title="Total de clientes en el sistema"
+                  value={dashboardReport[0]?.TotalClientes || 0}
+                />
+                <StatisticsCard
+                  icon={<BarChart3 className="h-5 w-5 text-amber-600" />}
+                  title="Monto total generado por contratos"
+                  value={fmtCRC(dashboardReport[0]?.MontoTotalContratos || 0)}
+                />
+                <StatisticsCard
+                  icon={<ReceiptText className="h-5 w-5 text-cyan-500" />}
+                  title="Total asignado en comisiones"
+                  value={fmtCRC(dashboardReport[0]?.TotalComisiones || 0)}
+                />
+              </>
+            )}
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {tiles.map((tile) => (
