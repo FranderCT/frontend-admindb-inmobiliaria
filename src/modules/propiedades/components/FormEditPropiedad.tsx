@@ -5,7 +5,7 @@ import {
   Dialog, DialogPanel, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose,
 } from "@/components/animate-ui/components/headless/dialog";
 import { Label } from "@radix-ui/react-label";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { EditPropiedadDialogProps } from "../types/propiedadTypes";
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem, SelectLabel,
@@ -20,32 +20,68 @@ const FormEditPropiedad = ({
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const { propertyTypes } = useGetPropertyTypes();
-  const { propertyStatuses } = useGetPropertyStatuses();
+  const { propertyStatuses } = useGetPropertyStatuses();;
+
+  const initialRef = useRef({
+    ubicacion: property.ubicacion ?? "",
+    precio: Number(property.precio ?? 0),
+    estadoPropiedadId: property.estadoPropiedad?.idEstadoPropiedad,
+    tipoInmuebleId: property.tipoInmueble?.idTipoInmueble,
+  });
+
+  useEffect(() => {
+    if (open) {
+      initialRef.current = {
+        ubicacion: property.ubicacion ?? "",
+        precio: Number(property.precio ?? 0),
+        estadoPropiedadId: property.estadoPropiedad?.idEstadoPropiedad,
+        tipoInmuebleId: property.tipoInmueble?.idTipoInmueble,
+      };
+    }
+  }, [open, property]);
 
   const form = useForm({
     defaultValues: {
       idPropiedad: property.idPropiedad,
       ubicacion: property.ubicacion ?? "",
-      precio: property.precio ?? 0,
+      precio: Number(property.precio ?? 0),
       estadoPropiedadId: property.estadoPropiedad?.idEstadoPropiedad,
       tipoInmuebleId: property.tipoInmueble?.idTipoInmueble,
     },
     onSubmit: async ({ value }) => {
-      setFormErrors({}); setFormError(null);
+      // normalizar (trim/number)
+      const current = {
+        ubicacion: (value.ubicacion ?? "").trim(),
+        precio: Number(value.precio ?? 0),
+        estadoPropiedadId: value.estadoPropiedadId,
+        tipoInmuebleId: value.tipoInmuebleId,
+      };
+      const initial = initialRef.current;
+
+      // construir diff (sólo keys cambiadas)
+      const changes: Record<string, any> = {};
+      if (current.ubicacion !== initial.ubicacion) changes.ubicacion = current.ubicacion;
+      if (current.precio !== initial.precio) changes.precio = current.precio;
+      if (current.estadoPropiedadId !== initial.estadoPropiedadId)
+        changes.idEstado = Number(current.estadoPropiedadId);
+      if (current.tipoInmuebleId !== initial.tipoInmuebleId)
+        changes.idTipoInmueble = Number(current.tipoInmuebleId);
+
+      // si no cambió nada, sólo cierra
+      if (Object.keys(changes).length === 0) {
+        onOpenChange(false);
+        return;
+      }
+
       try {
         await updateProp.mutateAsync({
-          prop: {
-            idPropiedad: value.idPropiedad,
-            ubicacion: (value.ubicacion ?? "").trim(),
-            precio: Number(value.precio) || 0,
-            idEstado: Number(value.estadoPropiedadId),
-            idTipoInmueble: Number(value.tipoInmuebleId),
-          },
+          prop: { idPropiedad: value.idPropiedad, ...changes },
         });
         onOpenChange(false);
       } catch (err) {
         const { fieldErrors, formError } = extractServerErrors(err);
-        setFormErrors(fieldErrors); setFormError(formError ?? null);
+        setFormErrors(fieldErrors);
+        setFormError(formError ?? null);
       }
     },
   });
@@ -121,10 +157,13 @@ const FormEditPropiedad = ({
               <div>
                 <Label className="text-sm font-medium">Estado de propiedad</Label>
                 <Select
-                  value={field.state.value ? String(field.state.value) : "all"}
-                  onValueChange={(v) => field.handleChange(v === "all" ? undefined : Number(v))}
-                  disabled={disabled}>
-                  <SelectTrigger><SelectValue placeholder="Selecciona un estado" /></SelectTrigger>
+                  value={field.state.value !== undefined ? String(field.state.value) : undefined}
+                  onValueChange={(v) => field.handleChange(Number(v))}
+                  disabled={disabled}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un estado" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Estados</SelectLabel>
@@ -148,8 +187,8 @@ const FormEditPropiedad = ({
               <div>
                 <Label className="text-sm font-medium">Tipo de inmueble</Label>
                 <Select
-                  value={field.state.value ? String(field.state.value) : "all"}
-                  onValueChange={(v) => field.handleChange(v === "all" ? undefined : Number(v))}
+                  value={field.state.value !== undefined ? String(field.state.value) : undefined}
+                  onValueChange={(v) => field.handleChange(Number(v))}
                   disabled={disabled}>
                   <SelectTrigger><SelectValue placeholder="Selecciona un tipo" /></SelectTrigger>
                   <SelectContent>

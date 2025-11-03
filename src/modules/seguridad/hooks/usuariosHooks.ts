@@ -60,7 +60,6 @@ export const useGetUsers = (page: number, limit: number, estado: boolean) => {
   const { data, isLoading, error, isFetching, isRefetching } = useQuery<UsersResponse>({
     queryKey: ["users", page, limit, estado],
     queryFn: () => getUsers(page, limit, estado),
-    // evita parpadeos y estados undefined al paginar
     placeholderData: (prev) => prev ?? { data: [], meta: EMPTY_META },
   });
 

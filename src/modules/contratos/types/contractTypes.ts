@@ -75,4 +75,18 @@ export type FormAsignClientContractProps = {
   onCancel?: () => void;
 };
 
+
+
 export type ClientContractRow = { identificacion?: number; idRol?: number; };
+
+export type ContratosFilters = {
+  page: number;
+  limit: number;
+  sortCol: "fechaInicio" | "fechaFin" | "fechaFirma" | "montoTotal" | "idContrato";
+  sortDir: "ASC" | "DESC";
+  q?: string;
+  estado?: 0 | 1;
+  tipoContratoId?: number; 
+  agenteId?: number;
+  propiedadId?: number;
+}

@@ -1,7 +1,17 @@
-import { Plus, Pencil, FileText, CreditCard, User, Percent, Calendar, X, Building2 } from "lucide-react";
+import { Plus, FileText, CreditCard, User, Percent, Calendar, X, Building2 } from "lucide-react";
 import { InvoiceStatus } from "../types/facturasType";
 import { useInvoices } from "../hooks/facturasHooks";
 import { deriveClienteInfo, formatDate, formatMoney } from "../models/facturas";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Can } from "@/modules/seguridad/components/Can";
+import { Button } from "@/components/ui/button";
 
 function StatusPill({ estado }: { estado: InvoiceStatus }) {
   const styles: Record<InvoiceStatus, string> = {
@@ -19,50 +29,60 @@ export default function FacturacionPage() {
   } = useInvoices();
 
   return (
-    <div className="p-6 md:p-10">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-4xl font-extrabold tracking-tight">Facturas</h1>
-        <button
-          className="inline-flex items-center gap-2 bg-[#708C3E] hover:opacity-90 text-white px-4 py-2 rounded-lg shadow"
-          onClick={() => setOpen(true)}
-        >
-          <Plus className="w-5 h-5" /> Crear factura
-        </button>
-      </div>
 
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-3 mb-8">
-        <select
-          className="border rounded-md px-3 py-2 bg-white shadow-sm"
-          onChange={(e) => setEstado(e.target.value as any)}
-          defaultValue="Todos"
-        >
-          <option value="Todos">Todos</option>
-          <option value="Pendiente">Pendiente</option>
-          <option value="Pagada">Pagada</option>
-        </select>
+    <div className="m-4">
+      <header className="flex items-center justify-between mb-4 ml-16">
+        <h1 className="text-4xl font-bold">Facturas</h1>
+      </header>
 
-        <input
-          placeholder="ID contrato (número)"
-          className="border rounded-md px-3 py-2 shadow-sm"
-          inputMode="numeric"       // ← numérico, pero es string
-          onChange={(e) => setContratoIdText(e.target.value)}
-        />
+      <nav className="flex flex-wrap gap-4 justify-between mb-4 ml-16">
+        {/* Filtros */}
+        <div className="flex gap-3 mb-2">
+          <Select
+            onValueChange={(v) => setEstado(v as "Todos" | InvoiceStatus)}
+            defaultValue="Todos"
+          >
+            <SelectTrigger className="border rounded-md px-3 py-2 bg-white shadow-sm">
+              <SelectValue placeholder="Estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Todos">Todos</SelectItem>
+              <SelectItem value="Pendiente">Pendiente</SelectItem>
+              <SelectItem value="Pagada">Pagada</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <input
-          placeholder="ID cliente (número)"
-          className="border rounded-md px-3 py-2 shadow-sm"
-          inputMode="numeric"
-          onChange={(e) => setClienteIdText(e.target.value)}
-        />
+          <Input
+            placeholder="ID del contrato"
+            className="border rounded-md px-3 py-2 shadow-sm"
+            inputMode="numeric"
+            onChange={(e) => setContratoIdText(e.target.value)}
+          />
 
-        <input
-          type="date"
-          className="border rounded-md px-3 py-2 shadow-sm"
-          onChange={(e) => setFecha(e.target.value)}
-        />
-      </div>
+          <Input
+            placeholder="Identificación del cliente"
+            className="border rounded-md px-3 py-2 shadow-sm"
+            inputMode="numeric"
+            onChange={(e) => setClienteIdText(e.target.value)}
+          />
+
+          <Input
+            type="date"
+            className="border rounded-md px-3 py-2 shadow-sm"
+            onChange={(e) => setFecha(e.target.value)}
+          />
+        </div>
+
+        <Can resource="facturas" action="create">
+          <Button variant="default"
+            onClick={() => setOpen(true)}
+          >
+            <Plus className="w-5 h-5" /> Registrar factura
+          </Button>
+        </Can>
+      </nav>
+
+
 
       {error && (
         <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
@@ -107,7 +127,7 @@ export default function FacturacionPage() {
                     <span>
                       <span className="text-gray-500">Ubicación de la propiedad:</span> {f.ubicacion}
                     </span>
-                </li>
+                  </li>
 
                   <li className="flex items-center gap-2">
                     <User className="w-4 h-4" />

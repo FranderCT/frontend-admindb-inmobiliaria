@@ -17,7 +17,7 @@ const CardCliente = ({ client }: ClientCardProps) => {
   const [openEdit, setOpenEdit] = useState(false)
 
   const renderEstado = (status: boolean) =>
-    status ? <Badge>Activo</Badge> : <Badge variant="outline">Inactivo</Badge>
+    status ? <Badge variant='activo'>Activo</Badge> : <Badge variant="outline">Inactivo</Badge>
 
   const onDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation()

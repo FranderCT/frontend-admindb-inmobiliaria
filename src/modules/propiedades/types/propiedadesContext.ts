@@ -9,8 +9,8 @@ export type PropiedadesFilters = {
   sortDir: SortDir;
   q: string;
   estado?: 0 | 1;
-  estadoPropiedadId?: number; // catálogo: Disponible, Reservada, etc.
-  tipoInmuebleId?: number;    // catálogo: Casa, Apto, etc.
+  estadoPropiedadId?: number;
+  tipoInmuebleId?: number;
 };
 
 export const defaultFilters: PropiedadesFilters = {

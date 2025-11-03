@@ -131,3 +131,30 @@ export interface UpdateContract {
   estado?: string | null;
   condiciones?: string[];
 }
+
+export type PaginationMeta = {
+  page: number;
+  pageCount: number;
+  total: number;
+  limit: number;
+};
+
+export type ContractPreview = Contract; // si tu vista previa ya usa Contract; ajusta si es otro tipo
+
+export type ContractsPaginateResponse = {
+  data: ContractPreview[];
+  meta: PaginationMeta;
+};
+
+export type ContractsPaginateParams = {
+  page?: number;
+  limit?: number;
+  sortCol?: "fechaInicio" | "fechaFin" | "fechaFirma" | "montoTotal" | "idContrato";
+  sortDir?: "ASC" | "DESC";
+  // filtros opcionales (extensibles)
+  q?: string;
+  estado?: 0 | 1;
+  tipoContratoId?: number | string;
+  agenteId?: number | string;
+  propiedadId?: number | string;
+};

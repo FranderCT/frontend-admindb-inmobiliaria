@@ -144,8 +144,10 @@ export const useUpdateProperty = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: { prop: UpdateProperty }) => updateProperty(payload.prop),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["properties", "paginate"] });
-    },
+     onSuccess: (_data, payload) => {
+      queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.invalidateQueries({ queryKey: ["property", payload.prop.idPropiedad] });
+
+     },
   });
 };

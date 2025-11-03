@@ -6,6 +6,7 @@ import {
   markInvoiceAsPaidAndFetch,
 } from "../services/facturasServices";
 import { CreateInvoiceForm, InvoiceFilters, InvoiceItem, InvoiceStatus } from "../types/facturasType";
+import { useQueryClient } from "@tanstack/react-query";
 
 const defaultFilters: InvoiceFilters = {
   estado: "Todos",
@@ -18,6 +19,8 @@ export function useInvoices() {
   const [data, setData] = useState<InvoiceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const queryClient = useQueryClient();
 
   // filtros controlados desde la página
   const [filters, setFilters] = useState<InvoiceFilters>(defaultFilters);
@@ -47,7 +50,7 @@ export function useInvoices() {
 
   useEffect(() => {
     fetchList();
-    
+
   }, [filters.estado, filters.idContrato, filters.idCliente, filters.fecha]);
 
   const setEstado = (estado: "Todos" | InvoiceStatus) =>
@@ -56,33 +59,35 @@ export function useInvoices() {
   const setClienteIdText = (v: string) => setFilters((s) => ({ ...s, idCliente: v }));
   const setFecha = (v: string) => setFilters((s) => ({ ...s, fecha: v }));
 
-const save = async () => {
-  try {
-    const idNum = Number(form.idContrato);
-    if (!idNum || Number.isNaN(idNum)) return;
+  const save = async () => {
+    try {
+      const idNum = Number(form.idContrato);
+      if (!idNum || Number.isNaN(idNum)) return;
 
-    await createInvoice({
-      idContrato: idNum,                                   // ← número
-      porcentajeIVA: Number(form.porcentajeIVA ?? 13),
-    });
+      await createInvoice({
+        idContrato: idNum,                                   // ← número
+        porcentajeIVA: Number(form.porcentajeIVA ?? 13),
+      });
 
-    await fetchList();
-    setOpen(false);
-    setForm({ idContrato: "", porcentajeIVA: 13 });
-  } catch (e) {
-    console.error(e);
-    setError((e as any)?.message ?? "No se pudo crear la factura");
-  }
-};
+      await fetchList();
+      setOpen(false);
+      setForm({ idContrato: "", porcentajeIVA: 13 });
+    } catch (e) {
+      console.error(e);
+      setError((e as any)?.message ?? "No se pudo crear la factura");
+    }
+  };
 
 
 
-  
+
   const pagar = async (id: number) => {
     try {
       setLoading(true);
       const rows = await markInvoiceAsPaidAndFetch(id, filters);
       setData(rows);
+      // invalidate contracts queries so UI that depends on contract state refreshes
+      queryClient.invalidateQueries({ queryKey: ["contracts"] });
     } catch (e) {
       console.error(e);
       setError((e as any)?.message ?? "No se pudo marcar como pagada");

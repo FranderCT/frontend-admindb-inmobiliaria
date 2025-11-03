@@ -41,7 +41,6 @@ export function getRolesFromPayload(p?: JwtPayload | null): Role[] {
 
 export function isExpired(p?: JwtPayload | null): boolean {
   if (!p?.exp) return true
-  // exp viene en segundos
   return Date.now() >= p.exp * 1000
 }
 
@@ -62,7 +61,7 @@ export function requireAuth(args: { locationPathname: string; requiredRoles?: Ro
   if (!payload || isExpired(payload)) {
     localStorage.removeItem('token')
     throw redirect({
-      to: `/login?${new URLSearchParams({ reason: 'expired', redirect: args.locationPathname }).toString()}`, // ✅ tipado
+      to: `/login?${new URLSearchParams({ reason: 'expired', redirect: args.locationPathname }).toString()}`, 
     })
   }
   altosDelValleAPI.defaults.headers.common['Authorization'] = `Bearer ${token}`

@@ -17,7 +17,7 @@ const CardAgente = ({ agent }: AgentCardProps) => {
   const [openEdit, setOpenEdit] = useState(false)
 
   const renderEstado = (status: boolean) =>
-    status ? <Badge>Activo</Badge> : <Badge variant="outline">Inactivo</Badge>
+    status ? <Badge variant='activo'>Activo</Badge> : <Badge variant="outline">Inactivo</Badge>
 
   const onDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -67,7 +67,6 @@ const CardAgente = ({ agent }: AgentCardProps) => {
           <span className="font-medium">{agent.telefono}</span>
         </div>
 
-        {/* Comisión acumulada con símbolo de colón */}
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <span className="inline-flex items-center justify-center w-5">
