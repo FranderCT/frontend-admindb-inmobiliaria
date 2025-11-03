@@ -12,7 +12,7 @@ import {
     DialogDescription,
     DialogClose,
 } from "@/components/animate-ui/components/headless/dialog";
-import { Plus } from "lucide-react";
+import { ImageUp, Plus } from "lucide-react";
 import { Label } from "@radix-ui/react-label";
 import { extractServerErrors } from "@/utils/serverExtract";
 import {
@@ -118,7 +118,7 @@ const FormCrearPropiedad = () => {
             </Button>
 
             <Dialog open={open} onClose={setOpen}>
-                <DialogPanel className="sm:max-w-lg">
+                <DialogPanel className="sm:max-w-lg ">
                     <DialogHeader>
                         <DialogTitle>Agregar propiedad</DialogTitle>
                         <DialogDescription>
@@ -350,6 +350,52 @@ const FormCrearPropiedad = () => {
                                 completo.
                             </p>
                         </div>
+                        <form.Field
+                            name="imagen"
+                            validators={{
+                                onChange: ({ value }) =>
+                                    value && value instanceof File && !value.type.startsWith("image/")
+                                        ? "Seleccione un archivo de imagen"
+                                        : undefined,
+                            }}
+                        >
+                            {(field) => (
+                                <div className="flex flex-col gap-2">
+                                    <Label className="font-semibold">Imagen (opcional)</Label>
+                                    <div className="relative flex items-center">
+                                        <label
+                                            htmlFor="imagen-propiedad"
+                                            className="flex items-center gap-2 px-4 py-2 bg-white text-gray-600 text-sm rounded-lg border border-gray-200 shadow cursor-pointer hover:bg-gray-100"
+                                        >
+                                            <ImageUp className="h-4 w-4" />
+                                            Seleccionar imagen
+                                            <Input
+                                                id="imagen-propiedad"
+                                                name="imagen"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) field.handleChange(file);
+                                                }}
+                                                className="absolute left-0 top-0 h-full w-full opacity-0 cursor-pointer"
+                                                style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%", opacity: 0 }}
+                                            />
+                                        </label>
+                                        {field.state.value && typeof field.state.value === "object" && (
+                                            <span className="ml-3 max-w-xs truncate text-sm text-muted-foreground">
+                                                {(field.state.value as File).name}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {formErrors.identificacion && (
+                                        <p className="text-red-700 text-sm mt-1">
+                                            {formErrors.imagen}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+                        </form.Field>
 
                         {formError && (
                             <p className="text-red-700 text-sm text-center">{formError}</p>

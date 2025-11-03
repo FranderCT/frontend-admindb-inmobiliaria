@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createClient, deleteClient,  getClient,  getClients,  getClientsFiltered,  updateClient } from "../services/clientesServices";
+import { createClient, deleteClient,  getClient,  getClientHistory,  getClients,  getClientsFiltered,  updateClient } from "../services/clientesServices";
 import {  CreateClient, UpdateClient } from "../models/client";
 
 // post
@@ -68,7 +68,7 @@ export function useGetHistorialCliente(
 ) {
     const { data, isLoading, error, isPlaceholderData, isFetching } = useQuery({
         queryKey: ["client", identificacion],
-        queryFn: () => getClient(identificacion),
+        queryFn: () => getClientHistory(identificacion),
     });
 
     return {

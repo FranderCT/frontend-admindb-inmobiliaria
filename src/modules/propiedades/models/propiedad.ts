@@ -25,6 +25,11 @@ export interface CreateProperty {
   idEstado: number;
   identificacion: number;
   idTipoInmueble: number;
+  imagen?: File;
+}
+export interface CreatePropertyPayload {
+  property: CreateProperty;
+  file?: File;
 }
 export interface CreatePropertyType {
   nombre: string;

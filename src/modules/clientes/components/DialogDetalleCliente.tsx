@@ -7,9 +7,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
 import type { HistorialClienteProps } from '../types/clientTypes'
-import ContenidoHistorial from './ContenidoHistorial'
+import ContenidoHistorialCliente from './ContenidoHistorialCliente'
 
 const DialogDetalleCliente = ({ from = 'bottom', trigger, client, identificacion }: HistorialClienteProps) => {
+  const clienteNombre = "" + client.nombre + " " + client.apellido1 + " " + (client.apellido2 || '') ;
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
@@ -23,7 +24,7 @@ const DialogDetalleCliente = ({ from = 'bottom', trigger, client, identificacion
           </AlertDialogCancel>
         </div>
 
-        <ContenidoHistorial clienteNombre={client.nombre} telefono={client.telefono} identificacion={identificacion} />
+        <ContenidoHistorialCliente clienteNombre={clienteNombre} telefono={client.telefono} identificacion={identificacion} />
       </AlertDialogContent>
     </AlertDialog>
   )

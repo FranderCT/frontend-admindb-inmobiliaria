@@ -1,14 +1,28 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { CreatePropertyStatus, CreatePropertyType, CreateProperty, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty, Propiedad } from "../models/propiedad";
+import { CreatePropertyStatus, CreatePropertyType, CreateProperty, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty, Propiedad, CreatePropertyPayload } from "../models/propiedad";
 
 
 // post
-export const createProperty = async (property: CreateProperty): Promise<CreateProperty> => {
-  const response = await altosDelValleAPI.post<CreateProperty>(
-    `/propiedad`,
-    property
-  );
-  return response.data;
+export const createProperty = async ({
+  property,
+  file,
+}: CreatePropertyPayload): Promise<CreateProperty> => {
+  const fd = new FormData();
+
+  fd.append("ubicacion", property.ubicacion);
+  fd.append("precio", String(Number(property.precio || 0))); 
+  fd.append("idEstado", String(property.idEstado));
+  fd.append("idTipoInmueble", String(property.idTipoInmueble));
+  fd.append("identificacion", String(property.identificacion));
+
+  if (file) fd.append("imagen", file);
+
+  const res = await altosDelValleAPI.post(`/propiedad`, fd, {
+    headers: { "Content-Type": "multipart/form-data" },
+    transformRequest: [(d) => d], 
+  });
+
+  return res.data;
 };
 
 export const createPropertyType = async (type: CreatePropertyType): Promise<CreatePropertyType> => {
