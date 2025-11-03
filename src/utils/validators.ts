@@ -17,7 +17,7 @@ export const asNumber = (requiredMsg: string) =>
 export const requiredInt = (msg: string) =>
   asNumber(msg)
     .refine((n) => Number.isInteger(n), "Debe ser un número entero")
-    .refine((n) => n > 0, "Debe ser mayor a 0");
+    .refine((n) => n > 0, "Debes elegir al menos una opción");
 
 export const requiredMoneyGE1 = (msg: string) =>
   asNumber(msg).refine((n) => n >= 1, msg);

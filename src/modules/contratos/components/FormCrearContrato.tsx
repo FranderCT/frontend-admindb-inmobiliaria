@@ -35,7 +35,7 @@ import {
   DialogClose,
 } from "@/components/animate-ui/components/headless/dialog";
 import Stepper, { StepDef } from "@/modules/app/components/Stepper";
-import { datosVentaSchema, datosAlquilerSchema, mapIssuesByField, prettyIssue } from "../schema/contractValidators";
+import { datosVentaSchema, datosAlquilerSchema, mapIssuesByField, prettyIssue, MAX_MONEY, MAX_PERCENT, clampMoney } from "../schema/contractValidators";
 import { addMonthsISO } from "../utils/date";
 
 
@@ -225,7 +225,7 @@ export default function FormCrearContrato() {
     const fieldSchema = (schema as any).shape?.[fieldName];
     if (!fieldSchema) return;
 
-    const result = fieldSchema.safeParse(value); // con coerce ya transforma string→number
+    const result = fieldSchema.safeParse(value); 
     if (result.success) {
       setZodErrors((prev) => {
         const next = { ...prev };
@@ -481,12 +481,12 @@ export default function FormCrearContrato() {
                               <Input
                                 type="number"
                                 min={0}
-                                max={100}
+                                max={MAX_PERCENT}
                                 step="0.01"
                                 value={String(field.state.value ?? "")}
                                 onChange={(e) => {
                                   const raw = e.currentTarget.valueAsNumber;
-                                  const v = Number.isNaN(raw) ? 0 : clamp(raw, 0, 100);
+                                  const v = Number.isNaN(raw) ? 0 : clamp(raw, 0, MAX_PERCENT);
                                   field.handleChange(v);
                                 }}
                                 onBlur={() => validateField("porcentajeComision", field.state.value)}
@@ -499,6 +499,7 @@ export default function FormCrearContrato() {
                         </form.Field>
                       </div>
 
+
                       <form.Field name="montoTotal">
                         {(field) => (
                           <div>
@@ -507,12 +508,9 @@ export default function FormCrearContrato() {
                               type="number"
                               min={0}
                               step="0.01"
+                              max={MAX_MONEY}
                               value={String(field.state.value ?? "")}
-                              onChange={(e) => {
-                                const v = e.currentTarget.valueAsNumber;
-                                field.handleChange(Number.isNaN(v) ? 0 : v);
-                              }}
-                              onBlur={() => validateField("montoTotal", field.state.value)}
+                              onChange={(e) => field.handleChange(clampMoney(e.currentTarget.valueAsNumber))}
                               placeholder="Ej. 250000.00"
                             />
                             {zodErrors.montoTotal && <p className="text-red-700 text-sm">{zodErrors.montoTotal}</p>}
@@ -724,12 +722,9 @@ export default function FormCrearContrato() {
                               type="number"
                               min={0}
                               step="0.01"
+                              max={MAX_MONEY}
                               value={String(field.state.value ?? "")}
-                              onChange={(e) => {
-                                const v = e.currentTarget.valueAsNumber;
-                                field.handleChange(Number.isNaN(v) ? 0 : v);
-                              }}
-                              onBlur={() => validateField("montoTotal", field.state.value)}
+                              onChange={(e) => field.handleChange(clampMoney(e.currentTarget.valueAsNumber))}
                               placeholder="Ej. 250000.00"
                             />
                             {zodErrors.montoTotal && <p className="text-red-700 text-sm">{zodErrors.montoTotal}</p>}
@@ -746,12 +741,10 @@ export default function FormCrearContrato() {
                               type="number"
                               min={0}
                               step="0.01"
-                              value={String(field.state.value ?? "")}
-                              onChange={(e) => {
-                                const v = e.currentTarget.valueAsNumber;
-                                field.handleChange(Number.isNaN(v) ? 0 : v);
-                              }}
                               placeholder="Ej. 50000.00"
+                              max={MAX_MONEY}
+                              value={String(field.state.value ?? "")}
+                              onChange={(e) => field.handleChange(clampMoney(e.currentTarget.valueAsNumber))}
                             />
                             {zodErrors.deposito && <p className="text-red-700 text-sm">{zodErrors.deposito}</p>}
                             {formErrors.deposito && <p className="text-red-700 text-sm">{formErrors.deposito}</p>}
@@ -766,12 +759,12 @@ export default function FormCrearContrato() {
                             <Input
                               type="number"
                               min={0}
-                              max={100}
+                              max={MAX_PERCENT}
                               step="0.01"
                               value={String(field.state.value ?? "")}
                               onChange={(e) => {
                                 const raw = e.currentTarget.valueAsNumber;
-                                const v = Number.isNaN(raw) ? 0 : clamp(raw, 0, 100);
+                                const v = Number.isNaN(raw) ? 0 : clamp(raw, 0, MAX_PERCENT);
                                 field.handleChange(v);
                               }}
                               onBlur={() => validateField("porcentajeComision", field.state.value)}

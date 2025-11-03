@@ -12,6 +12,7 @@ import { useContratosPaginatedFromContext } from "@/modules/contratos/hooks/useC
 import FormCrearContrato from "@/modules/contratos/components/FormCrearContrato";
 import CardPreviewContrato from "@/modules/contratos/components/CardPreviewContrato";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export const Route = createFileRoute("/contratos/")({
   beforeLoad: ({ location }) => {
@@ -52,10 +53,18 @@ function RouteComponent() {
       </nav>
 
       {(isLoading || (isFetching && !data)) && (
-        <div className="ml-16 flex flex-col gap-2">
-          <Skeleton className="h-3 w-3/5 rounded-lg" />
-          <Skeleton className="h-3 w-3/5 rounded-lg" />
-          <Skeleton className="h-3 w-3/5 rounded-lg" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[1, 2, 3, 4, 5, 6, 7 ,8].map((k) => (
+            <Card key={k} className="h-[300px] w-70">
+              <CardHeader>
+                <Skeleton className="h-6 w-2/3" />
+                <Skeleton className="h-4 w-5/6" />
+              </CardHeader>
+              <CardContent className="px-2 pb-6">
+                <Skeleton className="h-[190px] w-full rounded-md" />
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
       {error && <div className="ml-16 text-destructive">Error cargando contratos.</div>}

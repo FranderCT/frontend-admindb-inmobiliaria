@@ -7,16 +7,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
-import { useContext, useState } from "react";
+import { useContext, useState, useMemo } from "react";
 import ContratosFiltersContext from "../context/contractContext";
+import { useGetContractType } from "../hooks/contractHooks"; 
+import { ContractType, EstadoContrato } from "../models/contract";
 
 const ContratosFiltros = () => {
   const ctx = useContext(ContratosFiltersContext);
-  const [open, setOpen] = useState(false);
-  const { filters, patchFilters, resetFilters } = ctx;
-  const [local, setLocal] = useState(filters);
-  if (!ctx) return null;
 
+  const { filters, patchFilters, resetFilters } = ctx;
+  const [open, setOpen] = useState(false);
+  const [local, setLocal] = useState(filters);
+
+  const { contractTypes, loadingContractTypes, fetchingContractTypes } = useGetContractType();
+  const tipos = useMemo<ContractType[]>(
+    () => Array.isArray(contractTypes) ? contractTypes : [],
+    [contractTypes]
+  );
+  if (!ctx) return null;
 
   const handleOpenChange = (v: boolean) => {
     setOpen(v);
@@ -40,7 +48,6 @@ const ContratosFiltros = () => {
       estado: undefined,
       tipoContratoId: undefined,
       agenteId: undefined,
-      propiedadId: undefined,
     });
   };
 
@@ -60,7 +67,7 @@ const ContratosFiltros = () => {
           </SheetHeader>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-neutral-500 scrollbar-track-transparent">
+        <div className="flex-1 overflow-y-auto p-4 space-y-5">
           <div className="grid gap-2">
             <label className="text-sm font-medium">Buscar</label>
             <Input
@@ -71,13 +78,13 @@ const ContratosFiltros = () => {
           </div>
 
           <div className="grid gap-2">
-            <label className="text-sm font-medium">Estado (activo/inactivo)</label>
+            <label className="text-sm font-medium">Estado</label>
             <Select
-              value={typeof local.estado === "number" ? String(local.estado) : "all"}
+              value={local.estado ?? "all"}
               onValueChange={(v) =>
                 setLocal((p) => ({
                   ...p,
-                  estado: v === "all" ? undefined : (Number(v) as 0 | 1),
+                  estado: v === "all" ? undefined : (v as EstadoContrato),
                 }))
               }
             >
@@ -86,8 +93,9 @@ const ContratosFiltros = () => {
                 <SelectGroup>
                   <SelectLabel>Estado</SelectLabel>
                   <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="1">Activo</SelectItem>
-                  <SelectItem value="0">Inactivo</SelectItem>
+                  <SelectItem value="Pendiente">Pendiente</SelectItem>
+                  <SelectItem value="Activo">Activo</SelectItem>
+                  <SelectItem value="Finalizado">Finalizado</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -95,16 +103,31 @@ const ContratosFiltros = () => {
 
           <div className="grid gap-2">
             <label className="text-sm font-medium">Tipo de contrato</label>
-            <Input
-              placeholder="ID tipo (ej. 1)"
-              value={local.tipoContratoId ?? ""}
-              onChange={(e) =>
+            <Select
+              value={local.tipoContratoId != null ? String(local.tipoContratoId) : "all"}
+              onValueChange={(v) =>
                 setLocal((p) => ({
                   ...p,
-                  tipoContratoId: e.target.value ? Number(e.target.value) : undefined,
+                  tipoContratoId: v === "all" ? undefined : Number(v),
                 }))
               }
-            />
+              disabled={loadingContractTypes || fetchingContractTypes}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={loadingContractTypes ? "Cargando..." : "Todos"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Tipo</SelectLabel>
+                  <SelectItem value="all">Todos</SelectItem>
+                  {tipos.map((t) => (
+                    <SelectItem key={t.idTipoContrato} value={String(t.idTipoContrato)}>
+                      {t.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid gap-2">
@@ -116,20 +139,6 @@ const ContratosFiltros = () => {
                 setLocal((p) => ({
                   ...p,
                   agenteId: e.target.value ? Number(e.target.value) : undefined,
-                }))
-              }
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <label className="text-sm font-medium">Propiedad</label>
-            <Input
-              placeholder="ID propiedad"
-              value={local.propiedadId ?? ""}
-              onChange={(e) =>
-                setLocal((p) => ({
-                  ...p,
-                  propiedadId: e.target.value ? Number(e.target.value) : undefined,
                 }))
               }
             />
@@ -149,7 +158,7 @@ const ContratosFiltros = () => {
                   <SelectItem value="fechaFin">Fecha fin</SelectItem>
                   <SelectItem value="fechaFirma">Fecha firma</SelectItem>
                   <SelectItem value="montoTotal">Monto total</SelectItem>
-                  <SelectItem value="idContrato">ID contrato</SelectItem>
+                  {/* OJO: 'idContrato' NO está permitido por el DTO */}
                 </SelectGroup>
               </SelectContent>
             </Select>

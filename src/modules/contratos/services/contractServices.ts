@@ -25,11 +25,10 @@ export const getContracts = async (
     direccionOrden: p.sortDir ?? "ASC",
   };
 
-  if (p.q) params.q = p.q;
-  if (typeof p.estado === "number") params.estado = p.estado;
-  if (p.tipoContratoId != null) params.idTipoContrato = Number(p.tipoContratoId);
-  if (p.agenteId != null) params.idAgente = Number(p.agenteId);
-  if (p.propiedadId != null) params.idPropiedad = Number(p.propiedadId);
+  if (p.q) params.buscar = p.q; 
+  if (p.estado) params.estado = p.estado;
+  if (typeof p.tipoContratoId === "number") params.tipoContratoId = p.tipoContratoId;
+  if (p.agenteId != null) params.agenteId = Number(p.agenteId);
 
   const { data } = await altosDelValleAPI.get<ContractsPaginateResponse>(
     "/contrato/vista-previa",

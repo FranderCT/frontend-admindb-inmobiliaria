@@ -17,7 +17,7 @@ export const initialValuesPropertyType: CreatePropertyType = {
 
 export const initialValuesProperty: CreateProperty = {
   ubicacion: "",
-  precio: "₡0",
+  precio: "",
   idEstado: 0,
   identificacion: 0,
   idTipoInmueble: 0,

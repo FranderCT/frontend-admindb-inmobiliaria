@@ -85,7 +85,7 @@ export type ContratosFilters = {
   sortCol: "fechaInicio" | "fechaFin" | "fechaFirma" | "montoTotal" | "idContrato";
   sortDir: "ASC" | "DESC";
   q?: string;
-  estado?: 0 | 1;
+  estado?: string
   tipoContratoId?: number; 
   agenteId?: number;
   propiedadId?: number;
