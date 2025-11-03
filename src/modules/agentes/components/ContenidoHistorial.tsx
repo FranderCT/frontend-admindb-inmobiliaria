@@ -11,11 +11,9 @@ import { estadoContratoVariant } from '@/utils/statusVariants'
 
 function ContenidoHistorial({
   agenteNombre,
-  telefono, 
   identificacion,
 }: {
   agenteNombre: string
-  telefono: string
   identificacion: string
 }) {
   const {

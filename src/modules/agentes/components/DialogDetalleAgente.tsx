@@ -23,7 +23,7 @@ const DialogDetalleAgente = ({ from = 'bottom', trigger, agent, identificacion }
           </AlertDialogCancel>
         </div>
 
-        <ContenidoHistorial agenteNombre={agent.nombre} telefono={agent.telefono} identificacion={identificacion} />
+        <ContenidoHistorial agenteNombre={agent.nombre} identificacion={identificacion} />
       </AlertDialogContent>
     </AlertDialog>
   )
