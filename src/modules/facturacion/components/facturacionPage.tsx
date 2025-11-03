@@ -39,11 +39,10 @@ export default function FacturacionPage() {
         {/* Filtros */}
         <div className="flex gap-3 mb-2">
           <Select
-            className="border rounded-md px-3 py-2 bg-white shadow-sm"
-            onChange={(e) => setEstado(e.target.value as any)}
+            onValueChange={(v) => setEstado(v as "Todos" | InvoiceStatus)}
             defaultValue="Todos"
           >
-            <SelectTrigger>
+            <SelectTrigger className="border rounded-md px-3 py-2 bg-white shadow-sm">
               <SelectValue placeholder="Estado" />
             </SelectTrigger>
             <SelectContent>
@@ -74,16 +73,16 @@ export default function FacturacionPage() {
           />
         </div>
 
-          <Can resource="facturas" action="create">
-            <Button variant="default"
+        <Can resource="facturas" action="create">
+          <Button variant="default"
             onClick={() => setOpen(true)}
           >
             <Plus className="w-5 h-5" /> Registrar factura
           </Button>
-          </Can>
+        </Can>
       </nav>
 
-      
+
 
       {error && (
         <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
@@ -127,7 +126,7 @@ export default function FacturacionPage() {
                     <span>
                       <span className="text-gray-500">Ubicación de la propiedad:</span> {f.ubicacion}
                     </span>
-                </li>
+                  </li>
 
                   <li className="flex items-center gap-2">
                     <User className="w-4 h-4" />
