@@ -134,7 +134,7 @@ export interface UpdateContract {
 
 export type EstadoContrato = "Pendiente" | "Activo" | "Finalizado";
 
-export type ContractsPaginateParams = {
+export type ContractsPaginateParams ={
   page?: number;   
   limit?: number;  
   sortCol?: "fechaInicio" | "fechaFin" | "fechaFirma" | "montoTotal"; 

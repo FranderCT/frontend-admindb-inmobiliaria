@@ -10,7 +10,6 @@ export function useContratosPaginatedFromContext() {
   const query = useGetContracts(filters);
 
   useEffect(() => {
-    // si deseas side-effects cuando cambie de página
   }, [filters.page]);
 
   return query;

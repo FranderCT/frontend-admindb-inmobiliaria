@@ -158,7 +158,6 @@ const ContratosFiltros = () => {
                   <SelectItem value="fechaFin">Fecha fin</SelectItem>
                   <SelectItem value="fechaFirma">Fecha firma</SelectItem>
                   <SelectItem value="montoTotal">Monto total</SelectItem>
-                  {/* OJO: 'idContrato' NO está permitido por el DTO */}
                 </SelectGroup>
               </SelectContent>
             </Select>
