@@ -12,6 +12,7 @@ import PanelContratos from '@/modules/estadisticas/components/PanelContratos'
 import PanelFinanciero from '@/modules/estadisticas/components/PanelFinanciero'
 import { PanelPropiedades } from '@/modules/estadisticas/components/PanelPropiedades'
 import { PanelClientes } from '@/modules/estadisticas/components/PanelClientes'
+import PanelGeneral from '@/modules/estadisticas/components/PanelGeneral'
 
 export const Route = createFileRoute('/statistics/')({
   beforeLoad: ({ location }) => {
@@ -36,7 +37,7 @@ function RouteComponent() {
 
         <TabsPanels>
           <TabsPanel value="general" className="w-full">
-            <div className="text-sm text-muted-foreground">Resumen general en construcción…</div>
+            <PanelGeneral/>
           </TabsPanel>
 
           <TabsPanel value="financiero" className="w-full space-y-10">

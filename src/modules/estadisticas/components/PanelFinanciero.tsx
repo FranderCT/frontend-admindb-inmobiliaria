@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
 import { BarChart, LineChart, ScatterChart } from "@mui/x-charts";
 import {
@@ -8,18 +9,14 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-
-import {
-  crc,
-  groupBy,
-  monthIndex,
-  monthsLabels,
-} from "../utils/stats";
+import { crc, groupBy, monthIndex, monthsLabels, PALETTE } from "../utils/stats";
 import {
   useGetContratosMes,
   useGetContratosTipo,
   useGetEstadisticasAgentes,
 } from "../hooks/statsHooks";
+import { vistaContratosPorTipo } from "../model/reportes";
+
 
 const PanelFinanciero = () => {
   const {
@@ -56,13 +53,13 @@ const PanelFinanciero = () => {
   );
 
   const seriesComisiones = useMemo(() => {
-    return Object.entries(porAnio).map(([anio, rows]) => {
+    return Object.entries(porAnio).map(([anio, rows], i) => {
       const arr = new Array(12).fill(0);
-      rows.forEach((r: any) => {
+      (rows as any[]).forEach((r) => {
         const idx = monthIndex[(r.NombreMes || "").toLowerCase()] ?? -1;
         if (idx >= 0) arr[idx] = r.MontoTotal;
       });
-      return { label: String(anio), data: arr };
+      return { label: String(anio), data: arr, color: PALETTE[i % PALETTE.length] };
     });
   }, [porAnio]);
 
@@ -83,7 +80,7 @@ const PanelFinanciero = () => {
       const idx = monthIndex[(m.NombreMes || "").toLowerCase()];
       if (idx >= 0) arr[idx] += m.MontoTotal;
     });
-    return [{ label: "Monto total", data: arr }];
+    return [{ label: "Monto total", data: arr, color: PALETTE[0] }];
   }, [estadisticasContratosMes]);
 
   if (loading) {
@@ -106,7 +103,7 @@ const PanelFinanciero = () => {
 
   if (error) {
     return (
-      <div className="text-sm text-red-500 px-4 py-8">
+      <div className="text-sm text-red-600 px-4 py-8">
         Ocurrió un problema obteniendo las estadísticas. Intenta nuevamente.
       </div>
     );
@@ -116,14 +113,12 @@ const PanelFinanciero = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* 1. Ingresos por tipo de contrato */}
       <Card className="col-span-1">
         <CardHeader>
           <CardTitle>Ingresos acumulados por tipo de contrato</CardTitle>
           <CardDescription>
             Distribución del monto total generado por cada tipo de contrato
-            (venta, alquiler, etc.). Útil para identificar qué líneas aportan más
-            ingresos.
+            (venta, alquiler, etc.). 
           </CardDescription>
         </CardHeader>
         <CardContent className="px-2 pb-6">
@@ -134,38 +129,38 @@ const PanelFinanciero = () => {
           ) : (
             <BarChart
               height={300}
+              colors={PALETTE}
               xAxis={[
                 {
                   scaleType: "band",
-                  data: contratosTipo?.map((d: any) => d.TipoContrato) ?? [],
+                  data: contratosTipo?.map((d: vistaContratosPorTipo) => d.TipoContrato) ?? [],
                   label: "Tipo de contrato",
                 },
               ]}
               series={[
                 {
                   label: "Monto total",
-                  data: contratosTipo?.map((d: any) => d.MontoTotal) ?? [],
+                  data: contratosTipo?.map((d: vistaContratosPorTipo) => d.MontoTotal) ?? [],
+                  color: PALETTE[2],
                 },
               ]}
               yAxis={[
                 {
-                  label: "Ingresos (₡)",
+                  label: "Monto en colones (₡)",
                   valueFormatter: (v) => crc(Number(v)),
                 },
               ]}
-              margin={{ top: 16, right: 16, bottom: 40, left: 64 }}
+              margin={{ top: 16, right: 16, bottom: 0, left: 34 }}
             />
           )}
         </CardContent>
       </Card>
 
-      {/* 2. Evolución mensual de comisiones */}
       <Card className="col-span-1">
         <CardHeader>
           <CardTitle>Evolución mensual de comisiones por año</CardTitle>
           <CardDescription>
-            Tendencia de las comisiones mes a mes, comparando diferentes años
-            para detectar estacionalidad o crecimiento.
+            Tendencia en los valores de las comisiones mes a mes.
           </CardDescription>
         </CardHeader>
         <CardContent className="px-2 pb-6">
@@ -176,17 +171,14 @@ const PanelFinanciero = () => {
           ) : (
             <LineChart
               height={320}
+              colors={PALETTE}
               xAxis={[
-                {
-                  scaleType: "point",
-                  data: monthsLabels,
-                  label: "Mes",
-                },
+                { scaleType: "point", data: monthsLabels, label: "Mes" },
               ]}
               series={seriesComisiones}
               yAxis={[
                 {
-                  label: "Comisiones (₡)",
+                  label: "Monto comisionado en colones (₡)",
                   valueFormatter: (v) => crc(Number(v)),
                 },
               ]}
@@ -196,14 +188,12 @@ const PanelFinanciero = () => {
         </CardContent>
       </Card>
 
-      {/* 3. Productividad por agente (contratos vs comisiones) */}
       <Card className="md:col-span-2">
         <CardHeader>
           <CardTitle>Productividad por agente: contratos vs comisiones</CardTitle>
           <CardDescription>
             Relación entre el volumen de contratos y el total de comisiones por
-            agente. El tamaño del punto sugiere el promedio del monto por
-            contrato.
+            agente. 
           </CardDescription>
         </CardHeader>
         <CardContent className="px-2 pb-6">
@@ -214,12 +204,11 @@ const PanelFinanciero = () => {
           ) : (
             <ScatterChart
               height={360}
-              xAxis={[
-                { label: "Total de contratos", min: 0 },
-              ]}
+              colors={PALETTE}
+              xAxis={[{ label: "Total de contratos", min: 0 }]}
               yAxis={[
                 {
-                  label: "Total de comisiones (₡)",
+                  label: "Monto comisionado en colones (₡)",
                   valueFormatter: (v) => crc(Number(v)),
                 },
               ]}
@@ -227,19 +216,19 @@ const PanelFinanciero = () => {
                 {
                   label: "Agentes",
                   data: puntosAgentes,
+                  color: PALETTE[4],
                   valueFormatter: (p) =>
                     `${p?.id}\nContratos: ${p?.x}\nComisiones: ${crc(
                       Number(p?.y)
                     )}`,
                 },
               ]}
-              margin={{ top: 24, right: 24, bottom: 48, left: 72 }}
+              margin={{ top: 24, right: 44, bottom: 0, left: 32 }}
             />
           )}
         </CardContent>
       </Card>
 
-      {/* 4. Ingresos totales por mes */}
       <Card className="col-span-1 md:col-span-2">
         <CardHeader>
           <CardTitle>Ingresos totales por mes</CardTitle>
@@ -256,9 +245,8 @@ const PanelFinanciero = () => {
           ) : (
             <BarChart
               height={300}
-              xAxis={[
-                { scaleType: "band", data: monthsLabels, label: "Mes" },
-              ]}
+              colors={PALETTE}
+              xAxis={[{ scaleType: "band", data: monthsLabels, label: "Mes" }]}
               series={seriesIngresosMes}
               yAxis={[
                 {

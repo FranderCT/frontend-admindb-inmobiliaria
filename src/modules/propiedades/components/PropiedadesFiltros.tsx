@@ -72,29 +72,6 @@ const PropiedadesFiltros = () => {
                     </div>
 
                     <div className="grid gap-2">
-                        <label className="text-sm font-medium">Estado (activo/inactivo)</label>
-                        <Select
-                            value={typeof local.estado === "number" ? String(local.estado) : "all"}
-                            onValueChange={(v) =>
-                                setLocal((p) => ({
-                                    ...p,
-                                    estado: v === "all" ? undefined : (Number(v) as 0 | 1),
-                                }))
-                            }
-                        >
-                            <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Estado</SelectLabel>
-                                    <SelectItem value="all">Todos</SelectItem>
-                                    <SelectItem value="1">Activo</SelectItem>
-                                    <SelectItem value="0">Inactivo</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="grid gap-2">
                         <label className="text-sm font-medium">Ordenar por</label>
                         <Select
                             value={local.sortCol}

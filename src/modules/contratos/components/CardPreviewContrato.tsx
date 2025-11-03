@@ -7,7 +7,6 @@ import type { CardContractProps } from '../types/contractTypes'
 import DialogDetalleContrato from './DialogDetalleContrato'
 import { formatDate } from '@/utils/dates'
 import DialogEditarContrato from './DialogEditarContrato'
-import { estadoContratoVariant } from '@/utils/statusVariants'
 import { Can } from '@/modules/seguridad/components/Can'
 
 const CardPreviewContrato = ({ contract }: CardContractProps) => {
@@ -29,7 +28,9 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
               <FileText size={15} /> {contract.TipoContrato}
             </CardTitle>
           </div>
-          <Badge variant={estadoContratoVariant[contract.estado]}>{contract.estado}</Badge>
+          <div className="flex gap-1 items-end">
+            <Badge variant="type">{contract.TipoContrato}</Badge>
+          </div>
         </div>
       </CardHeader>
 

@@ -72,31 +72,35 @@ function RouteComponent() {
             {errorDashboardReport && <div className="text-destructive">Error cargando datos del dashboard.</div>}
             {dashboardReport && dashboardReport.length > 0 && (
               <>
-                <StatisticsCard
+                <StatisticsCard size='small'
                   icon={<LandPlot className="h-5 w-5 text-green-600" />}
-                  title="Total de propiedades registradas"
+                  title="Propiedades registradas"
                   value={dashboardReport[0]?.TotalPropiedades || 0}
                 />
 
                 <StatisticsCard
-                  icon={<Scroll className="h-5 w-5 text-orange-600" />}
-                  title="Total de contratos en el sistema"
-                  value={dashboardReport[0]?.TotalContratos || 0}
-                />
-                <StatisticsCard
-                  icon={<Users className="h-5 w-5 text-blue-600" />}
-                  title="Total de clientes en el sistema"
-                  value={dashboardReport[0]?.TotalClientes || 0}
-                />
-                <StatisticsCard
+                  size='small'
                   icon={<BarChart3 className="h-5 w-5 text-amber-600" />}
-                  title="Monto total generado por contratos"
+                  title="Ganancias por contratos"
                   value={fmtCRC(dashboardReport[0]?.MontoTotalContratos || 0)}
                 />
                 <StatisticsCard
+                  size='small'
+                  icon={<Scroll className="h-5 w-5 text-orange-600" />}
+                  title="Contratos en el sistema"
+                  value={dashboardReport[0]?.TotalContratos || 0}
+                />
+                <StatisticsCard
+                  size='small'
                   icon={<ReceiptText className="h-5 w-5 text-cyan-500" />}
-                  title="Total asignado en comisiones"
+                  title="Comisiones asignadas"
                   value={fmtCRC(dashboardReport[0]?.TotalComisiones || 0)}
+                />
+                <StatisticsCard
+                  size='small'
+                  icon={<Users className="h-5 w-5 text-blue-600" />}
+                  title="Clientes en el sistema"
+                  value={dashboardReport[0]?.TotalClientes || 0}
                 />
               </>
             )}

@@ -18,3 +18,9 @@ export function groupBy<T, K extends string | number>(arr: T[], key: (x: T) => K
 
 export const currency = (v: number) =>
     new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC', maximumFractionDigits: 0 }).format(v)
+
+
+export const PALETTE =
+    [  "#a8dc94",
+      "#8dc179", "#71a55d", "#568a42",
+      "#3a6e26", "#1e520a",];
