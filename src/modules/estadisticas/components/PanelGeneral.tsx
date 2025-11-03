@@ -5,7 +5,6 @@ import {
   Card, CardHeader, CardTitle, CardDescription, CardContent,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-
 import {
   useGetContratosMes,
   useGetContratosTipo,
@@ -15,11 +14,7 @@ import { useGetHistorialClientes } from "@/modules/estadisticas/hooks/statsHooks
 import { useGetPropiedadesEstado } from "@/modules/estadisticas/hooks/statsHooks";
 import { BarChart3, ChartBarStacked, TrendingUp } from "lucide-react";
 import StatisticsCard from "@/components/StatisticsCard";
-import { monthIndex, monthsLabels, PALETTE } from "../utils/stats";
-
-const crc = (v: number) =>
-  new Intl.NumberFormat("es-CR", { style: "currency", currency: "CRC", maximumFractionDigits: 0 }).format(v);
-const intFmt = (v: number) => new Intl.NumberFormat("es-CR").format(v);
+import { crc, intFmt, monthIndex, monthsLabels, PALETTE } from "../utils/stats";
 
 
 export default function PanelGeneral() {

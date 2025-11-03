@@ -9,7 +9,7 @@ export const monthsLabels = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Se
 
 export const crc = (v: number) =>
   new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC', maximumFractionDigits: 0 }).format(v);
-
+export const intFmt = (v: number) => new Intl.NumberFormat("es-CR").format(v);
 export function groupBy<T, K extends string | number>(arr: T[], key: (x: T) => K) {
   return arr.reduce<Record<K, T[]>>((acc, item) => {
     const k = key(item); (acc[k] ||= []).push(item); return acc;
