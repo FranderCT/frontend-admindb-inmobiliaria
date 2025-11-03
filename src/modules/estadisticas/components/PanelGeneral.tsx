@@ -15,14 +15,11 @@ import { useGetHistorialClientes } from "@/modules/estadisticas/hooks/statsHooks
 import { useGetPropiedadesEstado } from "@/modules/estadisticas/hooks/statsHooks";
 import { BarChart3, ChartBarStacked, TrendingUp } from "lucide-react";
 import StatisticsCard from "@/components/StatisticsCard";
-import { monthIndex, monthsLabels } from "../utils/stats";
+import { monthIndex, monthsLabels, PALETTE } from "../utils/stats";
 
 const crc = (v: number) =>
   new Intl.NumberFormat("es-CR", { style: "currency", currency: "CRC", maximumFractionDigits: 0 }).format(v);
 const intFmt = (v: number) => new Intl.NumberFormat("es-CR").format(v);
-
-// paleta
-const PALETTE = ["#60A5FA","#84CC8E","#FBBF24","#F472B6","#A78BFA","#F59E0B","#22D3EE","#E879F9","#34D399","#93C5FD","#FB7185","#E1C27A"];
 
 
 export default function PanelGeneral() {
