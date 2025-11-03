@@ -68,3 +68,14 @@ export async function markInvoiceAsPaidAndFetch(
   }
   return await getFilteredInvoices(filters);
 }
+
+export async function getAvailableContracts(): Promise<Array<{ idContrato: number; tipoContrato: string }>> {
+  const { data } = await altosDelValleAPI.get("/facturas/contratos/disponibles");
+  return Array.isArray(data)
+    ? data.map((d: any) => ({
+        idContrato: Number(d.idContrato),
+        tipoContrato: String(d.tipoContrato),
+      }))
+    : [];
+}
+

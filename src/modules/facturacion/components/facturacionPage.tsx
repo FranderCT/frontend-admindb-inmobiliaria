@@ -25,7 +25,7 @@ export default function FacturacionPage() {
   const {
     data, loading, error,
     setEstado, setContratoIdText, setClienteIdText, setFecha,
-    open, setOpen, form, setForm, save, pagar
+    open, setOpen, form, setForm, save, pagar,  availableContracts, 
   } = useInvoices();
 
   return (
@@ -202,21 +202,28 @@ export default function FacturacionPage() {
 
               <div className="px-6 py-5 space-y-4">
                 <label className="flex flex-col gap-1">
-                  <span className="text-sm text-gray-600">ID Contrato</span>
-                  <input
-                    type="text"             // texto para controlar "" y número
-                    inputMode="numeric"
-                    className="border rounded-md px-3 py-2"
-                    value={form.idContrato === "" ? "" : String(form.idContrato)}
-                    onChange={(e) => {
-                      const raw = e.target.value.trim();
-                      setForm((s) => ({
-                        ...s,
-                        idContrato: raw === "" ? "" : Number(raw), // ← único cambio
-                      }));
-                    }}
-                  />
-                </label>
+                    <span className="text-sm text-gray-600">Selecciona el contrato que desees registrar</span>
+                    <Select
+                      value={form.idContrato === "" ? "" : String(form.idContrato)}
+                      onValueChange={(v) => setForm((s) => ({ ...s, idContrato: Number(v) }))}
+                    >
+                      <SelectTrigger className="border rounded-md px-3 py-2 bg-white">
+                        <SelectValue placeholder="Selecciona un contrato" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableContracts.length === 0 ? (
+                          <SelectItem value="none" disabled>No hay contratos disponibles</SelectItem>
+                        ) : (
+                          availableContracts.map((c) => (
+                            <SelectItem key={c.idContrato} value={String(c.idContrato)}>
+                              #{c.idContrato} — {c.tipoContrato}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </label>
+
 
                 <label className="flex flex-col gap-1">
                   <span className="text-sm text-gray-600">IVA (%)</span>
