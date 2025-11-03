@@ -21,12 +21,12 @@ export interface PropertyStatus {
 
 export interface CreateProperty {
   ubicacion: string;
-  precio: string;
+  precio: string; 
   idEstado: number;
   identificacion: number;
   idTipoInmueble: number;
-  imagen?: File;
 }
+
 export interface CreatePropertyPayload {
   property: CreateProperty;
   file?: File;
