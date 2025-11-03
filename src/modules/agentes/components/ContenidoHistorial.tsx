@@ -6,14 +6,14 @@ import {
 } from '@/components/animate-ui/components/radix/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { useGetHistorialAgente } from '../hooks/agentesHooks'
+import { Badge } from '@/components/ui/badge'
+import { estadoContratoVariant } from '@/utils/statusVariants'
 
 function ContenidoHistorial({
   agenteNombre,
-  telefono,         // se mantiene por compatibilidad, no se muestra
-  identificacion,   // se mantiene por compatibilidad, no se muestra
+  identificacion,
 }: {
   agenteNombre: string
-  telefono: string
   identificacion: string
 }) {
   const {
@@ -27,16 +27,11 @@ function ContenidoHistorial({
     <>
       <AlertDialogHeader className="mb-2 pr-10">
         <AlertDialogTitle className="text-lg">
-          Contratos en los que ha Participado un Agente
+          Contratos en los que ha participado {agenteNombre}
         </AlertDialogTitle>
       </AlertDialogHeader>
 
-      <div className="space-y-1 text-sm">
-        <h3 className="font-semibold">{agenteNombre}</h3>
-        {/* Líneas removidas: identificación y teléfono */}
-      </div>
-
-      <div className="mt-4 space-y-2">
+      <div className=" space-y-2">
         <h3 className="font-semibold text-sm">Historial de contratos</h3>
 
         {(loadingAgente || fetchingAgente) && (
@@ -58,14 +53,17 @@ function ContenidoHistorial({
                 Sin contratos para este agente.
               </p>
             ) : (
-              <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                <div className="space-y-3 max-h-80 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-700
+         scrollbar-track-gray-100 ">
                 {contratos.map((c: any) => (
                   <div key={c.idContrato} className="rounded border p-3 text-sm space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="font-medium">
                         {c.tipoContrato} · #{c.idContrato}
                       </span>
-                      <span className="text-muted-foreground">{c.estado}</span>
+                      <Badge variant={estadoContratoVariant[c.estado]}>
+                        {c.estado}
+                      </Badge>
                     </div>
 
                     <div className="text-muted-foreground text-xs">
@@ -76,8 +74,10 @@ function ContenidoHistorial({
                     </div>
 
                     <div className="text-xs">
-                      Monto total: ₡{Number(c.montoTotal ?? 0).toLocaleString()} · Depósito: ₡
-                      {Number(c.deposito ?? 0).toLocaleString()} · Comisión: {c.porcentajeComision}%
+                      <p>Monto total: ₡{Number(c.montoTotal ?? 0).toLocaleString()}
+                      {c.tipoContrato === 'Alquiler' ? ' · Depósito: ₡' + Number(c.deposito ?? 0).toLocaleString()
+                        : ''}</p>
+                       <p>Comisión: {c.porcentajeComision}%</p>
                     </div>
                   </div>
                 ))}

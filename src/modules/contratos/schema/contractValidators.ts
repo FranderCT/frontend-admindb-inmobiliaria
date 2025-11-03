@@ -1,28 +1,38 @@
 import { requiredInt } from "@/utils/validators";
 import { z, ZodIssue, ZodIssueCode } from "zod";
 
+
+export const MAX_MONEY = 100_000_000_000_000;
+export const MAX_PERCENT = 20;
+
+export const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+export const clampMoney = (raw: number) => {
+  if (Number.isNaN(raw)) return 0;
+  const v = Math.round(raw * 100) / 100;
+  return clamp(v, 0, MAX_MONEY);
+};
+
 export const zIntId = z.number("Selecciona un valor" )
   .int("Debe ser entero")
   .positive("Debe ser mayor a 0");
 
-export const zMoneyGE0 = z.number("Ingresa un monto")
-  .min(0, "Debe ser >= 0");
-export const zMoneyGE1 = z.number("Ingresa un monto")
-  .min(1, "Debe ser >= 1");
+const zMoney = z.number()
+  .min(0, "Debe ser ≥ 0")
+  .max(MAX_MONEY, `No debe exceder ${MAX_MONEY.toLocaleString()}`);
 
-export const zPercent = z.number("Ingresa un porcentaje")
-  .min(0, "Debe ser >= 0")
-  .max(100, "Debe ser <= 100");
+const zPercentMax20 = z.number()
+  .min(0, "Debe ser ≥ 0")
+  .max(MAX_PERCENT, `Debe ser ≤ ${MAX_PERCENT}`);
 
 export const datosVentaSchema = z.object({
   fechaFirma: z.string(),
   idPropiedad: zIntId,
   idAgente: zIntId,
-  montoTotal: zMoneyGE1,
-  porcentajeComision: zPercent,
+  montoTotal: zMoney,
+  porcentajeComision: zPercentMax20,
   fechaInicio: z.string(),
   fechaFin: z.string(),
-  deposito: zMoneyGE0.optional(),
+  deposito: zMoney.optional(),
 });
 
 export const datosAlquilerSchema = z.object({
@@ -34,9 +44,9 @@ export const datosAlquilerSchema = z.object({
   fechaPago: z.string(),
   idPropiedad: zIntId,
   idAgente: zIntId,
-  montoTotal: zMoneyGE1,
-  deposito: zMoneyGE0,
-  porcentajeComision: zPercent,
+  montoTotal: zMoney,
+  deposito: zMoney,
+  porcentajeComision: zPercentMax20,
   fechaFin: z.string().optional(),
 });
 
@@ -50,21 +60,21 @@ const baseSubmit = z.object({
   idTipoContrato: zIntId,
   idPropiedad: zIntId,
   idAgente: zIntId,
-  montoTotal: zMoneyGE1,
-  porcentajeComision: zPercent,
+  montoTotal: zMoney,
+  porcentajeComision: zPercentMax20,
   condicionesTexto: z.string().optional().default(""),
 });
 
 export const submitVentaSchema = baseSubmit.extend({
   fechaInicio: z.string(),
   fechaFin: z.string(),
-  deposito: zMoneyGE0.optional(),
+  deposito: zMoney.optional(),
 });
 
 export const submitAlquilerSchema = baseSubmit.extend({
   fechaInicio: z.string(),
   fechaFin: z.string(),
-  deposito: zMoneyGE0,
+  deposito: zMoney,
   cantidadPagos: z.number().int().min(1),
 });
 

@@ -30,7 +30,6 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
             </CardTitle>
           </div>
           <div className="flex gap-1 items-end">
-            <Badge variant="type">{contract.TipoContrato}</Badge>
             <Badge variant={estadoContratoVariant[contract.estado]}>
               {contract.estado}</Badge>
           </div>

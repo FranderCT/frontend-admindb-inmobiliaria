@@ -32,7 +32,7 @@ import {
 import { ClientSearchPreview } from "@/modules/clientes/models/client";
 import { useGetClient, useGetClients } from "@/modules/clientes/hooks/clientesHooks";
 import { useDebounced } from "@/utils/debounce";
-import { createPropertySchema } from "../schema/propertyValidators";
+import { createPropertySchema, MAX_DIGITS, MAX_PRICE } from "../schema/propertyValidators";
 
 const FormCrearPropiedad = () => {
     const [open, setOpen] = useState(false);
@@ -163,13 +163,25 @@ const FormCrearPropiedad = () => {
                                         </Label>
                                         <Input
                                             id="precio"
-                                            type="number"
+                                            type="text"
                                             inputMode="numeric"
                                             value={field.state.value ?? ""}
-                                            onChange={(e) => field.handleChange(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (["e", "E", "+", "-", ".", ","].includes(e.key)) e.preventDefault();
+                                            }}
+                                            onChange={(e) => {
+                                                let raw = e.target.value.replace(/\D+/g, "");
+                                                if (raw.length > MAX_DIGITS) raw = raw.slice(0, MAX_DIGITS);
+                                                if (raw.length > 1) raw = raw.replace(/^0+/, "") || "0";
+                                                if (raw) {
+                                                    const n = Number(raw);
+                                                    if (n > MAX_PRICE) raw = String(MAX_PRICE);
+                                                }
+                                                field.handleChange(raw);
+                                            }}
                                             placeholder="₡1 400 000"
-                                            min={1}
-                                            step={1}
+                                            aria-invalid={!!formErrors.precio}
+                                            className={formErrors.precio ? "border-red-600" : ""}
                                         />
                                         {formErrors.precio && (
                                             <p className="text-red-700 text-sm">{formErrors.precio}</p>
@@ -181,7 +193,8 @@ const FormCrearPropiedad = () => {
 
                         <form.Field
                             name="idTipoInmueble"
-                            children={(field) => (
+                        >
+                            {(field) => (
                                 <div>
                                     <Label className="font-semibold mb-2" htmlFor="tipoInmueble">
                                         Tipo de inmueble
@@ -190,7 +203,8 @@ const FormCrearPropiedad = () => {
                                         value={field.state.value ? field.state.value.toString() : ""}
                                         onValueChange={(value) => field.handleChange(Number(value))}
                                     >
-                                        <SelectTrigger>
+                                        <SelectTrigger
+                                        >
                                             <SelectValue placeholder="Selecciona un tipo de inmueble" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -204,16 +218,17 @@ const FormCrearPropiedad = () => {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {formErrors.tipoUnidadMedida && (
-                                        <p className="text-red-700 text-sm">{formErrors.tipoUnidadMedida}</p>
+                                    {formErrors.idTipoInmueble && (
+                                        <p className="text-red-700 text-sm">{formErrors.idTipoInmueble}</p>
                                     )}
                                 </div>
                             )}
-                        />
+                        </form.Field>
 
                         <form.Field
                             name="idEstado"
-                            children={(field) => (
+                        >
+                            {(field) => (
                                 <div>
                                     <Label className="font-semibold mb-2" htmlFor="estadoPropiedad">
                                         Estado de la propiedad
@@ -222,7 +237,8 @@ const FormCrearPropiedad = () => {
                                         value={field.state.value ? field.state.value.toString() : ""}
                                         onValueChange={(value) => field.handleChange(Number(value))}
                                     >
-                                        <SelectTrigger>
+                                        <SelectTrigger
+                                        >
                                             <SelectValue placeholder="Selecciona el estado" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -236,12 +252,12 @@ const FormCrearPropiedad = () => {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {formErrors.estadoPropiedad && (
-                                        <p className="text-red-700 text-sm">{formErrors.estadoPropiedad}</p>
+                                    {formErrors.idEstado && (
+                                        <p className="text-red-700 text-sm">{formErrors.idEstado}</p>
                                     )}
                                 </div>
                             )}
-                        />
+                        </form.Field>
 
                         <div className="space-y-2 rounded-md border p-3">
                             <Label className="font-semibold">Asignar propietario</Label>

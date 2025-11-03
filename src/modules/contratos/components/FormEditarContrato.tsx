@@ -17,6 +17,8 @@ import {
 import type { AgentPreview, UpdateContract } from "../models/contract";
 import { EditContractProps } from "../types/contractTypes";
 import { addMonthsISO } from "../utils/date";
+import { clamp } from "framer-motion";
+import { clampMoney, MAX_MONEY, MAX_PERCENT } from "../schema/contractValidators";
 
 const toTextBlock = (arr?: { textoCondicion: string }[] | string[]) =>
   Array.isArray(arr)
@@ -131,7 +133,7 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
           ? String(idProp) + (loadingAvailableProperties ? " (cargando…)" : "")
           : "";
     })();
-    
+
   const selectedAgenteId = form.state.values.idAgente;
   const selectedExists = opcionesAgentes.some((a) => a.identificacion === Number(selectedAgenteId));
   const fallbackAgenteLabel = selectedAgenteId ? String(selectedAgenteId) : "";
@@ -140,7 +142,7 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
     if (isVenta) return form.state.values.fechaFin || "";
     const n = Number(form.state.values.cantidadPagos || 0);
     return addMonthsISO(form.state.values.fechaInicio, Number.isFinite(n) ? n : 0);
-  }, [ form.state.values.fechaInicio, form.state.values.cantidadPagos, form.state.values.fechaFin]);
+  }, [form.state.values.fechaInicio, form.state.values.cantidadPagos, form.state.values.fechaFin]);
 
   return (
     <form
@@ -314,11 +316,8 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
                 min={0}
                 step="0.01"
                 value={String(field.state.value ?? "")}
-                onChange={(e) =>
-                  field.handleChange(
-                    Number.isNaN(e.currentTarget.valueAsNumber) ? 0 : e.currentTarget.valueAsNumber
-                  )
-                }
+                max={MAX_MONEY}
+                onChange={(e) => field.handleChange(clampMoney(e.currentTarget.valueAsNumber))}
                 placeholder="Ej. 25000000"
                 disabled={isLoading}
               />
@@ -334,13 +333,10 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
                 <Input
                   type="number"
                   min={0}
+                  max={MAX_MONEY}
+                  onChange={(e) => field.handleChange(clampMoney(e.currentTarget.valueAsNumber))}
                   step="0.01"
                   value={String(field.state.value ?? "")}
-                  onChange={(e) =>
-                    field.handleChange(
-                      Number.isNaN(e.currentTarget.valueAsNumber) ? 0 : e.currentTarget.valueAsNumber
-                    )
-                  }
                   placeholder="Ej. 2500000"
                   disabled={isLoading}
                 />
@@ -356,12 +352,12 @@ export default function FormEditarContrato({ initialIdContrato, onSuccess }: Edi
               <Input
                 type="number"
                 min={0}
-                max={100}
+                max={MAX_PERCENT}
                 step="0.01"
                 value={String(field.state.value ?? "")}
                 onChange={(e) => {
                   const raw = e.currentTarget.valueAsNumber;
-                  const v = Number.isNaN(raw) ? 0 : Math.max(0, Math.min(100, raw));
+                  const v = Number.isNaN(raw) ? 0 : Math.max(0, Math.min(MAX_PERCENT, raw));
                   field.handleChange(v);
                 }}
                 placeholder="Ej. 3.5"

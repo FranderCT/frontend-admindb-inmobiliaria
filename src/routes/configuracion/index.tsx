@@ -9,6 +9,8 @@ import type { User } from '@/modules/seguridad/models/usuario';
 import DataTable from '@/modules/seguridad/components/UsersTable';
 import { protectRoute } from '@/modules/seguridad/utils/authGuard';
 import ActionsCell from '@/modules/seguridad/components/AccionesCell';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import Skeleton from '@mui/material/Skeleton';
 
 export const Route = createFileRoute('/configuracion/')({
   beforeLoad: ({ location }) => {
@@ -64,7 +66,20 @@ function RouteComponent() {
         </nav>
       </header>
       <main className="mx-4">
-        {loadingUsers && <p>Cargando usuarios...</p>}
+        {loadingUsers &&
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((k) => (
+              <Card key={k} className="h-[300px] w-70">
+                <CardHeader>
+                  <Skeleton className="h-6 w-2/3" />
+                  <Skeleton className="h-4 w-5/6" />
+                </CardHeader>
+                <CardContent className="px-2 pb-6">
+                  <Skeleton className="h-[190px] w-full rounded-md" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>}
         {errorUsers && <p>Error al cargar usuarios: {(errorUsers as Error).message}</p>}
 
         <DataTable<User, unknown>

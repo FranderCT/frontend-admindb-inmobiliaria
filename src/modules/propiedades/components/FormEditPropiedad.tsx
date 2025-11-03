@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { extractServerErrors } from "@/utils/serverExtract";
 import { useGetPropertyStatuses, useGetPropertyTypes, useUpdateProperty } from "../hooks/propiedadesHook";
+import { MAX_DIGITS, MAX_PRICE } from "../schema/propertyValidators";
 
 const FormEditPropiedad = ({
   open, onOpenChange, from = "bottom", showCloseButton = true, property, disabled = false,
@@ -142,7 +143,19 @@ const FormEditPropiedad = ({
                   type="number"
                   inputMode="numeric"
                   value={field.state.value ?? ""}
-                  onChange={(e) => field.handleChange(Number(e.target.value))}
+                  onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", ".", ","].includes(e.key)) e.preventDefault();
+                  }}
+                  onChange={(e) => {
+                    let raw = e.target.value.replace(/\D+/g, "");
+                    if (raw.length > MAX_DIGITS) raw = raw.slice(0, MAX_DIGITS);
+                    if (raw.length > 1) raw = raw.replace(/^0+/, "") || "0";
+                    if (raw) {
+                      const n = Number(raw);
+                      if (n > MAX_PRICE) raw = String(MAX_PRICE);
+                    }
+                    field.handleChange(Number(raw));
+                  }}
                   placeholder="₡1 400 000"
                   min={1}
                   step={1}

@@ -8,10 +8,9 @@ const DEFAULT_FILTERS: ContratosFilters = {
   sortCol: "fechaInicio",
   sortDir: "ASC",
   q: "",
-  estado: undefined,
+  estado: undefined, 
   tipoContratoId: undefined,
   agenteId: undefined,
-  propiedadId: undefined,
 };
 
 export function ContratosFiltersProvider({ children }: PropsWithChildren) {

@@ -132,6 +132,19 @@ export interface UpdateContract {
   condiciones?: string[];
 }
 
+export type EstadoContrato = "Pendiente" | "Activo" | "Finalizado";
+
+export type ContractsPaginateParams ={
+  page?: number;   
+  limit?: number;  
+  sortCol?: "fechaInicio" | "fechaFin" | "fechaFirma" | "montoTotal"; 
+  sortDir?: "ASC" | "DESC"; 
+  q?: string;              
+  estado?: EstadoContrato;
+  tipoContratoId?: number;
+  agenteId?: number | string;
+};
+
 export type PaginationMeta = {
   page: number;
   pageCount: number;
@@ -139,22 +152,12 @@ export type PaginationMeta = {
   limit: number;
 };
 
-export type ContractPreview = Contract; // si tu vista previa ya usa Contract; ajusta si es otro tipo
-
 export type ContractsPaginateResponse = {
-  data: ContractPreview[];
+  data: Contract[];
   meta: PaginationMeta;
 };
 
-export type ContractsPaginateParams = {
-  page?: number;
-  limit?: number;
-  sortCol?: "fechaInicio" | "fechaFin" | "fechaFirma" | "montoTotal" | "idContrato";
-  sortDir?: "ASC" | "DESC";
-  // filtros opcionales (extensibles)
-  q?: string;
-  estado?: 0 | 1;
-  tipoContratoId?: number | string;
-  agenteId?: number | string;
-  propiedadId?: number | string;
-};
+export type ContratosFilters = Required<Pick<
+  ContractsPaginateParams,
+  "page" | "limit" | "sortCol" | "sortDir"
+>> & Omit<ContractsPaginateParams, "page" | "limit" | "sortCol" | "sortDir">;

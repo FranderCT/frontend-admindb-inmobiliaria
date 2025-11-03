@@ -10,6 +10,8 @@ import { useContext } from "react"
 import PropiedadesFiltersContext from "@/modules/propiedades/context/propiedadesContext";
 import { protectRoute } from "@/modules/seguridad/utils/authGuard";
 import { Can } from "@/modules/seguridad/components/Can";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export const Route = createFileRoute("/propiedades/")({
   beforeLoad: ({ location }) => {
@@ -55,7 +57,20 @@ function RouteComponent() {
       </nav>
 
       {(isLoading || (isFetching && !data)) && (
-        <div className="ml-16">Cargando propiedades...</div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((k) => (
+            <Card key={k} className="h-[300px] w-70">
+              <CardHeader>
+                <Skeleton className="h-6 w-2/3" />
+                <Skeleton className="h-4 w-5/6" />
+              </CardHeader>
+              <CardContent className="px-2 pb-6">
+                <Skeleton className="h-[190px] w-full rounded-md" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
       {error && <div className="ml-16 text-destructive">Error cargando propiedades.</div>}
 
