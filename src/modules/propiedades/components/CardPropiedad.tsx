@@ -15,24 +15,47 @@ import { capitalize } from "@/utils/capitalize";
 const placeholder =
   "https://images.adsttc.com/media/images/623c/4fa0/3e4b/3145/3000/001b/newsletter/_d_ambrosio_07._copy.jpg?1648119692";
 
-const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: PropiedadCardProps) => {
+interface CardPropiedadExtendedProps extends PropiedadCardProps {
+  onClick?: () => void;
+}
+
+const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [], onClick }: CardPropiedadExtendedProps) => {
   const deleteProp = useDeleteProperty();
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
-  const onDeleteClick = (e: React.MouseEvent) => { e.stopPropagation(); e.preventDefault(); setOpenConfirmDelete(true); };
-  const handleConfirmDelete = async () => { await deleteProp.mutateAsync(property.idPropiedad); };
-  const onEditClick = (e: React.MouseEvent) => { e.stopPropagation(); e.preventDefault(); setOpenEdit(true); };
+  const onDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setOpenConfirmDelete(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    await deleteProp.mutateAsync(property.idPropiedad);
+  };
+
+  const onEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setOpenEdit(true);
+  };
 
   const estadoNombre = String(property.estadoPropiedad?.nombre ?? "").trim();
   const isLocked = /^(Vendido|Reservado)$/i.test(estadoNombre);
 
   const imagenUrl = property.imagenUrl || placeholder;
 
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
     <Card
       className="relative overflow-hidden rounded-2xl hover:shadow-md transition-shadow
-                 grid grid-cols-[180px_1fr] w-full p-0"
+                 grid grid-cols-[180px_1fr] w-full p-0 cursor-pointer"
+      onClick={handleCardClick}
     >
       {property.estadoPropiedad?.nombre && (
         <div className="absolute right-3 top-3 z-10">
@@ -61,9 +84,9 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: 
             {property.tipoInmueble?.nombre || "—"}
           </CardDescription>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 text-md">
             <MapPin className="h-4 w-4 text-muted-foreground" />
-            <CardTitle className="font-semibold leading-tight line-clamp-1 text-md">
+            <CardTitle className="font-semibold">
               {property.ubicacion}
             </CardTitle>
           </div>
@@ -106,7 +129,6 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: 
           </div>
         </CardContent>
 
-        {/* Acciones visibles */}
         <div className="flex gap-1 justify-end pr-3">
           <Button
             variant="ghost"
@@ -130,7 +152,6 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: 
         </div>
       </div>
 
-      {/* Modales */}
       <Can resource="propiedades" action="update">
         {(() => (
           <FormEditPropiedad

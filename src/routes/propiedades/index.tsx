@@ -6,12 +6,13 @@ import FormCrearPropiedad from "@/modules/propiedades/components/FormCrearPropie
 import PropiedadesFiltros from "@/modules/propiedades/components/PropiedadesFiltros";
 import { PropiedadesFiltersProvider } from "@/modules/propiedades/context/propiedadesContextProvider";
 import { usePropiedadesPaginatedFromContext } from "@/modules/propiedades/hooks/usePropiedadesFromContext";
-import { useContext } from "react"
+import { useContext, useState } from "react";
 import PropiedadesFiltersContext from "@/modules/propiedades/context/propiedadesContext";
 import { protectRoute } from "@/modules/seguridad/utils/authGuard";
 import { Can } from "@/modules/seguridad/components/Can";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import PropiedadDetailPanel from "@/modules/propiedades/components/PanelDetallesPropiedad";
 
 export const Route = createFileRoute("/propiedades/")({
   beforeLoad: ({ location }) => {
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/propiedades/")({
 function RouteComponent() {
   const ctx = useContext(PropiedadesFiltersContext);
   const { filters, patchFilters } = ctx;
+  const [selectedPropertyId, setSelectedPropertyId] = useState<number | null>(null);
 
   const { data, isLoading, isFetching, error } = usePropiedadesPaginatedFromContext();
 
@@ -57,7 +59,6 @@ function RouteComponent() {
       </nav>
 
       {(isLoading || (isFetching && !data)) && (
-
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((k) => (
             <Card key={k} className="h-[300px] w-70">
@@ -79,9 +80,21 @@ function RouteComponent() {
           {rows.length === 0 ? (
             <div className="ml-16 text-muted-foreground">Sin resultados.</div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className={`transition-all duration-300 ${selectedPropertyId
+                ? "grid gap-6 grid-cols-1 md:w-1/2"
+                : "grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+              }`}>
               {rows.map((property) => (
-                <CardPropiedad key={property.idPropiedad} property={property} />
+                <CardPropiedad
+                  key={property.idPropiedad}
+                  property={property}
+                  estadosPropiedad={[]}
+                  tiposInmueble={[]}
+                  onClick={() => {
+                    console.log('Card clicked:', property.idPropiedad);
+                    setSelectedPropertyId(property.idPropiedad);
+                  }}
+                />
               ))}
             </div>
           )}
@@ -108,6 +121,14 @@ function RouteComponent() {
             </div>
           </div>
         </>
+      )}
+
+      {/* Panel de detalles */}
+      {selectedPropertyId && (
+        <PropiedadDetailPanel
+          idPropiedad={selectedPropertyId}
+          onClose={() => setSelectedPropertyId(null)}
+        />
       )}
     </div>
   );
