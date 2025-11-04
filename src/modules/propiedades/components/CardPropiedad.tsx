@@ -139,16 +139,7 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [], on
             title={isLocked ? "No se puede editar una propiedad vendida o reservada" : undefined}
           >
             <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-destructive hover:text-destructive"
-            aria-label="Eliminar"
-            onClick={onDeleteClick}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          </Button> 
         </div>
       </div>
 
@@ -163,19 +154,6 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [], on
             disabled={isLocked}
           />
         ))()}
-      </Can>
-
-      <Can resource="propiedades" action="delete">
-        <ConfirmDialog
-          open={openConfirmDelete}
-          onOpenChange={setOpenConfirmDelete}
-          title="Anular propiedad"
-          description={`¿Seguro que deseas anular la propiedad #${property.idPropiedad} en ${property.ubicacion}? Esta acción no se puede deshacer.`}
-          confirmText="Eliminar"
-          cancelText="Cancelar"
-          onConfirm={handleConfirmDelete}
-          loading={deleteProp.isPending as boolean}
-        />
       </Can>
     </Card>
   );

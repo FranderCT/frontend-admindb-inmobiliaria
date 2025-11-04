@@ -43,6 +43,11 @@ export type EditPropiedadDialogProps = {
   showCloseButton?: boolean;
   disabled?: boolean;
   property: {
+    propietario: any;
+    amueblado(amueblado: any): boolean;
+    cantHabitaciones: number;
+    cantBannios: number;
+    areaM2: number;
     idPropiedad: number;
     ubicacion: string;
     precio: number;

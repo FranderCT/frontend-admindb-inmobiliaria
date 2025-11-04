@@ -205,12 +205,14 @@ export default function FacturacionPage() {
                   <p className="text-base font-semibold">{formatMoney(f.montoTotal)}</p>
                   <div className="flex gap-2">
                     {f.estado === "Pendiente" && (
-                      <button
-                        className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-gray-50"
-                        onClick={() => pagar(f.id)}
-                      >
-                        Marcar pagada
-                      </button>
+                      <Can resource="facturas" action="update">
+                        <button
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-gray-50"
+                          onClick={() => pagar(f.id)}
+                        >
+                          Marcar pagada
+                        </button>
+                      </Can>
                     )}
                   </div>
                 </div>

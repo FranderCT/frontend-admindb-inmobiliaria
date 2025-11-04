@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { createProperty, createPropertyStatus, createPropertyType, deleteProperty, getPropertiesFiltered, getProperty, getPropertyStatuses, getPropertyTypes, updateProperty } from "../services/propiedadesServices";
-import {  CreatePropertyPayload, CreatePropertyStatus, CreatePropertyType, PropertysPaginateParams, UpdateProperty,  } from "../models/propiedad";
+import {  CreatePropertyPayload, CreatePropertyStatus, CreatePropertyType, PropertysPaginateParams, UpdateProperty, UpdatePropertyJSON, UpdatePropertyPayload,  } from "../models/propiedad";
 
 export const useCreateProperty = () => {
     const qc = useQueryClient();
@@ -130,14 +130,24 @@ export const useDeleteProperty = () => {
   });
 };
 
+type UpdatePropertyInput = UpdatePropertyPayload | UpdatePropertyJSON;
+
+const getIdFromPayload = (input: UpdatePropertyInput) =>
+  (("prop" in input ? input.prop?.idPropiedad : input.idPropiedad) ?? undefined);
+
 export const useUpdateProperty = () => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: { prop: UpdateProperty }) => updateProperty(payload.prop),
-     onSuccess: (_data, payload) => {
-      queryClient.invalidateQueries({ queryKey: ["properties"] });
-      queryClient.invalidateQueries({ queryKey: ["property", payload.prop.idPropiedad] });
 
-     },
+  return useMutation<{ ok: boolean }, unknown, UpdatePropertyInput>({
+    mutationFn: (payload) => updateProperty(payload),
+    onSuccess: (_data, variables) => {
+      const id = getIdFromPayload(variables);
+
+      queryClient.invalidateQueries({ queryKey: ["properties"] });
+
+      if (typeof id === "number") {
+        queryClient.invalidateQueries({ queryKey: ["property", id] });
+      }
+    },
   });
 };
