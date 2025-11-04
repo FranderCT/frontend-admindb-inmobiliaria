@@ -19,7 +19,7 @@ const badgeVariants = cva(
           "border-transparent bg-blue-500 text-white [a&]:hover:bg-blue-400",
 
         activo:
-          "border-transparent bg-emerald-600 text-white [a&]:hover:bg-emerald-500 focus-visible:ring-emerald-200 dark:focus-visible:ring-emerald-400",
+          "border-transparent bg-[#5c9048] text-white [a&]:hover:bg-emerald-500 focus-visible:ring-emerald-200 dark:focus-visible:ring-emerald-400",
         inactivo:
           "border-transparent bg-gray-200 text-gray-700 [a&]:hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-100",
         pendiente:

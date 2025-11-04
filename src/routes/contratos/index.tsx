@@ -13,7 +13,6 @@ import FormCrearContrato from "@/modules/contratos/components/FormCrearContrato"
 import CardPreviewContrato from "@/modules/contratos/components/CardPreviewContrato";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import MiniCardsContratosHome from "@/modules/contratos/components/MiniStats";
 
 export const Route = createFileRoute("/contratos/")({
   beforeLoad: ({ location }) => {
@@ -52,9 +51,6 @@ function RouteComponent() {
           </Can>
         </div>
       </nav>
-      <div className="flex mb-4 gap-4 flex-wrap">
-        <MiniCardsContratosHome />
-      </div>
       {(isLoading || (isFetching && !data)) && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((k) => (

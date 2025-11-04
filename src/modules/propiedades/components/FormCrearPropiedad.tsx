@@ -95,19 +95,19 @@ const FormCrearPropiedad = () => {
       }
 
       try {
-        await create.mutateAsync({
-          property: {
-            ubicacion: value.ubicacion,
-            precio: value.precio,
-            idEstado: value.idEstado,
-            identificacion: value.identificacion,
-            idTipoInmueble: value.idTipoInmueble,
-            amueblado: value.amueblado,
-            cantHabitaciones: value.cantHabitaciones,
-            cantBannios: value.cantBannios,
-            areaM2: value.areaM2,
-          },
-          file: value.file,
+          await create.mutateAsync({
+              property: {
+                  ubicacion: value.ubicacion,
+                  precio: value.precio,
+                  idEstado: value.idEstado,
+                  idTipoInmueble: value.idTipoInmueble,
+                  identificacion: value.identificacion,
+                  amueblado: value.amueblado,
+                  cantHabitaciones: value.cantHabitaciones,
+                  cantBannios: value.cantBannios,
+                  areaM2: value.areaM2,
+              },
+              file: value.file as File,
         });
         formApi.reset();
         setCedulaQuery("");
@@ -470,52 +470,29 @@ const FormCrearPropiedad = () => {
                 </p>
               </div>
 
-              <form.Field
-                name="file"
-                validators={{
-                  onChange: ({ value }) =>
-                    value && value instanceof File && !value.type.startsWith("image/")
-                      ? "Seleccione un archivo de imagen"
-                      : undefined,
-                }}
-              >
-                {(field) => (
-                  <div className="flex flex-col gap-2">
-                    <Label className="font-semibold">Imagen</Label>
-                    <div className="relative flex items-center">
-                      <label
-                        htmlFor="imagen-propiedad"
-                        className="flex items-center gap-2 px-4 py-2 bg-white text-gray-600 text-sm rounded-lg border border-gray-200 shadow cursor-pointer hover:bg-gray-100"
-                      >
-                        <FilePlus className="h-4 w-4" />
-                        Seleccionar imagen
-                        <Input
-                          id="imagen-propiedad"
-                          name="imagen"
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) field.handleChange(file);
-                          }}
-                          className="absolute left-0 top-0 h-full w-full opacity-0 cursor-pointer"
-                          style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%", opacity: 0 }}
-                        />
-                      </label>
-                      {field.state.value && typeof field.state.value === "object" && (
-                        <span className="ml-3 max-w-xs truncate text-sm text-muted-foreground">
-                          {(field.state.value as File).name}
-                        </span>
-                      )}
-                    </div>
-                    {field.state.value && typeof field.state.value === "object" && (
-                      <span className="ml-3 max-w-xs truncate text-sm text-muted-foreground">
-                        {(field.state.value as File).name}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </form.Field>
+                          <form.Field name="file">
+                              {(field) => (
+                                  <div className="flex flex-col gap-2">
+                                      <Label>Imagen</Label>
+                                      <label className="cursor-pointer border rounded-lg px-3 py-2 bg-white hover:bg-gray-50">
+                                          <FilePlus className="inline-block mr-2 h-4 w-4" />
+                                          Seleccionar imagen
+                                          <Input
+                                              type="file"
+                                              accept="image/*"
+                                              onChange={(e) => {
+                                                  const f = e.target.files?.[0];
+                                                  if (f) field.handleChange(f); // ✅ guarda un File real
+                                              }}
+                                          />
+                                      </label>
+                                      {field.state.value && field.state.value instanceof File && (
+                                          <span className="text-sm text-muted-foreground">{field.state.value.name}</span>
+                                      )}
+                                  </div>
+                              )}
+                          </form.Field>
+
 
               {formError && <p className="text-red-700 text-sm text-center">{formError}</p>}
             </div>

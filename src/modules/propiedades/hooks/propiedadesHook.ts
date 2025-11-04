@@ -3,13 +3,10 @@ import { createProperty, createPropertyStatus, createPropertyType, deletePropert
 import {  CreatePropertyPayload, CreatePropertyStatus, CreatePropertyType, PropertysPaginateParams, UpdateProperty,  } from "../models/propiedad";
 
 export const useCreateProperty = () => {
-    const queryClient = useQueryClient();
-
+    const qc = useQueryClient();
     return useMutation({
         mutationFn: (payload: CreatePropertyPayload) => createProperty(payload),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["properties"] });
-        },
+        onSuccess: () => qc.invalidateQueries({ queryKey: ["properties"] }),
     });
 };
 

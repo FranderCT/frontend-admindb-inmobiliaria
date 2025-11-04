@@ -82,7 +82,7 @@ function RouteComponent() {
           ) : (
             <div className={`transition-all duration-300 ${selectedPropertyId
                 ? "grid gap-6 grid-cols-1 md:w-1/2"
-                : "grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+                : "grid gap-6 md:grid-cols-2 lg:grid-cols-2"
               }`}>
               {rows.map((property) => (
                 <CardPropiedad

@@ -17,7 +17,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
   const isDisabled = contract.estado?.toLowerCase() === 'finalizado'
   const Trigger = (
     <Card
-      className="hover:shadow-md transition-shadow hover:cursor-pointer"
+      className="hover:shadow-md transition-shadow hover:cursor-pointer overflow-hidden"
       onClick={() => setOpenDetalle(true)}
       data-trigger="contrato"
     >
@@ -41,7 +41,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
           <div className="text-muted-foreground flex gap-2 items-center">
             <LandPlot className="h-4 w-4" /> Propiedad:
           </div>
-          <span className="font-medium">{contract.idPropiedad}</span>
+          <span className="font-medium leading-none">{contract.idPropiedad}</span>
         </div>
 
         <div className="flex items-center justify-between text-sm ml-10">

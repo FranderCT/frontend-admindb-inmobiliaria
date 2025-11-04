@@ -4,28 +4,31 @@ import { CreatePropertyStatus, CreatePropertyType, PropertyType, PropertyStatus,
 
 // post
 
-const appendIf = (fd: FormData, k: string, v: unknown) => {
-  if (v !== undefined && v !== null) fd.append(k, String(v));
-};
-
 export const createProperty = async ({ property, file }: CreatePropertyPayload) => {
-  if (!file) throw new Error("La imagen es obligatoria");
+  if (!(file instanceof File)) {
+    throw new Error("La imagen es obligatoria y debe ser un archivo válido.");
+  }
 
   const fd = new FormData();
-  appendIf(fd, "ubicacion", property.ubicacion);
-  appendIf(fd, "precio", property.precio);
-  appendIf(fd, "idEstado", property.idEstado);
-  appendIf(fd, "idTipoInmueble", property.idTipoInmueble);
-  appendIf(fd, "identificacion", property.identificacion);
-  appendIf(fd, "amueblado", property.amueblado ? 1 : 0);
-  appendIf(fd, "cantHabitaciones", property.cantHabitaciones);
-  appendIf(fd, "cantBannios", property.cantBannios);
-  appendIf(fd, "areaM2", property.areaM2);
+  // campos que tu DTO espera
+  fd.append("ubicacion", property.ubicacion);
+  fd.append("precio", String(property.precio));
+  fd.append("idEstado", String(property.idEstado));
+  fd.append("idTipoInmueble", String(property.idTipoInmueble));
+  fd.append("identificacion", String(property.identificacion));
+  fd.append("cantBannios", String(property.cantBannios));
+  fd.append("cantHabitaciones", String(property.cantHabitaciones));
+  fd.append("areaM2", String(property.areaM2));
+  fd.append("amueblado", String(property.amueblado === true)); // "true"/"false"
 
-  fd.append("imagen", file);
+  // 👇 clave EXACTA del FileInterceptor('imagen')
+  fd.append("imagen", file, file.name);
 
-  const { data } = await altosDelValleAPI.post(`/propiedad`, fd);
-  return data;
+  const res = await altosDelValleAPI.post(`/propiedad`, fd, {
+    headers: { "Content-Type": "multipart/form-data" },
+    transformRequest: [(d) => d], // evita que Axios lo convierta a JSON
+  });
+  return res.data;
 };
 
 export const createPropertyType = async (type: CreatePropertyType): Promise<CreatePropertyType> => {
