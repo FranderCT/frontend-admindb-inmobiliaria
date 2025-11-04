@@ -18,8 +18,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 function StatusPill({ estado }: { estado: InvoiceStatus }) {
   const styles: Record<InvoiceStatus, string> = {
-    Pendiente: "bg-amber-500 text-white",
-    Pagada: "bg-emerald-600 text-white",
+    Pendiente: "bg-[#BEBC58] text-white",
+    Pagada: "bg-[#71a55d] text-white",
   };
   return <span className={`px-3 py-1 rounded-full text-xs font-semibold ${styles[estado]}`}>{estado}</span>;
 }
@@ -271,12 +271,12 @@ export default function FacturacionPage() {
               </div>
 
               <div className="px-6 pb-6 flex justify-end gap-3">
-                <button className="px-4 py-2 rounded-md border" onClick={() => setOpen(false)}>
-                  Cancelar
-                </button>
-                <button className="px-4 py-2 rounded-md text-white bg-[#708C3E] hover:opacity-90" onClick={save}>
+                <Button onClick={save}>
                   Guardar
-                </button>
+                </Button>
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancelar
+                </Button>
               </div>
             </div>
           </div>

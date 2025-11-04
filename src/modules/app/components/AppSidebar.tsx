@@ -22,6 +22,8 @@ import {
 
 import LogoutButton from "@/modules/seguridad/components/LogoutButton"
 import { decodeJwt, getRolesFromPayload, getToken, isExpired, type Role } from "@/modules/seguridad/utils/auth"
+import { Separator } from "@/components/ui/separator"
+
 
 function useUserRoles(): Role[] {
   return useMemo(() => {
@@ -53,7 +55,7 @@ export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "fixed top-4 left-4 z-50 grid h-9 w-9 place-items-center rounded-xl",
-          "bg-white border border-slate-300 ring-1 ring-slate-200 shadow-sm",
+          "bg-[#] border border-slate-300 ring-1 ring-slate-200 shadow-sm",
           "transition-transform duration-300 ease-in-out",
           isOpen ? "translate-x-64" : "translate-x-0"
         )}
@@ -73,12 +75,8 @@ export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
             <SidebarHeader>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    <img src="/AltosDelValleLogo.png" alt="Altos del Valle" className="h-9 w-9 rounded-md" />
-                    <div className="leading-tight">
-                      <div className="text-sm font-semibold text-slate-900">Altos del Valle</div>
-                      <div className="text-xs text-slate-500">Inmobiliaria</div>
-                    </div>
+                  <div className="flex items-center gap-3 px-4 mt-4 flex-col">
+                    <img src="/AltosDelValleLogo.png" alt="Altos del Valle" className="h-25 w-25 rounded-md" />
                   </div>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -86,7 +84,9 @@ export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
 
             <SidebarContent>
               <SidebarGroup>
-                <SidebarGroupLabel>Navegación</SidebarGroupLabel>
+                <div className="flex justify-center items-center mt-4 mb-6">
+                  <hr className="w-45" />
+                </div>
                 <SidebarMenu>
                   {filteredNav.map((item) => (
                     <SidebarMenuItem key={item.name}>

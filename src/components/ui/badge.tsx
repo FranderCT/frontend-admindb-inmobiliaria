@@ -19,11 +19,11 @@ const badgeVariants = cva(
           "border-transparent bg-blue-500 text-white [a&]:hover:bg-blue-400",
 
         activo:
-          "border-transparent bg-[#5c9048] text-white [a&]:hover:bg-emerald-500 focus-visible:ring-emerald-200 dark:focus-visible:ring-emerald-400",
+          "border-transparent bg-[#71a55d] text-white [a&]:hover:bg-emerald-500 focus-visible:ring-emerald-200 dark:focus-visible:ring-emerald-400",
         inactivo:
           "border-transparent bg-gray-200 text-gray-700 [a&]:hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-100",
         pendiente:
-          "border-transparent bg-amber-400 text-white [a&]:hover:bg-amber-300 focus-visible:ring-amber-200 dark:focus-visible:ring-amber-400",
+          "border-transparent bg-[#BEBC58] text-white [a&]:hover:bg-amber-300 focus-visible:ring-amber-200 dark:focus-visible:ring-amber-400",
 
         // contract type variants
         venta:
@@ -32,7 +32,7 @@ const badgeVariants = cva(
           "border-transparent bg-indigo-500 text-white [a&]:hover:bg-indigo-400 focus-visible:ring-indigo-200 dark:focus-visible:ring-indigo-400",
 
         destructive:
-          "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+          "border-transparent bg-[#D23636] text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
       },
