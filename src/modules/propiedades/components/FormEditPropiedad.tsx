@@ -16,7 +16,6 @@ import { useGetPropertyStatuses, useGetPropertyTypes, useUpdateProperty } from "
 import { MAX_DIGITS, MAX_PRICE } from "../schema/propertyValidators";
 import { Switch, SwitchThumb } from "@/components/animate-ui/primitives/base/switch";
 import { cn } from "@/lib/utils";
-import { FilePlus } from "lucide-react";
 
 const FormEditPropiedad = ({
   open, onOpenChange, from = "bottom", showCloseButton = true, property, disabled = false,
@@ -212,7 +211,7 @@ const FormEditPropiedad = ({
                 </div>
               )}
             </form.Field>
-
+            <div className="flex justify-between">
             <form.Field name="estadoPropiedadId">
               {(field) => (
                 <div>
@@ -264,7 +263,7 @@ const FormEditPropiedad = ({
                 </div>
               )}
             </form.Field>
-
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="flex flex-col justify-end">
                 <Label className="font-semibold mb-2">Amueblado</Label>
@@ -384,30 +383,6 @@ const FormEditPropiedad = ({
                 )}
               </form.Field>
             </div>
-
-            <form.Field name="file">
-              {(field) => (
-                <div className="flex flex-col gap-2">
-                  <Label>Imagen</Label>
-                  <label className="cursor-pointer border rounded-lg px-3 py-2 bg-white hover:bg-gray-50">
-                    <FilePlus className="inline-block mr-2 h-4 w-4" />
-                    Seleccionar imagen
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const f = e.target.files?.[0];
-                        field.handleChange(f);
-                      }}
-                      disabled={disabled}
-                    />
-                  </label>
-                  {field.state.value && field.state.value instanceof File && (
-                    <span className="text-sm text-muted-foreground">{field.state.value.name}</span>
-                  )}
-                </div>
-              )}
-            </form.Field>
 
             {!!formError && <p className="text-red-700 text-sm text-center">{formError}</p>}
           </div>
