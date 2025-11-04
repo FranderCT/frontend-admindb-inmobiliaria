@@ -139,16 +139,7 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [], on
             title={isLocked ? "No se puede editar una propiedad vendida o reservada" : undefined}
           >
             <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-destructive hover:text-destructive"
-            aria-label="Eliminar"
-            onClick={onDeleteClick}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          </Button> 
         </div>
       </div>
 
