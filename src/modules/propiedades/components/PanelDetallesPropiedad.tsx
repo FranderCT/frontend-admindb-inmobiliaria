@@ -10,6 +10,7 @@ import { formatPrice } from "../utils/formatters";
 import { estadoPropiedadVariant } from "@/utils/statusVariants";
 import { capitalize } from "@/utils/capitalize";
 import { Skeleton } from "@/components/ui/skeleton";
+import StatItem from "./InfoPropiedad";
 
 interface PropiedadDetailPanelProps {
   idPropiedad: number;
@@ -139,33 +140,33 @@ const PropiedadDetailPanel = ({ idPropiedad, onClose, open = true }: PropiedadDe
                     <h3 className="text-2xl font-bold text-foreground">{formatPrice(propiedad.precio, "CRC")}</h3>
                   </div>
                 </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3">
+                  <StatItem
+                    icon={<BedDouble className="h-5 w-5" />}
+                    label="Habitaciones"
+                    value={
+                      <p className="text-sm font-semibold">{propiedad.cantHabitaciones || ""} hab</p>}
+                  />
+                  <StatItem
+                    icon={<Bath className="h-5 w-5" />}
+                    label="Baños"
+                    value={
+                      <p className="text-sm font-semibold">{propiedad.cantBannios || ""} baños</p>}
+                  />
+                  <StatItem
+                    icon={<Ruler className="h-5 w-5" />}
+                    label="Área"
+                    value={
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
-                  <Card className="text-center py-3">
-                    <CardContent className="p-0">
-                      <Ruler className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
                       <p className="text-sm font-semibold">{propiedad.areaM2 || ""} m²</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="text-center py-3">
-                    <CardContent className="p-0">
-                      <BedDouble className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
-                      <p className="text-sm font-semibold">{propiedad.cantHabitaciones || ""} hab</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="text-center py-3">
-                    <CardContent className="p-0">
-                      <Bath className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
-                      <p className="text-sm font-semibold">{propiedad.cantBannios || ""} baños</p>
-                    </CardContent>
-                  </Card>
-                  <div className="text-center py-3">
-                    <div className="p-0 flex flex-col items-center">
-                      <div className="bg-gray-100 w-10 h-10 flex items-center justify-center rounded-2xl">
-                        <Home className="h-6 w-6  mb-1" /></div>
-                      <p className="text-sm font-semibold">{propiedad.amueblado ? "Amueblado" : "No amueblado"}</p>
-                    </div>
-                  </div>
+
+                    }
+                  />
+                  <StatItem
+                    icon={<Home className="h-5 w-5" />}
+                    label="Amueblado"
+                    value={<p className="text-sm font-semibold">{propiedad.amueblado ? "Amueblado" : "No amueblado"}</p>}
+                  />
                 </div>
 
                 <Separator />

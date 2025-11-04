@@ -99,7 +99,7 @@ function RouteComponent() {
             </div>
           )}
 
-          <div className="flex items-center justify-between mt-6">
+          <div className="flex items-center justify-between mt-6 ">
             <div className="text-sm text-muted-foreground">
               Página {data.meta.page} de {data.meta.pageCount} · {data.meta.total} resultados
             </div>
