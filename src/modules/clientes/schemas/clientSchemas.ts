@@ -6,7 +6,7 @@ export const createClientSchema = z.object({
   nombre: z.string().min(1, "El nombre es obligatorio"),
   apellido1: z.string().min(1, "El primer apellido es obligatorio").max(30, "El primer apellido es muy largo"),
   apellido2: z.string().min(2, "El segundo apellido es obligatorio").max(30, "El segundo apellido es muy largo"),
-  telefono: emptyToUndef,
+  telefono: requiredInt("El teléfono es obligatorio"),
 });
 
 export const editClientSchema = z.object({
@@ -14,11 +14,8 @@ export const editClientSchema = z.object({
   nombre: z.string().min(1, "El nombre es obligatorio"),
   apellido1: z.string().min(1, "El primer apellido es obligatorio").max(30, "El primer apellido es muy largo"),
   apellido2: z.string().min(2, "El segundo apellido es obligatorio").max(30, "El segundo apellido es muy largo"),
-  telefono: emptyToUndef.refine(
-    (v) => !v || /^\d{8}$/.test(v), 
-    "El teléfono debe tener 8 dígitos"
-  ),
-  estado: asBoolean, 
+  telefono: requiredInt("El teléfono es obligatorio"),
+  estado: asBoolean,
 });
 
 export type EditClientPayload = z.infer<typeof editClientSchema>;

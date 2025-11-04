@@ -37,7 +37,7 @@ const FormEditCliente = ({
       nombre: cliente.nombre ?? "",
       apellido1: cliente.apellido1 ?? "",
       apellido2: cliente.apellido2 ?? "",
-      telefono: cliente.telefono ?? "",
+      telefono: cliente.telefono ?? 0,
       estado: cliente.estado ? 1 : 0,
     },
     onSubmit: async ({ value }) => {
@@ -51,7 +51,7 @@ const FormEditCliente = ({
             nombre: value.nombre?.trim() ?? "",
             apellido1: value.apellido1?.trim() ?? "",
             apellido2: value.apellido2?.trim() ?? "",
-            telefono: value.telefono?.trim() ?? "",
+            telefono: value.telefono,
             estado: Boolean(value.estado),
           }
         });
@@ -72,7 +72,7 @@ const FormEditCliente = ({
       form.setFieldValue("nombre", cliente.nombre ?? "");
       form.setFieldValue("apellido1", cliente.apellido1 ?? "");
       form.setFieldValue("apellido2", cliente.apellido2 ?? "");
-      form.setFieldValue("telefono", cliente.telefono ?? "");
+      form.setFieldValue("telefono", cliente.telefono ??0);
       form.setFieldValue("estado", cliente.estado ? 1 : 0);
       setFormErrors({});
       setFormError(null);

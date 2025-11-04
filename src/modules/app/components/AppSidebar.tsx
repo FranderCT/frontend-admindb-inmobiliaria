@@ -55,7 +55,7 @@ export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "fixed top-4 left-4 z-50 grid h-9 w-9 place-items-center rounded-xl",
-          "bg-[#] border border-slate-300 ring-1 ring-slate-200 shadow-sm",
+          "bg-white border border-slate-300 ring-1 ring-slate-200 shadow-sm",
           "transition-transform duration-300 ease-in-out",
           isOpen ? "translate-x-64" : "translate-x-0"
         )}
