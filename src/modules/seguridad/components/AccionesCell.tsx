@@ -53,12 +53,10 @@ export default function ActionsCell({ user }: Props) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={onConfirm}
-          >
+          <Button variant="destructive" onClick={onConfirm}>
             Confirmar
-          </AlertDialogAction>
+          </Button>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

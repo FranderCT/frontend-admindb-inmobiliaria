@@ -22,6 +22,8 @@ import {
 
 import LogoutButton from "@/modules/seguridad/components/LogoutButton"
 import { decodeJwt, getRolesFromPayload, getToken, isExpired, type Role } from "@/modules/seguridad/utils/auth"
+import { Separator } from "@/components/ui/separator"
+
 
 function useUserRoles(): Role[] {
   return useMemo(() => {
@@ -73,12 +75,8 @@ export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
             <SidebarHeader>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    <img src="/AltosDelValleLogo.png" alt="Altos del Valle" className="h-9 w-9 rounded-md" />
-                    <div className="leading-tight">
-                      <div className="text-sm font-semibold text-slate-900">Altos del Valle</div>
-                      <div className="text-xs text-slate-500">Inmobiliaria</div>
-                    </div>
+                  <div className="flex items-center gap-3 px-4 mt-4 flex-col">
+                    <img src="/AltosDelValleLogo.png" alt="Altos del Valle" className="h-25 w-25 rounded-md" />
                   </div>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -86,7 +84,9 @@ export function AppSidebar({ isOpen, setIsOpen }: SidebarProps) {
 
             <SidebarContent>
               <SidebarGroup>
-                <SidebarGroupLabel>Navegación</SidebarGroupLabel>
+                <div className="flex justify-center items-center mt-4 mb-6">
+                  <hr className="w-45" />
+                </div>
                 <SidebarMenu>
                   {filteredNav.map((item) => (
                     <SidebarMenuItem key={item.name}>

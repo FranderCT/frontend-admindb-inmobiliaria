@@ -245,12 +245,12 @@ export default function FacturacionPage() {
               </div>
 
               <div className="px-6 pb-6 flex justify-end gap-3">
-                <button className="px-4 py-2 rounded-md border" onClick={() => setOpen(false)}>
-                  Cancelar
-                </button>
-                <button className="px-4 py-2 rounded-md text-white bg-[#708C3E] hover:opacity-90" onClick={save}>
+                <Button onClick={save}>
                   Guardar
-                </button>
+                </Button>
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancelar
+                </Button>
               </div>
             </div>
           </div>

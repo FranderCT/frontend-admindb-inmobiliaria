@@ -117,7 +117,7 @@ const PropiedadDetailPanel = ({ idPropiedad, onClose, open = true }: PropiedadDe
                 </div>
               </div>
 
-                          <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-700
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-700
          scrollbar-track-gray-100 ">
                 <div className="relative">
                   <img
@@ -149,7 +149,7 @@ const PropiedadDetailPanel = ({ idPropiedad, onClose, open = true }: PropiedadDe
                   </Card>
                   <Card className="text-center py-3">
                     <CardContent className="p-0">
-                      <BedDouble  className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
+                      <BedDouble className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
                       <p className="text-sm font-semibold">{propiedad.cantHabitaciones || ""} hab</p>
                     </CardContent>
                   </Card>
@@ -161,8 +161,8 @@ const PropiedadDetailPanel = ({ idPropiedad, onClose, open = true }: PropiedadDe
                   </Card>
                   <div className="text-center py-3">
                     <div className="p-0 flex flex-col items-center">
-                                          <div className="bg-gray-100 w-10 h-10 flex items-center justify-center rounded-2xl">
-                                              <Home className="h-6 w-6  mb-1" /></div>
+                      <div className="bg-gray-100 w-10 h-10 flex items-center justify-center rounded-2xl">
+                        <Home className="h-6 w-6  mb-1" /></div>
                       <p className="text-sm font-semibold">{propiedad.amueblado ? "Amueblado" : "No amueblado"}</p>
                     </div>
                   </div>
