@@ -18,8 +18,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 function StatusPill({ estado }: { estado: InvoiceStatus }) {
   const styles: Record<InvoiceStatus, string> = {
-    Pendiente: "bg-amber-500 text-white",
-    Pagada: "bg-emerald-600 text-white",
+    Pendiente: "bg-[#BEBC58] text-white",
+    Pagada: "bg-[#71a55d] text-white",
   };
   return <span className={`px-3 py-1 rounded-full text-xs font-semibold ${styles[estado]}`}>{estado}</span>;
 }
