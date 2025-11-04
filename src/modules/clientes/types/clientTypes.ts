@@ -78,3 +78,9 @@ export type ClientesPaginateResponse = {
         pageCount: number
     }
 }
+
+export type DetalleHistorialClienteProps = {
+  clienteNombre: string
+  telefono: string
+  identificacion: string
+}

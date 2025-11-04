@@ -1,4 +1,4 @@
-import { CreateProperty, CreatePropertyStatus, CreatePropertyType, Propiedad } from "../models/propiedad"
+import {  CreatePropertyStatus, CreatePropertyType, Propiedad } from "../models/propiedad"
 
 export type PropiedadCardProps = {
   property: Propiedad;
@@ -15,12 +15,17 @@ export const initialValuesPropertyType: CreatePropertyType = {
   nombre: "",
 };
 
-export const initialValuesProperty: CreateProperty = {
+export const initialValuesProperty = {
   ubicacion: "",
   precio: "",
   idEstado: 0,
-  identificacion: 0,
   idTipoInmueble: 0,
+  identificacion: 0,
+  amueblado: false,
+  cantHabitaciones: 0,
+  cantBannios: 0,
+  areaM2: 0,
+  file: undefined,
 };
 
 export type UpdateProperty = {

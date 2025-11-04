@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FormEvent, useContext, useState } from "react";
+import { FormEvent, useContext, useMemo, useState } from "react";
 import CardAgente from "@/modules/agentes/components/CardAgente";
 import FormAgregarAgente from "@/modules/agentes/components/FormAgregarAgente";
 import { useAgentesPaginatedFromContext } from "@/modules/agentes/hooks/usePaginationContext";
@@ -13,6 +13,9 @@ import { Can } from "@/modules/seguridad/components/Can";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useGetEstadisticasAgentes } from "@/modules/estadisticas/hooks/statsHooks";
+import { currency } from "@/modules/estadisticas/utils/stats";
+import TopAgentMedal from "@/modules/agentes/components/TopAgentMedal";
 
 export const Route = createFileRoute("/agentes/")({
   beforeLoad: ({ location }) => {
@@ -29,6 +32,7 @@ export const Route = createFileRoute("/agentes/")({
 function RouteComponent() {
   const { filters, patchFilters } = useContext(AgentesFiltersContext);
   const { data, isLoading, isFetching, error } = useAgentesPaginatedFromContext();
+      const { estadisticasAgentes } = useGetEstadisticasAgentes()
 
   const [inputQ, setInputQ] = useState(filters.q);
 
@@ -45,6 +49,13 @@ function RouteComponent() {
     setInputQ("");
     patchFilters({ q: "", page: 1 });
   };
+  const topAgente = useMemo(() => {
+    const arr = [...(estadisticasAgentes ?? [])]
+    if (!arr.length) return { nombre: "—", comisiones: 0, contratos: 0 }
+    arr.sort((a, b) => (b.TotalComisiones ?? 0) - (a.TotalComisiones ?? 0))
+    const a0 = arr[0]
+    return { nombre: a0.Agente, comisiones: a0.TotalComisiones ?? 0, contratos: a0.TotalContratos ?? 0 }
+  }, [estadisticasAgentes])
 
   return (
     <section className="m-4">
@@ -77,6 +88,13 @@ function RouteComponent() {
           </Can>
         </div>
       </nav>
+      <Card className="p-0 border-none shadow-none mb-4 ">
+        <TopAgentMedal
+          name={topAgente.nombre}
+          commissionsCRC={currency(topAgente.comisiones)}
+          contracts={topAgente.contratos}
+        />
+      </Card>
 
       {(isLoading || (isFetching && !data)) && (
 

@@ -1,14 +1,34 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { CreatePropertyStatus, CreatePropertyType, CreateProperty, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty, Propiedad } from "../models/propiedad";
+import { CreatePropertyStatus, CreatePropertyType, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty, Propiedad, CreatePropertyPayload } from "../models/propiedad";
 
 
 // post
-export const createProperty = async (property: CreateProperty): Promise<CreateProperty> => {
-  const response = await altosDelValleAPI.post<CreateProperty>(
-    `/propiedad`,
-    property
-  );
-  return response.data;
+
+export const createProperty = async ({ property, file }: CreatePropertyPayload) => {
+  if (!(file instanceof File)) {
+    throw new Error("La imagen es obligatoria y debe ser un archivo válido.");
+  }
+
+  const fd = new FormData();
+  // campos que tu DTO espera
+  fd.append("ubicacion", property.ubicacion);
+  fd.append("precio", String(property.precio));
+  fd.append("idEstado", String(property.idEstado));
+  fd.append("idTipoInmueble", String(property.idTipoInmueble));
+  fd.append("identificacion", String(property.identificacion));
+  fd.append("cantBannios", String(property.cantBannios));
+  fd.append("cantHabitaciones", String(property.cantHabitaciones));
+  fd.append("areaM2", String(property.areaM2));
+  fd.append("amueblado", String(property.amueblado === true)); // "true"/"false"
+
+  // 👇 clave EXACTA del FileInterceptor('imagen')
+  fd.append("imagen", file, file.name);
+
+  const res = await altosDelValleAPI.post(`/propiedad`, fd, {
+    headers: { "Content-Type": "multipart/form-data" },
+    transformRequest: [(d) => d], // evita que Axios lo convierta a JSON
+  });
+  return res.data;
 };
 
 export const createPropertyType = async (type: CreatePropertyType): Promise<CreatePropertyType> => {

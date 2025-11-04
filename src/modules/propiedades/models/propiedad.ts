@@ -7,6 +7,11 @@ export interface Propiedad {
   estadoPropiedad: PropertyStatus;
   tipoInmueble: PropertyType;
   cliente: Client
+  amueblado: boolean; 
+  cantHabitaciones: number; 
+  cantBannios: number; 
+  areaM2: number;
+  imagenUrl:string;
 }
 
 export interface PropertyType {
@@ -25,6 +30,15 @@ export interface CreateProperty {
   idEstado: number;
   identificacion: number;
   idTipoInmueble: number;
+  amueblado: boolean;
+  cantHabitaciones: number;
+  cantBannios: number;
+  areaM2: number;
+}
+
+export interface CreatePropertyPayload {
+  property: CreateProperty;
+  file: File; 
 }
 export interface CreatePropertyType {
   nombre: string;

@@ -1,5 +1,5 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { Client, CreateClient, UpdateClient } from "../models/client";
+import { Client, ClienteHistorialContrato, CreateClient, UpdateClient } from "../models/client";
 import { ClientesPaginateParams } from "../types/clientTypes";
 
 // post
@@ -22,6 +22,11 @@ export const getClients = async (): Promise<Client[]> => {
 export const getClient = async (identificacion: string): Promise<Client | null> => {
     const response = await altosDelValleAPI.get<Client>(`cliente/${identificacion}`);
     return response.data;
+};
+
+export const getClientHistory = async (identificacion: string): Promise<ClienteHistorialContrato[] | null> => {
+  const response = await altosDelValleAPI.get<ClienteHistorialContrato[]>(`cliente/history/${identificacion}`);
+  return response.data;
 };
 
 export const getClientsFiltered = async (params: ClientesPaginateParams) => {

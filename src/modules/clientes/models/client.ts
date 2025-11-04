@@ -38,3 +38,29 @@ export interface ClientSearchPreview {
   apellido1?: string;
   apellido2?: string;
 }
+
+export interface ClienteHistorialContrato {
+  idClienteContrato: number;
+  identificacion: number;
+  nombre: string[];
+  apellido1: string[];
+  apellido2: string[];
+  idRol: number;
+  idContrato: number;
+  fechaInicio: string;
+  fechaFin: string;
+  fechaFirma: string;
+  fechaPago: string;
+  idTipoContrato: number;
+  idPropiedad: number;
+  ubicacion: string;
+  precio: number;
+  idAgente: number;
+  montoTotal: number;
+  deposito: number;
+  porcentajeComision: number;
+  cantidadPagos: number;
+  estado: string;
+  "": (number | string)[];
+  ultima_factura_emision: string;
+}

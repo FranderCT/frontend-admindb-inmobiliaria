@@ -1,146 +1,184 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Edit, DollarSign, Home, MapPin, Trash2, CircleUser } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { PropiedadCardProps } from '../types/propiedadTypes'
-import { formatPrice } from '../utils/formatters'
-import FormEditPropiedad from './FormEditPropiedad'
-import { useDeleteProperty } from '../hooks/propiedadesHook'
-import ConfirmDialog from '@/modules/clientes/components/ConfirmDialog'
-import { estadoPropiedadVariant } from '@/utils/statusVariants'
-import { Can } from '@/modules/seguridad/components/Can'
-import { capitalize } from '@/utils/capitalize'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Edit, Trash2, Ruler, MapPin, BedDouble, Bath } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { PropiedadCardProps } from "../types/propiedadTypes";
+import { formatPrice } from "../utils/formatters";
+import FormEditPropiedad from "./FormEditPropiedad";
+import { useDeleteProperty } from "../hooks/propiedadesHook";
+import ConfirmDialog from "@/modules/clientes/components/ConfirmDialog";
+import { estadoPropiedadVariant } from "@/utils/statusVariants";
+import { Can } from "@/modules/seguridad/components/Can";
+import { capitalize } from "@/utils/capitalize";
 
-const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [] }: PropiedadCardProps) => {
-  const deleteProp = useDeleteProperty()
-  const [openConfirmDelete, setOpenConfirmDelete] = useState(false)
-  const [openEdit, setOpenEdit] = useState(false)
+const placeholder =
+  "https://images.adsttc.com/media/images/623c/4fa0/3e4b/3145/3000/001b/newsletter/_d_ambrosio_07._copy.jpg?1648119692";
+
+interface CardPropiedadExtendedProps extends PropiedadCardProps {
+  onClick?: () => void;
+}
+
+const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [], onClick }: CardPropiedadExtendedProps) => {
+  const deleteProp = useDeleteProperty();
+  const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
 
   const onDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
-    setOpenConfirmDelete(true)
-  }
+    e.stopPropagation();
+    e.preventDefault();
+    setOpenConfirmDelete(true);
+  };
 
   const handleConfirmDelete = async () => {
-    await deleteProp.mutateAsync(property.idPropiedad)
-  }
+    await deleteProp.mutateAsync(property.idPropiedad);
+  };
 
   const onEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
-    setOpenEdit(true)
-  }
+    e.stopPropagation();
+    e.preventDefault();
+    setOpenEdit(true);
+  };
 
   const estadoNombre = String(property.estadoPropiedad?.nombre ?? "").trim();
   const isLocked = /^(Vendido|Reservado)$/i.test(estadoNombre);
 
+  const imagenUrl = property.imagenUrl || placeholder;
+
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
-    <>
-      <Card key={property.idPropiedad} className="hover:shadow-md transition-shadow hover:cursor-default">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <CardTitle className="text-lg line-clamp-2">{property.ubicacion}</CardTitle>
-              <CardDescription className="font-mono text-xs">{property.idPropiedad}</CardDescription>
-            </div>
-            <Badge variant={estadoPropiedadVariant[property.estadoPropiedad.nombre]}>
-              {capitalize(property.estadoPropiedad.nombre)}
-            </Badge>
+    <Card
+      className="relative overflow-hidden rounded-2xl hover:shadow-md transition-shadow
+                 grid grid-cols-[180px_1fr] w-full p-0 cursor-pointer"
+      onClick={handleCardClick}
+    >
+      {property.estadoPropiedad?.nombre && (
+        <div className="absolute right-3 top-3 z-10">
+          <Badge
+            variant={estadoPropiedadVariant[property.estadoPropiedad.nombre]}
+            className="rounded-full px-2 py-0.5 text-xs"
+          >
+            {capitalize(property.estadoPropiedad.nombre)}
+          </Badge>
+        </div>
+      )}
+
+      <div className="p-3 pr-0">
+        <div className="w-full h-full">
+          <img
+            src={imagenUrl}
+            alt={property.ubicacion ?? "Propiedad"}
+            className="w-full h-full object-cover rounded-lg"
+          />
+        </div>
+      </div>
+
+      <div className="relative flex flex-col justify-between py-3 min-h-[180px] text-sm">
+        <CardHeader className="p-0">
+          <CardDescription className="text-[13px] leading-tight">
+            {property.tipoInmueble?.nombre || "—"}
+          </CardDescription>
+
+          <div className="flex items-center gap-1.5 text-md">
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="font-semibold">
+              {property.ubicacion}
+            </CardTitle>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
-
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4" /> Ubicación:
-            </div>
-
-            <span className="truncate font-semibold">{property.ubicacion}</span>
+        <CardContent className="p-0 pr-3 text-sm">
+          <div className="mt-1 flex flex-wrap items-center justify-between gap-3 text-muted-foreground">
+            {Number.isFinite(property.cantHabitaciones) && (
+              <span className="inline-flex items-center gap-1">
+                <BedDouble className="h-4 w-4" />
+                <span>{property.cantHabitaciones}</span>
+              </span>
+            )}
+            {Number.isFinite(property.cantBannios) && (
+              <span className="inline-flex items-center gap-1">
+                <Bath className="h-4 w-4" />
+                <span>{property.cantBannios}</span>
+              </span>
+            )}
+            {Number.isFinite(property.areaM2) && (
+              <span className="inline-flex items-center gap-1">
+                <Ruler className="h-4 w-4" />
+                <span>{property.areaM2.toLocaleString()} m²</span>
+              </span>
+            )}
+            {property.amueblado && (
+              <Badge variant="secondary" className="h-5 px-2 py-0 text-[11px]">
+                Amueblado
+              </Badge>
+            )}
           </div>
 
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <DollarSign className="h-4 w-4" /> Precio:
-            </div>
-            <span className="truncate font-semibold">{formatPrice(property.precio, 'CRC')}</span>
-          </div>
-
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Home className="h-4 w-4 " /> Tipo de inmueble:
-            </div>
-            <span className="truncate font-semibold">{property.tipoInmueble.nombre}</span>
-          </div>
-
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CircleUser className="h-4 w-4 text-muted-foreground" /> Propietario:
-            </div>
-            <span className="truncate font-semibold">
-              {property.cliente.nombre} {property.cliente.apellido1} {property.cliente.apellido2}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between pt-2 border-t">
-            <p className="text-sm text-muted-foreground">Acciones</p>
-            <div className="flex gap-1">
-              <Button variant="ghost" size="sm" aria-label="Editar" onClick={onEditClick} disabled={isLocked} title={isLocked ? 'No se puede editar una propiedad vendida o reservada' : undefined}>
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-destructive hover:text-destructive"
-                aria-label="Eliminar"
-                onClick={onDeleteClick}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+          <div className="mt-3 flex items-end justify-between">
+            <div className="flex justify-between w-full">
+              <CardDescription className="leading-none mb-1">Precio</CardDescription>
+              <p className="font-semibold leading-none">
+                {formatPrice(property.precio, "CRC")}
+              </p>
             </div>
           </div>
         </CardContent>
-      </Card>
 
-      {/* Modal editar */}
+        <div className="flex gap-1 justify-end pr-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label="Editar"
+            onClick={onEditClick}
+            disabled={isLocked}
+            title={isLocked ? "No se puede editar una propiedad vendida o reservada" : undefined}
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-destructive hover:text-destructive"
+            aria-label="Eliminar"
+            onClick={onDeleteClick}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
       <Can resource="propiedades" action="update">
-        {/* disable editing when property is sold or reserved */}
-        {(() => {
-          const estadoNombre = String(property.estadoPropiedad?.nombre ?? "").trim();
-          const isLocked = /^(Vendido|Reservado)$/i.test(estadoNombre);
-          return (
-            <>
-              <FormEditPropiedad
-                open={openEdit}
-                onOpenChange={setOpenEdit}
-                property={property}
-                estadosPropiedad={estadosPropiedad}
-                tiposInmueble={tiposInmueble}
-                disabled={isLocked}
-              />
-              {/* Ensure Edit button is disabled visually */}
-              {/* We can't easily access the button above here, so also disable via props on render */}
-            </>
-          );
-        })()}
+        {(() => (
+          <FormEditPropiedad
+            open={openEdit}
+            onOpenChange={setOpenEdit}
+            property={property}
+            estadosPropiedad={estadosPropiedad}
+            tiposInmueble={tiposInmueble}
+            disabled={isLocked}
+          />
+        ))()}
       </Can>
-      {/* Confirm eliminar */}
+
       <Can resource="propiedades" action="delete">
         <ConfirmDialog
           open={openConfirmDelete}
           onOpenChange={setOpenConfirmDelete}
-          title="Eliminar propiedad"
-          description={`¿Seguro que deseas eliminar la propiedad #${property.idPropiedad} en ${property.ubicacion}? Esta acción no se puede deshacer.`}
+          title="Anular propiedad"
+          description={`¿Seguro que deseas anular la propiedad #${property.idPropiedad} en ${property.ubicacion}? Esta acción no se puede deshacer.`}
           confirmText="Eliminar"
           cancelText="Cancelar"
           onConfirm={handleConfirmDelete}
           loading={deleteProp.isPending as boolean}
         />
       </Can>
-    </>
-  )
-}
+    </Card>
+  );
+};
 
-export default CardPropiedad
+export default CardPropiedad;

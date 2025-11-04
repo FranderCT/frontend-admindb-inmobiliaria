@@ -8,16 +8,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   useGetContratosMes,
   useGetContratosTipo,
+  useGetDashboardReport,
   useGetEstadisticasAgentes,
 } from "@/modules/estadisticas/hooks/statsHooks";
 import { useGetHistorialClientes } from "@/modules/estadisticas/hooks/statsHooks";
 import { useGetPropiedadesEstado } from "@/modules/estadisticas/hooks/statsHooks";
 import { BarChart3, ChartBarStacked, TrendingUp } from "lucide-react";
 import StatisticsCard from "@/components/StatisticsCard";
-import { crc, intFmt, monthIndex, monthsLabels, PALETTE } from "../utils/stats";
+import { crc, currency, intFmt, monthIndex, monthsLabels, PALETTE } from "../utils/stats";
 
 
 export default function PanelGeneral() {
+    const { dashboardReport } = useGetDashboardReport()
+
   const { estadisticasContratosMes, loadingEstadisticasContratosMes, errorEstadisticasContratosMes } = useGetContratosMes();
   const { contratosTipo, loadingContratosTipo, errorContratosTipo } = useGetContratosTipo();
   const { estadisticasAgentes, loadingEstadisticasAgentes, errorEstadisticasAgentes } = useGetEstadisticasAgentes();
@@ -81,6 +84,12 @@ export default function PanelGeneral() {
     return { kpiMesLabel, kpiContratos, kpiIngresos, kpiClientesNuevos, kpiPropActivas };
   }, [estadisticasContratosMes, estadisticasHistorialClientes, propiedadesEstado]);
 
+  const ticketPromedio = useMemo(() => {
+    const d = dashboardReport?.[0]
+    if (!d || !d.TotalContratos) return 0
+    return (d.MontoTotalContratos ?? 0) / d.TotalContratos
+  }, [dashboardReport])
+  
   const { serieContratosUltAnio, serieIngresosUltAnio, yearLabel } = useMemo(() => {
     const rows = estadisticasContratosMes ?? [];
     if (!rows.length) return { serieContratosUltAnio: [{ label: "Contratos", data: new Array(12).fill(0), color: PALETTE[2] }], serieIngresosUltAnio: [{ label: "Ingresos", data: new Array(12).fill(0), color: PALETTE[0] }], yearLabel: "—" };
@@ -162,7 +171,7 @@ export default function PanelGeneral() {
 
   return (
     <div className="grid grid-cols-1 gap-6">
-      <div className="flex gap-10">
+      <div className="flex gap-4">
 
         <StatisticsCard
           size="large"
@@ -181,7 +190,11 @@ export default function PanelGeneral() {
           icon={<TrendingUp className="h-5 w-5 text-amber-600" />}
           title={"Ingresos en el último mes"}
           value={crc(kpiIngresos)} />
-
+        <StatisticsCard
+          size="large"
+          icon={<TrendingUp className="h-5 w-5 text-amber-600" />}
+          title={"Promedio de ganancias por contrato"}
+          value={crc(ticketPromedio)} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
