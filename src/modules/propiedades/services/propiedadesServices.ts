@@ -1,14 +1,31 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { CreatePropertyStatus, CreatePropertyType, CreateProperty, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty, Propiedad } from "../models/propiedad";
+import { CreatePropertyStatus, CreatePropertyType, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty, Propiedad, CreatePropertyPayload } from "../models/propiedad";
 
 
 // post
-export const createProperty = async (property: CreateProperty): Promise<CreateProperty> => {
-  const response = await altosDelValleAPI.post<CreateProperty>(
-    `/propiedad`,
-    property
-  );
-  return response.data;
+
+const appendIf = (fd: FormData, k: string, v: unknown) => {
+  if (v !== undefined && v !== null) fd.append(k, String(v));
+};
+
+export const createProperty = async ({ property, file }: CreatePropertyPayload) => {
+  if (!file) throw new Error("La imagen es obligatoria");
+
+  const fd = new FormData();
+  appendIf(fd, "ubicacion", property.ubicacion);
+  appendIf(fd, "precio", property.precio);
+  appendIf(fd, "idEstado", property.idEstado);
+  appendIf(fd, "idTipoInmueble", property.idTipoInmueble);
+  appendIf(fd, "identificacion", property.identificacion);
+  appendIf(fd, "amueblado", property.amueblado ? 1 : 0);
+  appendIf(fd, "cantHabitaciones", property.cantHabitaciones);
+  appendIf(fd, "cantBannios", property.cantBannios);
+  appendIf(fd, "areaM2", property.areaM2);
+
+  fd.append("imagen", file);
+
+  const { data } = await altosDelValleAPI.post(`/propiedad`, fd);
+  return data;
 };
 
 export const createPropertyType = async (type: CreatePropertyType): Promise<CreatePropertyType> => {

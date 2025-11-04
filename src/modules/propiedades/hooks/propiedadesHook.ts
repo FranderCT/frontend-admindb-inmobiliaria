@@ -1,21 +1,14 @@
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { createProperty, createPropertyStatus, createPropertyType, deleteProperty, getPropertiesFiltered, getProperty, getPropertyStatuses, getPropertyTypes, updateProperty } from "../services/propiedadesServices";
-import { CreateProperty, CreatePropertyStatus, CreatePropertyType, PropertysPaginateParams, UpdateProperty,  } from "../models/propiedad";
+import {  CreatePropertyPayload, CreatePropertyStatus, CreatePropertyType, PropertysPaginateParams, UpdateProperty,  } from "../models/propiedad";
 
 export const useCreateProperty = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({
-            property,
-        }: {
-            property: CreateProperty;
-        }) => createProperty(property),
-
+        mutationFn: (payload: CreatePropertyPayload) => createProperty(payload),
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["properties"],
-            });
+            queryClient.invalidateQueries({ queryKey: ["properties"] });
         },
     });
 };

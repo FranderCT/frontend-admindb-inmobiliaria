@@ -21,6 +21,10 @@ export const initialValuesProperty: CreateProperty = {
   idEstado: 0,
   identificacion: 0,
   idTipoInmueble: 0,
+  amueblado: false,
+  cantHabitaciones: 0,
+  cantBannios: 0,
+  areaM2: 0,
 };
 
 export type UpdateProperty = {
