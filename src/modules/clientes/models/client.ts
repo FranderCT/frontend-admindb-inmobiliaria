@@ -3,7 +3,7 @@ export interface Client {
   nombre: string;
   apellido1: string;
   apellido2?: string;
-  telefono: string;
+  telefono: number;
   estado: boolean; 
 }
 
@@ -12,14 +12,14 @@ export interface CreateClient {
   nombre: string;
   apellido1: string;
   apellido2?: string;
-  telefono: string;
+  telefono: number;
 }
 export interface UpdateClient {
   identificacion: number;
   nombre: string;
   apellido1: string;
   apellido2?: string;
-  telefono: string;
+  telefono: number;
   estado: boolean;
 }
 export interface ClientesPaginateParams {

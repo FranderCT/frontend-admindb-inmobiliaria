@@ -45,12 +45,12 @@ export const getClientsFiltered = async (params: ClientesPaginateParams) => {
 
 //delete
 export const deleteClient = async (identificacion: string): Promise<{ ok: boolean }> => {
-    const response = await altosDelValleAPI.delete<{ ok: boolean }>(`cliente/${identificacion}`);
-    return response.data;
+  const response = await altosDelValleAPI.delete<{ ok: boolean }>(`cliente/${identificacion}`);
+  return response.data;
 };
 
 //put
 export const updateClient = async (data: UpdateClient): Promise<{ ok: boolean }> => {
-    const response = await altosDelValleAPI.put<{ ok: boolean }>(`cliente`, data);
-    return response.data;
+  const response = await altosDelValleAPI.put<{ ok: boolean }>(`cliente`, data);
+  return response.data;
 };

@@ -1,6 +1,7 @@
 import { ComponentProps, ReactNode } from "react"
 import { Client, CreateClient } from "../models/client"
 import { DialogPanel } from "node_modules/@headlessui/react/dist/components/dialog/dialog"
+import { n } from "node_modules/framer-motion/dist/types.d-BJcRxCew"
 
 export type ClientCardProps = { 
     client: Client
@@ -26,7 +27,7 @@ export const initialValuesClient: CreateClient = {
   nombre: "",
   apellido1: "",
   apellido2: "",
-  telefono: "",
+  telefono: 0,
 };
 
 
@@ -40,7 +41,7 @@ export type EditClienteDialogProps = {
     nombre: string;
     apellido1: string;
     apellido2: string;
-    telefono: string;
+    telefono: number;
     estado: boolean;
   };
 };
@@ -81,6 +82,6 @@ export type ClientesPaginateResponse = {
 
 export type DetalleHistorialClienteProps = {
   clienteNombre: string
-  telefono: string
+  telefono: number
   identificacion: string
 }

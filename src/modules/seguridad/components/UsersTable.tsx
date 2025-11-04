@@ -162,7 +162,7 @@ const DataTable = <TData, TValue>({
       )}
 
       <div className="w-full overflow-x-auto rounded-md border text-left max-w-screen">
-        <UiTable>
+        <UiTable className="bg-secondary">
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (
               <TableRow key={hg.id}>
@@ -175,7 +175,7 @@ const DataTable = <TData, TValue>({
             ))}
           </TableHeader>
 
-          <TableBody>
+          <TableBody className="bg-white">
             {table.getRowModel().rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="py-8 text-center text-muted-foreground">
