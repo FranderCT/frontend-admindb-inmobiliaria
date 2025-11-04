@@ -1,5 +1,5 @@
 import altosDelValleAPI from "@/api/altosdelvalle";
-import { CreatePropertyStatus, CreatePropertyType, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty, Propiedad, CreatePropertyPayload } from "../models/propiedad";
+import { CreatePropertyStatus, CreatePropertyType, PropertyType, PropertyStatus, PropertysPaginateParams, UpdateProperty, Propiedad, CreatePropertyPayload, UpdatePropertyPayload, UpdatePropertyJSON } from "../models/propiedad";
 
 
 // post
@@ -19,14 +19,13 @@ export const createProperty = async ({ property, file }: CreatePropertyPayload) 
   fd.append("cantBannios", String(property.cantBannios));
   fd.append("cantHabitaciones", String(property.cantHabitaciones));
   fd.append("areaM2", String(property.areaM2));
-  fd.append("amueblado", String(property.amueblado === true)); // "true"/"false"
+  fd.append("amueblado", String(property.amueblado === true)); 
 
-  // 👇 clave EXACTA del FileInterceptor('imagen')
   fd.append("imagen", file, file.name);
 
   const res = await altosDelValleAPI.post(`/propiedad`, fd, {
     headers: { "Content-Type": "multipart/form-data" },
-    transformRequest: [(d) => d], // evita que Axios lo convierta a JSON
+    transformRequest: [(d) => d], 
   });
   return res.data;
 };
@@ -92,7 +91,67 @@ export const deleteProperty = async (idPropiedad: number): Promise<{ ok: boolean
 
 
 // patch
-export const updateProperty = async (data: UpdateProperty): Promise<{ ok: boolean }> => {
-  const response = await altosDelValleAPI.patch<{ ok: boolean }>(`propiedad/${data.idPropiedad}`, data);
-  return response.data;
+
+export async function updateProperty(
+  input: UpdatePropertyPayload | UpdatePropertyJSON
+): Promise<{ ok: boolean }> {
+  // Normaliza a { prop, file }
+  let prop: UpdatePropertyJSON | undefined;
+  let file: File | undefined;
+
+  if (hasProp(input)) {
+    prop = input.prop;
+    file = input.file;
+  } else if (hasIdPropiedad(input)) {
+    prop = input;
+  } else {
+    throw new Error(
+      "updateProperty: input inválido. Esperaba { prop: { idPropiedad, ... }, file? } o { idPropiedad, ... }."
+    );
+  }
+
+  if (!prop || typeof prop.idPropiedad !== "number") {
+    throw new Error(
+      "updateProperty: falta idPropiedad en el objeto a actualizar."
+    );
+  }
+
+  const { idPropiedad, ...rest } = prop;
+
+  // Si hay archivo => multipart con sólo los campos definidos
+  if (file instanceof File) {
+    const fd = new FormData();
+    Object.entries(rest).forEach(([k, v]) => appendIfDefined(fd, k, v));
+    fd.append("imagen", file, file.name);
+
+    const res = await altosDelValleAPI.patch<{ ok: boolean }>(
+      `/propiedad/${idPropiedad}`,
+      fd,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+        transformRequest: [(d) => d],
+      }
+    );
+    return res.data;
+  }
+
+  // Sin archivo => JSON con los campos definidos
+  const res = await altosDelValleAPI.patch<{ ok: boolean }>(
+    `/propiedad/${idPropiedad}`,
+    rest
+  );
+  return res.data;
 }
+
+const hasProp = (x: any): x is UpdatePropertyPayload =>
+  x && typeof x === "object" && "prop" in x;
+
+const hasIdPropiedad = (x: any): x is UpdatePropertyJSON =>
+  x && typeof x === "object" && "idPropiedad" in x;
+
+// ----- Helper
+const appendIfDefined = (fd: FormData, key: string, val: unknown) => {
+  if (val === undefined || val === null) return;
+  if (typeof val === "boolean") fd.append(key, val ? "true" : "false");
+  else fd.append(key, String(val));
+};

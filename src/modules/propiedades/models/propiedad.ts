@@ -68,10 +68,20 @@ export type PropertysPaginateParams = {
   tipoInmuebleId?: number;
 };
 
-export interface UpdateProperty{
-  idPropiedad: number,
-  ubicacion?: string,
-  precio?: number,
-  idEstado?: number,
-  idTipoInmueble?: number,
-}
+export type UpdatePropertyJSON = {
+  idPropiedad: number;
+  ubicacion?: string;
+  precio?: number | string;
+  idEstado?: number;
+  idTipoInmueble?: number;
+  identificacion?: number;
+  amueblado?: boolean;
+  cantHabitaciones?: number;
+  cantBannios?: number;
+  areaM2?: number;
+};
+
+export type UpdatePropertyPayload = {
+  prop: UpdatePropertyJSON;
+  file?: File;
+};

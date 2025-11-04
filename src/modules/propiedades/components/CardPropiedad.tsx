@@ -164,19 +164,6 @@ const CardPropiedad = ({ property, estadosPropiedad = [], tiposInmueble = [], on
           />
         ))()}
       </Can>
-
-      <Can resource="propiedades" action="delete">
-        <ConfirmDialog
-          open={openConfirmDelete}
-          onOpenChange={setOpenConfirmDelete}
-          title="Anular propiedad"
-          description={`¿Seguro que deseas anular la propiedad #${property.idPropiedad} en ${property.ubicacion}? Esta acción no se puede deshacer.`}
-          confirmText="Eliminar"
-          cancelText="Cancelar"
-          onConfirm={handleConfirmDelete}
-          loading={deleteProp.isPending as boolean}
-        />
-      </Can>
     </Card>
   );
 };
