@@ -40,7 +40,7 @@ const PanelChrome: React.FC<{ children: React.ReactNode; onClose: () => void }> 
     <motion.div
       className={`
         fixed inset-y-0 right-0 ${WIDTH}
-        bg-background/95 backdrop-blur-md
+        bg-white backdrop-blur-md
         border-l shadow-[0_8px_32px_rgba(0,0,0,0.08)]
         
         z-[70] flex flex-col overflow-hidden
