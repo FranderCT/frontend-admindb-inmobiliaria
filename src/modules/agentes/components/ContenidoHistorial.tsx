@@ -77,7 +77,10 @@ function ContenidoHistorial({
                       <p>Monto total: ₡{Number(c.montoTotal ?? 0).toLocaleString()}
                       {c.tipoContrato === 'Alquiler' ? ' · Depósito: ₡' + Number(c.deposito ?? 0).toLocaleString()
                         : ''}</p>
-                       <p>Comisión: {c.porcentajeComision}%</p>
+                      <p>Porcentaje de Comisión: {c.porcentajeComision}%</p>
+                      <p>Monto de comisión: ₡{Number(c.montoComision ?? 0).toLocaleString()}</p>
+
+
                     </div>
                   </div>
                 ))}

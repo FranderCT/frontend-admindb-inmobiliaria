@@ -10,12 +10,14 @@ export interface InvoiceItem {
   periodo: { inicio: string; fin: string };
   agente: string;
   comisionPct: number;
+  montoComisionAgente?: number;
   fechaEmision: string; // ISO
   fechaPago: string;    // ISO o "" si no aplica
   contratoId: number;
   montoTotal: number;
   estado: InvoiceStatus;
   porcentajeIva: number;
+  montoIva?: number;
 
   // String original que puede venir de la API
   clientes: string;

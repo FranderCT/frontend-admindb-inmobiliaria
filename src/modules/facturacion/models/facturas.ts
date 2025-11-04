@@ -14,6 +14,7 @@ export function mapFacturaApiToInvoice(api: any): InvoiceItem {
     periodo: { inicio: api.fechaEmision ?? null, fin: api.fechaEmision ?? null },
     agente: api.nombreAgente ?? "",
     comisionPct: Number(api.porcentajeComision ?? 0),
+    montoComisionAgente: api.montoComisionAgente ? Number(api.montoComisionAgente) : undefined,
     fechaEmision: api.fechaEmision ?? null,
     fechaPago: api.fechaPago ?? null,
     contratoId: api.idContrato,
@@ -24,6 +25,7 @@ export function mapFacturaApiToInvoice(api: any): InvoiceItem {
     clienteNombre: parsed?.name ?? undefined,
     rolCliente: parsed?.rol ?? undefined,
     porcentajeIva: Number(api.porcentajeIva ?? 0),
+    montoIva: api.montoIva ? Number(api.montoIva) : undefined,
   };
 }
 

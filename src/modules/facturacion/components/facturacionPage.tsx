@@ -1,4 +1,4 @@
-import { Plus, FileText, CreditCard, User, Percent, Calendar, X, Building2 } from "lucide-react";
+import { Plus, FileText, CreditCard, User, Percent, Calendar, X, Building2, DollarSign } from "lucide-react";
 import { InvoiceStatus } from "../types/facturasType";
 import { useInvoices } from "../hooks/facturasHooks";
 import { deriveClienteInfo, formatDate, formatMoney } from "../models/facturas";
@@ -154,6 +154,15 @@ export default function FacturacionPage() {
                   </li>
 
                   <li className="flex items-center gap-2">
+                    <span className="text-lg font-semibold text-black-600">₡</span>
+                    <span>
+                      <span className="text-gray-500"> Monto de Comisión del Agente:</span>{' '}
+                      ₡{Number(f.montoComisionAgente ?? 0).toLocaleString()}
+                    </span>
+                  </li>
+
+
+                  <li className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     <span><span className="text-gray-500">Emitida:</span> {formatDate(f.fechaEmision)}</span>
                   </li>
@@ -178,6 +187,16 @@ export default function FacturacionPage() {
                     <Percent className="w-4 h-4" />
                     <span><span className="text-gray-500"> IVA:</span> {f.porcentajeIva}%</span>
                   </li>
+
+                   <li className="flex items-center gap-2">
+                    <span className="text-lg font-semibold text-black-600">₡</span>
+                    <span>
+                      <span className="text-gray-500"> Monto de IVA:</span>{' '}
+                      ₡{Number(f.montoIva ?? 0).toLocaleString()}
+                    </span>
+                  </li>
+
+
 
                   
                 </ul>
