@@ -497,7 +497,7 @@ const FormCrearPropiedad = () => {
               {formError && <p className="text-red-700 text-sm text-center">{formError}</p>}
             </div>
 
-            <DialogFooter className="bottom-0 left-0 right-0 bg-background border-t mt-3 pt-3">
+            <DialogFooter className="bottom-0 left-0 right-0 border-t mt-3 pt-3">
               <Button type="submit">{create.isPending ? "Guardando..." : "Guardar"}</Button>
 
               <DialogClose>
