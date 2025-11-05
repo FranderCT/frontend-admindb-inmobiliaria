@@ -1,8 +1,8 @@
 export interface vistaDashboard {
     TotalContratos: number;
-    TotalPropiedades: number;
+    PropiedadesDisponibles: number;
     TotalAgentes: number;
-    TotalClientes: number;
+    ClientesActivos: number;
     MontoTotalContratos: number;
     TotalComisiones: number;
 }

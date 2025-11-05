@@ -74,8 +74,8 @@ function RouteComponent() {
               <>
                 <StatisticsCard size='small'
                   icon={<LandPlot className="h-5 w-5 text-green-600" />}
-                  title="Propiedades registradas"
-                  value={dashboardReport[0]?.TotalPropiedades || 0}
+                  title="Propiedades disponibles"
+                  value={dashboardReport[0]?.PropiedadesDisponibles || 0}
                 />
 
                 <StatisticsCard
@@ -99,8 +99,8 @@ function RouteComponent() {
                 <StatisticsCard
                   size='small'
                   icon={<Users className="h-5 w-5 text-blue-600" />}
-                  title="Clientes en el sistema"
-                  value={dashboardReport[0]?.TotalClientes || 0}
+                  title="Clientes activos"
+                  value={dashboardReport[0]?.ClientesActivos || 0}
                 />
               </>
             )}
