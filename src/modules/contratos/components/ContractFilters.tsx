@@ -67,7 +67,7 @@ const ContratosFiltros = () => {
           </SheetHeader>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-5">
+        <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-700 scrollbar-track-gray-100">
           <div className="grid gap-2">
             <label className="text-sm font-medium">Buscar</label>
             <Input

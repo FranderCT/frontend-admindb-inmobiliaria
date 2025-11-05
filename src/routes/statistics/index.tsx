@@ -30,7 +30,7 @@ function RouteComponent() {
           <TabsTab value="general">General</TabsTab>
           <TabsTab value="financiero">Financiero</TabsTab>
           <TabsTab value="contratos">Contratos</TabsTab>
-          <TabsTab value="operaciones">Operaciones</TabsTab>
+          <TabsTab value="operaciones">Agentes</TabsTab>
           <TabsTab value="propiedades">Propiedades</TabsTab>
           <TabsTab value="clientes">Clientes</TabsTab>
         </TabsList>
