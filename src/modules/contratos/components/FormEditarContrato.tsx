@@ -19,13 +19,7 @@ import { EditContractProps } from "../types/contractTypes";
 import { addMonthsISO } from "../utils/date";
 import { clamp } from "framer-motion";
 import { clampMoney, MAX_MONEY, MAX_PERCENT } from "../schema/contractValidators";
-
-const toTextBlock = (arr?: { textoCondicion: string }[] | string[]) =>
-  Array.isArray(arr)
-    ? (typeof arr[0] === "string"
-      ? (arr as string[]).join("\n")
-      : (arr as { textoCondicion: string }[]).map(c => c.textoCondicion).join("\n"))
-    : "";
+import { toTextBlock } from "../utils/contrtact";
 
 const toDateInput = (v?: string | null): string => {
   if (!v) return "";

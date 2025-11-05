@@ -37,6 +37,7 @@ import {
 import Stepper, { StepDef } from "@/modules/app/components/Stepper";
 import { datosVentaSchema, datosAlquilerSchema, mapIssuesByField, prettyIssue, MAX_MONEY, MAX_PERCENT, clampMoney } from "../schema/contractValidators";
 import { addMonthsISO } from "../utils/date";
+import { toTextBlock } from "../utils/contrtact";
 
 
 type WizardStep = "tipo" | "datos" | "condiciones" | "assign";
@@ -50,7 +51,10 @@ const steps: StepDef[] = [
 
 const hoyISO = () => new Date().toISOString().slice(0, 10);
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
-
+const condicionesArray = (value.condicionesTexto ?? "")
+  .split("\n")
+  .map(t => t.trim())
+  .filter(Boolean);
 
 export default function FormCrearContrato() {
   const [open, setOpen] = useState(false);
@@ -106,7 +110,7 @@ export default function FormCrearContrato() {
       montoTotal: 0 as number,
       deposito: 0 as number,
       porcentajeComision: 0 as number,
-      condicionesTexto: "" as string,
+      condicionesTexto: toTextBlock([]),
       cantidadPagos: 12 as number,
     },
     onSubmit: async ({ value }) => {
@@ -125,9 +129,7 @@ export default function FormCrearContrato() {
           deposito: Number(value.deposito),
           porcentajeComision: Number(value.porcentajeComision),
           estado: null,
-          condiciones: value.condicionesTexto
-            ? value.condicionesTexto.split("\n").map((t) => t.trim()).filter(Boolean)
-            : [],
+          condiciones: condicionesArray, 
         };
 
         const payload: CreateContract = pruneUndefined({
