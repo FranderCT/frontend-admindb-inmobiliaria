@@ -1,7 +1,9 @@
 export type InvoiceStatus = "Pendiente" | "Pagada";
 export type RolCliente = "Inquilino" | "Arrendatario" | "Comprador" | "Vendedor";
+export type SortCol = 'idFactura' | 'montoPagado' | 'estadoPago';
+export type SortDir = 'ASC' | 'DESC';
 
-// Lo que la UI consume para cada tarjeta de factura
+
 export interface InvoiceItem {
   id: number;
   tipo: "Venta" | "Alquiler";
@@ -11,25 +13,23 @@ export interface InvoiceItem {
   agente: string;
   comisionPct: number;
   montoComisionAgente?: number;
-  fechaEmision: string; // ISO
-  fechaPago: string;    // ISO o "" si no aplica
+  fechaEmision: string; 
+  fechaPago: string;    
   contratoId: number;
   montoTotal: number;
   estado: InvoiceStatus;
   porcentajeIva: number;
   montoIva?: number;
 
-  // String original que puede venir de la API
+
   clientes: string;
 
-  // ↓ NUEVOS opcionales para mostrar el cliente principal igual que en el back
+ 
   clienteId?: string;
   clienteNombre?: string;
   rolCliente?: RolCliente;
 }
 
-// Filtros enviados al backend
-// Mantener como texto porque el back compara NVARCHAR/LIKE
 export interface InvoiceFilters {
   estado: "Todos" | InvoiceStatus;
   idContrato?: string; // texto
@@ -37,8 +37,22 @@ export interface InvoiceFilters {
   fecha?: string;      // YYYY-MM-DD
 }
 
-// Formulario para crear factura (modal)
+
 export interface CreateInvoiceForm {
-  idContrato: number | "";   // ← permite número (o "" cuando el input está vacío)
+  idContrato: number | "";   
   porcentajeIVA: number;
+}
+export interface PaginationParams {
+  page: number;
+  limit: number;
+  sortCol?: SortCol;
+  sortDir?: SortDir;
+  q?: string;
+}
+
+export interface PaginatedInvoices {
+  items: InvoiceItem[];
+  total: number;
+  page: number;
+  limit: number;
 }

@@ -44,7 +44,7 @@ const CardPreviewContrato = ({ contract }: CardContractProps) => {
           <span className="font-medium leading-none">{contract.idPropiedad}</span>
         </div>
 
-        <div className="flex items-center justify-between text-sm ml-10">
+        <div className="flex items-center justify-between text-sm">
           <div className="text-muted-foreground flex gap-2 items-center">
             <MapPin className="h-4 w-4" /> Ubicación:
           </div>

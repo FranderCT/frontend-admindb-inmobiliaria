@@ -1,4 +1,5 @@
-import { Plus, FileText, CreditCard, User, Percent, Calendar, X, Building2, DollarSign } from "lucide-react";
+import { Plus, FileText, CreditCard, User, Percent, Calendar, X, Building2, Filter } from "lucide-react";
+import { useState } from "react";
 import { InvoiceStatus } from "../types/facturasType";
 import { useInvoices } from "../hooks/facturasHooks";
 import { deriveClienteInfo, formatDate, formatMoney } from "../models/facturas";
@@ -15,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-
 function StatusPill({ estado }: { estado: InvoiceStatus }) {
   const styles: Record<InvoiceStatus, string> = {
     Pendiente: "bg-[#BEBC58] text-white",
@@ -26,66 +26,41 @@ function StatusPill({ estado }: { estado: InvoiceStatus }) {
 
 export default function FacturacionPage() {
   const {
+    // datos y estado
     data, loading, error,
+
+    // filtros
     setEstado, setContratoIdText, setClienteIdText, setFecha,
-    open, setOpen, form, setForm, save, pagar,  availableContracts, 
+
+    // modal crear
+    open, setOpen, form, setForm, save, pagar, availableContracts,
+
+    // paginación
+    page, setPage, limit, changeLimit, totalPages, nextPage, prevPage, total, // ← NUEVO: total desde el hook
   } = useInvoices();
 
-  return (
+  const [showFilters, setShowFilters] = useState(false);
 
+  return (
     <div className="m-4">
       <header className="flex items-center justify-between mb-4 ml-16">
         <h1 className="text-4xl font-bold">Facturas</h1>
       </header>
 
       <nav className="flex flex-wrap gap-4 justify-between mb-4 ml-16">
-        {/* Filtros */}
-        <div className="flex gap-3 mb-2">
-          <Select
-            onValueChange={(v) => setEstado(v as "Todos" | InvoiceStatus)}
-            defaultValue="Todos"
-          >
-            <SelectTrigger className="border rounded-md px-3 py-2 bg-white shadow-sm">
-              <SelectValue placeholder="Estado" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Todos">Todos</SelectItem>
-              <SelectItem value="Pendiente">Pendiente</SelectItem>
-              <SelectItem value="Pagada">Pagada</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Input
-            placeholder="ID del contrato"
-            className="border rounded-md px-3 py-2 shadow-sm"
-            inputMode="numeric"
-            onChange={(e) => setContratoIdText(e.target.value)}
-          />
-
-          <Input
-            placeholder="Identificación del cliente"
-            className="border rounded-md px-3 py-2 shadow-sm"
-            inputMode="numeric"
-            onChange={(e) => setClienteIdText(e.target.value)}
-          />
-
-          <Input
-            type="date"
-            className="border rounded-md px-3 py-2 shadow-sm"
-            onChange={(e) => setFecha(e.target.value)}
-          />
-        </div>
-
-        <Can resource="facturas" action="create">
-          <Button variant="default"
-            onClick={() => setOpen(true)}
-          >
-            <Plus className="w-5 h-5" /> Registrar factura
+        <div></div>
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={() => setShowFilters(true)}>
+            <Filter className="w-4 h-4 mr-1" /> Filtros
           </Button>
-        </Can>
+
+          <Can resource="facturas" action="create">
+            <Button variant="default" onClick={() => setOpen(true)}>
+              <Plus className="w-5 h-5" /> Registrar factura
+            </Button>
+          </Can>
+        </div>
       </nav>
-
-
 
       {error && (
         <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
@@ -96,7 +71,6 @@ export default function FacturacionPage() {
       {/* Grid */}
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {loading ? (
-
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((k) => (
               <Card key={k} className="h-[300px] w-70">
@@ -130,75 +104,50 @@ export default function FacturacionPage() {
                     Tipo de contrato:
                     <span>{f.tipo}</span>
                   </li>
-
                   <li className="flex items-center gap-2">
                     <CreditCard className="w-4 h-4" />
                     <span><span className="text-gray-500">ID Propiedad:</span> {f.propiedadId}</span>
                   </li>
-
                   <li className="flex items-center gap-2">
                     <Building2 className="w-4 h-4" />
-                    <span>
-                      <span className="text-gray-500">Ubicación de la propiedad:</span> {f.ubicacion}
-                    </span>
+                    <span><span className="text-gray-500">Ubicación de la propiedad:</span> {f.ubicacion}</span>
                   </li>
-
                   <li className="flex items-center gap-2">
                     <User className="w-4 h-4" />
                     <span><span className="text-gray-500">Agente:</span> {f.agente}</span>
                   </li>
-
                   <li className="flex items-center gap-2">
                     <Percent className="w-4 h-4" />
-                    <span><span className="text-gray-500"> Comisión del Agente:</span> {f.comisionPct}%</span>
+                    <span><span className="text-gray-500">Comisión del Agente:</span> {f.comisionPct}%</span>
                   </li>
-
                   <li className="flex items-center gap-2">
                     <span className="text-lg font-semibold text-black-600">₡</span>
-                    <span>
-                      <span className="text-gray-500"> Monto de Comisión del Agente:</span>{' '}
-                      ₡{Number(f.montoComisionAgente ?? 0).toLocaleString()}
-                    </span>
+                    <span><span className="text-gray-500">Monto de Comisión del Agente:</span> ₡{Number(f.montoComisionAgente ?? 0).toLocaleString()}</span>
                   </li>
-
-
                   <li className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     <span><span className="text-gray-500">Emitida:</span> {formatDate(f.fechaEmision)}</span>
                   </li>
-
                   <li className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     <span><span className="text-gray-500">Fecha de pago:</span> {formatDate(f.fechaPago)}</span>
                   </li>
-
                   <li className="flex items-center gap-2">
                     <FileText className="w-4 h-4" />
                     <span><span className="text-gray-500">ID contrato:</span> {f.contratoId}</span>
                   </li>
-
                   <li className="flex items-center gap-2">
                     <User className="w-4 h-4" />
-                    {/* ↓ Único cambio visual: mostramos el texto igual que back */}
                     <span><span className="text-gray-500">Cliente:</span> {cliente.text}</span>
                   </li>
-
                   <li className="flex items-center gap-2">
                     <Percent className="w-4 h-4" />
-                    <span><span className="text-gray-500"> IVA:</span> {f.porcentajeIva}%</span>
+                    <span><span className="text-gray-500">IVA:</span> {f.porcentajeIva}%</span>
                   </li>
-
-                   <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-2">
                     <span className="text-lg font-semibold text-black-600">₡</span>
-                    <span>
-                      <span className="text-gray-500"> Monto de IVA:</span>{' '}
-                      ₡{Number(f.montoIva ?? 0).toLocaleString()}
-                    </span>
+                    <span><span className="text-gray-500">Monto de IVA:</span> ₡{Number(f.montoIva ?? 0).toLocaleString()}</span>
                   </li>
-
-
-
-                  
                 </ul>
 
                 <div className="mt-4 flex items-center justify-between">
@@ -222,7 +171,95 @@ export default function FacturacionPage() {
         )}
       </div>
 
-      {/* Modal: ID Contrato + IVA */}
+      {/* --- Paginación (nuevo layout) --- */}
+      <div className="mt-6 flex items-center justify-between ml-16">
+        <p className="text-sm text-gray-600">
+          Página {Math.min(page, Math.max(1, totalPages))} de {Math.max(1, totalPages)} · {total} {total === 1 ? "resultado" : "resultados"}
+        </p>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={prevPage} disabled={page <= 1}>Anterior</Button>
+          <Button variant="outline" onClick={nextPage} disabled={page >= totalPages}>Siguiente</Button>
+        </div>
+      </div>
+
+      {/* --- PANEL LATERAL DE FILTROS --- */}
+      {showFilters && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowFilters(false)} />
+          <div className="relative bg-white w-full max-w-sm h-full shadow-xl border-l rounded-l-2xl animate-slide-in p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Filtros avanzados</h2>
+              <button onClick={() => setShowFilters(false)} className="p-1 rounded hover:bg-gray-100">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <label className="flex flex-col gap-1">
+                <span className="text-sm text-gray-600">Estado</span>
+                <Select onValueChange={(v) => setEstado(v as "Todos" | InvoiceStatus)} defaultValue="Todos">
+                  <SelectTrigger className="border rounded-md px-3 py-2 bg-white">
+                    <SelectValue placeholder="Estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Todos">Todos</SelectItem>
+                    <SelectItem value="Pendiente">Pendiente</SelectItem>
+                    <SelectItem value="Pagada">Pagada</SelectItem>
+                  </SelectContent>
+                </Select>
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm text-gray-600">ID del contrato</span>
+                <Input
+                  placeholder="ID del contrato"
+                  inputMode="numeric"
+                  className="border rounded-md px-3 py-2 shadow-sm"
+                  onChange={(e) => setContratoIdText(e.target.value)}
+                />
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm text-gray-600">Identificación del cliente</span>
+                <Input
+                  placeholder="Identificación del cliente"
+                  inputMode="numeric"
+                  className="border rounded-md px-3 py-2 shadow-sm"
+                  onChange={(e) => setClienteIdText(e.target.value)}
+                />
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm text-gray-600">Fecha</span>
+                <Input
+                  type="date"
+                  className="border rounded-md px-3 py-2 shadow-sm"
+                  onChange={(e) => setFecha(e.target.value)}
+                />
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm text-gray-600">Registros por página</span>
+                <Input
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={limit}
+                  onChange={(e) => changeLimit(Number(e.target.value))}
+                  className="border rounded-md px-3 py-2 shadow-sm w-24"
+                  placeholder="Límite"
+                />
+              </label>
+
+              <div className="flex justify-end mt-6">
+                <Button onClick={() => setShowFilters(false)}>Aplicar filtros</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- Modal crear factura (sin cambios) --- */}
       {open && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
@@ -237,28 +274,27 @@ export default function FacturacionPage() {
 
               <div className="px-6 py-5 space-y-4">
                 <label className="flex flex-col gap-1">
-                    <span className="text-sm text-gray-600">Selecciona el contrato que desees registrar</span>
-                    <Select
-                      value={form.idContrato === "" ? "" : String(form.idContrato)}
-                      onValueChange={(v) => setForm((s) => ({ ...s, idContrato: Number(v) }))}
-                    >
-                      <SelectTrigger className="border rounded-md px-3 py-2 bg-white">
-                        <SelectValue placeholder="Selecciona un contrato" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableContracts.length === 0 ? (
-                          <SelectItem value="none" disabled>No hay contratos disponibles</SelectItem>
-                        ) : (
-                          availableContracts.map((c) => (
-                            <SelectItem key={c.idContrato} value={String(c.idContrato)}>
-                              #{c.idContrato} — {c.tipoContrato}
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </label>
-
+                  <span className="text-sm text-gray-600">Selecciona el contrato</span>
+                  <Select
+                    value={form.idContrato === "" ? "" : String(form.idContrato)}
+                    onValueChange={(v) => setForm((s) => ({ ...s, idContrato: Number(v) }))}
+                  >
+                    <SelectTrigger className="border rounded-md px-3 py-2 bg-white">
+                      <SelectValue placeholder="Selecciona un contrato" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableContracts.length === 0 ? (
+                        <SelectItem value="none" disabled>No hay contratos disponibles</SelectItem>
+                      ) : (
+                        availableContracts.map((c) => (
+                          <SelectItem key={c.idContrato} value={String(c.idContrato)}>
+                            #{c.idContrato} — {c.tipoContrato}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </label>
 
                 <label className="flex flex-col gap-1">
                   <span className="text-sm text-gray-600">IVA (%)</span>
@@ -273,12 +309,8 @@ export default function FacturacionPage() {
               </div>
 
               <div className="px-6 pb-6 flex justify-end gap-3">
-                <Button onClick={save}>
-                  Guardar
-                </Button>
-                <Button variant="outline" onClick={() => setOpen(false)}>
-                  Cancelar
-                </Button>
+                <Button onClick={save}>Guardar</Button>
+                <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
               </div>
             </div>
           </div>
